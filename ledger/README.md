@@ -36,6 +36,13 @@ wails3 task build EXTRA_TAGS=gtk3        # bin em ./bin/ledger
 
 Em distros com GTK ≥ 4.10 o build padrão `wails3 build` funciona sem a tag.
 
+Se o `ld` do linuxbrew sombrear o do sistema e o link falhar (undefined references
+a `xcb_*`/`gcry_*`), rode o build sem o linuxbrew no PATH:
+
+```bash
+env PATH=$(echo $PATH | tr ':' '\n' | grep -v linuxbrew | paste -sd:) wails3 task build EXTRA_TAGS=gtk3
+```
+
 ## Como o preço é calculado
 
 Regras herdadas do `calc3d`, adaptadas para multi-filamento:

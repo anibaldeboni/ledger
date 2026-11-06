@@ -9,7 +9,7 @@
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
-import { Call as $Call, CancellablePromise as $CancellablePromise, Create as $Create } from "@wailsio/runtime";
+import { Call as $Call, CancellablePromise as $CancellablePromise } from "@wailsio/runtime";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
@@ -19,9 +19,7 @@ import * as domain$0 from "./internal/domain/models.js";
  * CalculateQuote calcula o orçamento sem salvá-lo (botão Calcular do formulário).
  */
 export function CalculateQuote(q: domain$0.Quote): $CancellablePromise<domain$0.Costs> {
-    return $Call.ByID(4227971064, q).then(($result: any) => {
-        return $$createType0($result);
-    });
+    return $Call.ByID(4227971064, q);
 }
 
 export function DeleteCostCategory(id: number): $CancellablePromise<void> {
@@ -45,9 +43,7 @@ export function DeleteTariff(id: number): $CancellablePromise<void> {
 }
 
 export function GetQuote(id: number): $CancellablePromise<domain$0.Quote> {
-    return $Call.ByID(1944333232, id).then(($result: any) => {
-        return $$createType1($result);
-    });
+    return $Call.ByID(1944333232, id);
 }
 
 export function GetSpoolmanURL(): $CancellablePromise<string> {
@@ -62,64 +58,44 @@ export function ImportSpoolman(): $CancellablePromise<number> {
     return $Call.ByID(2966826340);
 }
 
-export function ListCostCategories(): $CancellablePromise<domain$0.CostCategory[]> {
-    return $Call.ByID(427601101).then(($result: any) => {
-        return $$createType3($result);
-    });
+export function ListCostCategories(): $CancellablePromise<domain$0.CostCategory[] | null> {
+    return $Call.ByID(427601101);
 }
 
-export function ListFilaments(): $CancellablePromise<domain$0.Filament[]> {
-    return $Call.ByID(3356466563).then(($result: any) => {
-        return $$createType5($result);
-    });
+export function ListFilaments(): $CancellablePromise<domain$0.Filament[] | null> {
+    return $Call.ByID(3356466563);
 }
 
-export function ListPrinters(): $CancellablePromise<domain$0.Printer[]> {
-    return $Call.ByID(504919053).then(($result: any) => {
-        return $$createType7($result);
-    });
+export function ListPrinters(): $CancellablePromise<domain$0.Printer[] | null> {
+    return $Call.ByID(504919053);
 }
 
-export function ListQuotes(): $CancellablePromise<domain$0.QuoteSummary[]> {
-    return $Call.ByID(570138357).then(($result: any) => {
-        return $$createType9($result);
-    });
+export function ListQuotes(): $CancellablePromise<domain$0.QuoteSummary[] | null> {
+    return $Call.ByID(570138357);
 }
 
-export function ListTariffs(): $CancellablePromise<domain$0.Tariff[]> {
-    return $Call.ByID(1260516471).then(($result: any) => {
-        return $$createType11($result);
-    });
+export function ListTariffs(): $CancellablePromise<domain$0.Tariff[] | null> {
+    return $Call.ByID(1260516471);
 }
 
 export function SaveCostCategory(c: domain$0.CostCategory): $CancellablePromise<domain$0.CostCategory> {
-    return $Call.ByID(1353452496, c).then(($result: any) => {
-        return $$createType2($result);
-    });
+    return $Call.ByID(1353452496, c);
 }
 
 export function SaveFilament(f: domain$0.Filament): $CancellablePromise<domain$0.Filament> {
-    return $Call.ByID(2333632595, f).then(($result: any) => {
-        return $$createType4($result);
-    });
+    return $Call.ByID(2333632595, f);
 }
 
 export function SavePrinter(p: domain$0.Printer): $CancellablePromise<domain$0.Printer> {
-    return $Call.ByID(1997871711, p).then(($result: any) => {
-        return $$createType6($result);
-    });
+    return $Call.ByID(1997871711, p);
 }
 
 export function SaveQuote(q: domain$0.Quote): $CancellablePromise<domain$0.Quote> {
-    return $Call.ByID(338868535, q).then(($result: any) => {
-        return $$createType1($result);
-    });
+    return $Call.ByID(338868535, q);
 }
 
 export function SaveTariff(t: domain$0.Tariff): $CancellablePromise<domain$0.Tariff> {
-    return $Call.ByID(564528823, t).then(($result: any) => {
-        return $$createType10($result);
-    });
+    return $Call.ByID(564528823, t);
 }
 
 export function SetSpoolmanURL(url: string): $CancellablePromise<void> {
@@ -132,17 +108,3 @@ export function SetSpoolmanURL(url: string): $CancellablePromise<void> {
 export function TestSpoolman(): $CancellablePromise<void> {
     return $Call.ByID(1774702293);
 }
-
-// Private type creation functions
-const $$createType0 = domain$0.Costs.createFrom;
-const $$createType1 = domain$0.Quote.createFrom;
-const $$createType2 = domain$0.CostCategory.createFrom;
-const $$createType3 = $Create.Array($$createType2);
-const $$createType4 = domain$0.Filament.createFrom;
-const $$createType5 = $Create.Array($$createType4);
-const $$createType6 = domain$0.Printer.createFrom;
-const $$createType7 = $Create.Array($$createType6);
-const $$createType8 = domain$0.QuoteSummary.createFrom;
-const $$createType9 = $Create.Array($$createType8);
-const $$createType10 = domain$0.Tariff.createFrom;
-const $$createType11 = $Create.Array($$createType10);

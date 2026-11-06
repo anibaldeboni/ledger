@@ -1,11 +1,6 @@
+
 import { useState } from "react";
 import { LedgerService } from "../../bindings/ledger";
-import {
-  CostCategory,
-  Filament,
-  Printer,
-  Tariff,
-} from "../../bindings/ledger/internal/domain/models";
 import { brl, parseNum } from "../lib/format";
 import { useActionError, useAsync } from "../lib/hooks";
 
@@ -52,16 +47,14 @@ function PrintersSection() {
   async function save() {
     clearErr();
     try {
-      await LedgerService.SavePrinter(
-        new Printer({
-          id: form.id,
-          name: form.name.trim(),
-          purchasePrice: parseNum(form.purchase) ?? 0,
-          resalePrice: parseNum(form.resale) ?? 0,
-          lifespanHours: parseNum(form.lifespan) ?? 0,
-          powerWatts: parseNum(form.watts) ?? 0,
-        }),
-      );
+      await LedgerService.SavePrinter({
+        id: form.id,
+        name: form.name.trim(),
+        purchasePrice: parseNum(form.purchase) ?? 0,
+        resalePrice: parseNum(form.resale) ?? 0,
+        lifespanHours: parseNum(form.lifespan) ?? 0,
+        powerWatts: parseNum(form.watts) ?? 0,
+      });
       setForm({ id: 0, name: "", purchase: "", resale: "", lifespan: "", watts: "" });
       list.reload();
     } catch (e) {
@@ -170,9 +163,11 @@ function TariffsSection() {
   async function save() {
     clearErr();
     try {
-      await LedgerService.SaveTariff(
-        new Tariff({ id: form.id, name: form.name.trim(), kwhPrice: parseNum(form.kwh) ?? 0 }),
-      );
+      await LedgerService.SaveTariff({
+        id: form.id,
+        name: form.name.trim(),
+        kwhPrice: parseNum(form.kwh) ?? 0,
+      });
       setForm({ id: 0, name: "", kwh: "" });
       list.reload();
     } catch (e) {
@@ -250,16 +245,15 @@ function FilamentsSection() {
   async function save() {
     clearErr();
     try {
-      await LedgerService.SaveFilament(
-        new Filament({
-          id: form.id,
-          name: form.name.trim(),
-          material: form.material.trim(),
-          color: form.color,
-          pricePerKg: parseNum(form.price) ?? 0,
-          source: "manual",
-        }),
-      );
+      await LedgerService.SaveFilament({
+        id: form.id,
+        name: form.name.trim(),
+        material: form.material.trim(),
+        color: form.color,
+        pricePerKg: parseNum(form.price) ?? 0,
+        source: "manual",
+        spoolmanId: null,
+      });
       setForm({ id: 0, name: "", material: "", color: "#8b93a9", price: "" });
       list.reload();
     } catch (e) {
@@ -436,9 +430,11 @@ function CostCategoriesSection() {
   async function save() {
     clearErr();
     try {
-      await LedgerService.SaveCostCategory(
-        new CostCategory({ id: form.id, name: form.name.trim(), defaultValue: parseNum(form.value) ?? 0 }),
-      );
+      await LedgerService.SaveCostCategory({
+        id: form.id,
+        name: form.name.trim(),
+        defaultValue: parseNum(form.value) ?? 0,
+      });
       setForm({ id: 0, name: "", value: "" });
       list.reload();
     } catch (e) {

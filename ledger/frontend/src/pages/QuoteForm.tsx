@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
 import { LedgerService } from "../../bindings/ledger";
 import {
-  CostCategory,
-  Costs,
-  Filament,
-  Printer,
-  Quote,
-  QuoteFilament,
-  QuoteFixedCost,
-  Tariff,
+  type CostCategory,
+  type Costs,
+  type Filament,
+  type Printer,
+  type Quote,
+  type Tariff,
 } from "../../bindings/ledger/internal/domain/models";
 import { brl } from "../lib/format";
 import { parseNum } from "../lib/format";
@@ -56,16 +54,19 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
     setTariffId(q.tariffId);
     setMargin(String(q.marginPercent));
     setPlates(
-      q.filaments.map((f) => ({
+      (q.filaments ?? []).map((f) => ({
         filamentId: f.filamentId,
         time: String(f.printTimeHours),
         weight: String(f.weightG),
       })),
     );
-    setFixed(q.fixedCosts.map((c) => ({ categoryId: c.categoryId, value: String(c.value) })));
+    setFixed((q.fixedCosts ?? []).map((c) => ({ categoryId: c.categoryId, value: String(c.value) })));
   }, [editing.data]);
 
-  const [printers, tariffs, filaments, categories] = lists.data ?? [[], [], [], []] as const;
+  const printers = lists.data?.[0] ?? [];
+  const tariffs = lists.data?.[1] ?? [];
+  const filaments = lists.data?.[2] ?? [];
+  const categories = lists.data?.[3] ?? [];
 
   // Validação (S8) derivada do estado, sem efeitos.
   const platesValid =
@@ -81,24 +82,25 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
     printerId > 0 && tariffId > 0 && platesValid && marginNum !== null && marginNum > 0 && marginNum < 100;
 
   function buildQuote(): Quote {
-    return new Quote({
+    return {
       id: quoteId ?? 0,
       name: name.trim(),
       printerId,
       tariffId,
       marginPercent: marginNum ?? 0,
-      filaments: plates.map(
-        (p) =>
-          new QuoteFilament({
-            filamentId: p.filamentId,
-            printTimeHours: parseNum(p.time) ?? 0,
-            weightG: parseNum(p.weight) ?? 0,
-          }),
-      ),
-      fixedCosts: fixed.map(
-        (f) => new QuoteFixedCost({ categoryId: f.categoryId, value: parseNum(f.value) ?? 0 }),
-      ),
-    });
+      filaments: plates.map((p) => ({
+        filamentId: p.filamentId,
+        printTimeHours: parseNum(p.time) ?? 0,
+        weightG: parseNum(p.weight) ?? 0,
+      })),
+      fixedCosts: fixed.map((f) => ({
+        categoryId: f.categoryId,
+        value: parseNum(f.value) ?? 0,
+      })),
+      finalPrice: 0,
+      createdAt: "",
+      updatedAt: "",
+    };
   }
 
   async function calculate() {
@@ -130,9 +132,11 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
     if (!newCat.name.trim()) return;
     clearError();
     try {
-      const saved = await LedgerService.SaveCostCategory(
-        new CostCategory({ name: newCat.name.trim(), defaultValue: parseNum(newCat.value) ?? 0 }),
-      );
+      const saved = await LedgerService.SaveCostCategory({
+        id: 0,
+        name: newCat.name.trim(),
+        defaultValue: parseNum(newCat.value) ?? 0,
+      });
       setFixed((f) => [...f, { categoryId: saved.id, value: newCat.value || "0" }]);
       setNewCat({ name: "", value: "" });
       lists.reload();

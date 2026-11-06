@@ -31,7 +31,7 @@ Test runner: `go test ./...` (backend) + `npm run build` em `ledger/frontend` (f
 - [x] T6 — S7,S8,S9: frontend — formulário de orçamento (multi-filamento, validação, resultado). (inline) — commit (UI)
 - [x] T7 — S1–S5: frontend — páginas de cadastros (impressoras, bandeiras, filamentos, spoolman, categorias). (inline) — commit (UI)
 - [x] T8 — S10,S11: frontend — home com listagem, salvar/editar orçamento. (inline) — commit (UI)
-- [ ] T9 — S12: build completo (wails3), suite Go, glossário e README. (inline) — bloqueado em `sudo apt install libwebkit2gtk-4.1-dev` (usuário instalaria); glossário e README feitos.
+- [x] T9 — S12: build completo (wails3), suite Go, glossário e README. (inline) — binário `bin/ledger` gerado com `wails3 task build EXTRA_TAGS=gtk3` (linuxbrew `ld` precisa sair do PATH); smoke test OK (janela abre, banco criado com 8 tabelas); `go test -tags gtk3 ./...` 11/11.
 
 ## Log
 
@@ -41,3 +41,4 @@ Test runner: `go test ./...` (backend) + `npm run build` em `ledger/frontend` (f
 - 2026-11-06: bloqueio de ambiente — Wails v3 (v3.0.0 e v3.1.0) exige GTK ≥ 4.10 incondicionalmente (GtkFileDialog); Ubuntu 22.04 tem 4.6.9. Caminho suportado: build legado `-tags gtk3` + `libwebkit2gtk-4.1-dev` (disponível no apt jammy). Usuário optou por instalar e avisar. Enquanto isso: `go test ./internal/...` passa (11 testes), frontend `npm run build` passa; `go test ./...` na raiz e o binário desktop aguardam a dependência. Comando de build: `wails3 task build EXTRA_TAGS=gtk3`.
 - 2026-11-06: backend completo (domínio+cálculo, store, spoolman, serviços, bindings; 11 testes GREEN). RDD assess pós-commits 0e1fad0/d731093: medium / under_budget (revisão pendente na slice).
 - 2026-11-06: frontend completo (home/listagem, formulário com validação S8 e resultado S9, cadastros S1–S5, spoolman S4). Design: dark "bancada" (#0B0E16) + âmbar #F5A524, cor viva só nos chips de filamento; Inter tabular-nums.
+- 2026-11-06: dependência instalada pelo usuário. Ajustes finais de build: bindings em modo produção geram **interfaces** (não classes) com arrays nullable e campos obrigatórios → frontend usa literais + `import type`; link precisa do `ld` do sistema (linuxbrew fora do PATH). Binário `bin/ledger` OK, smoke test OK, `go test -tags gtk3 ./...` 11/11, schema com 8 tabelas confirmado no banco.
