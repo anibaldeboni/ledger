@@ -365,7 +365,7 @@ function SpoolmanSection() {
     setStatus(null);
     setBusy(true);
     try {
-      await LedgerService.TestSpoolman();
+      await LedgerService.TestSpoolman(value.trim());
       setStatus("Conexão OK.");
     } catch (e) {
       setErr(e);
@@ -379,7 +379,7 @@ function SpoolmanSection() {
     setStatus(null);
     setBusy(true);
     try {
-      const n = await LedgerService.ImportSpoolman();
+      const n = await LedgerService.ImportSpoolman(value.trim());
       setStatus(`${n} filamento(s) importados/atualizados.`);
     } catch (e) {
       setErr(e);

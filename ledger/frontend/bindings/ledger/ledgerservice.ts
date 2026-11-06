@@ -51,11 +51,11 @@ export function GetSpoolmanURL(): $CancellablePromise<string> {
 }
 
 /**
- * ImportSpoolman importa (faz upsert de) todos os spools não arquivados e
- * devolve a quantidade importada.
+ * ImportSpoolman importa (faz upsert de) todos os spools não arquivados da
+ * instância informada e devolve a quantidade importada.
  */
-export function ImportSpoolman(): $CancellablePromise<number> {
-    return $Call.ByID(2966826340);
+export function ImportSpoolman(url: string): $CancellablePromise<number> {
+    return $Call.ByID(2966826340, url);
 }
 
 export function ListCostCategories(): $CancellablePromise<domain$0.CostCategory[] | null> {
@@ -103,8 +103,9 @@ export function SetSpoolmanURL(url: string): $CancellablePromise<void> {
 }
 
 /**
- * TestSpoolman tenta buscar os spools da instância configurada.
+ * TestSpoolman tenta buscar os spools da instância informada (URL em edição
+ * na tela, não necessariamente a salva).
  */
-export function TestSpoolman(): $CancellablePromise<void> {
-    return $Call.ByID(1774702293);
+export function TestSpoolman(url: string): $CancellablePromise<void> {
+    return $Call.ByID(1774702293, url);
 }

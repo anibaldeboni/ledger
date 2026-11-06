@@ -82,23 +82,16 @@ func (s *LedgerService) SetSpoolmanURL(url string) error {
 	return s.store.SetSpoolmanURL(url)
 }
 
-// TestSpoolman tenta buscar os spools da instância configurada.
-func (s *LedgerService) TestSpoolman() error {
-	url, err := s.store.GetSpoolmanURL()
-	if err != nil {
-		return err
-	}
-	_, err = (&spoolman.Client{BaseURL: url}).Spools()
+// TestSpoolman tenta buscar os spools da instância informada (URL em edição
+// na tela, não necessariamente a salva).
+func (s *LedgerService) TestSpoolman(url string) error {
+	_, err := (&spoolman.Client{BaseURL: url}).Spools()
 	return err
 }
 
-// ImportSpoolman importa (faz upsert de) todos os spools não arquivados e
-// devolve a quantidade importada.
-func (s *LedgerService) ImportSpoolman() (int, error) {
-	url, err := s.store.GetSpoolmanURL()
-	if err != nil {
-		return 0, err
-	}
+// ImportSpoolman importa (faz upsert de) todos os spools não arquivados da
+// instância informada e devolve a quantidade importada.
+func (s *LedgerService) ImportSpoolman(url string) (int, error) {
 	spools, err := (&spoolman.Client{BaseURL: url}).Spools()
 	if err != nil {
 		return 0, err
