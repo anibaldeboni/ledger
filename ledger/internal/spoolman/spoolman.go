@@ -23,10 +23,11 @@ type Filament struct {
 
 // Spool é um spool retornado por GET /api/v1/spool.
 type Spool struct {
-	ID       int64
-	Archived bool
-	Price    *float64
-	Filament Filament
+	ID              int64
+	Archived        bool
+	RemainingWeight *float64 `json:"remaining_weight"`
+	Price           *float64
+	Filament        Filament
 }
 
 // Client acessa uma instância do Spoolman.
@@ -64,12 +65,12 @@ func (c *Client) Spools() ([]Spool, error) {
 	return spools, nil
 }
 
-// Filaments converte spools do Spoolman em filamentos do domínio.
-// Spools arquivados são ignorados.
+// Filaments converts Spoolman spools to domain filaments. Archived spools and
+// spools with an explicit remaining_weight of 0 are ignored; unknown weights are kept.
 func Filaments(spools []Spool) []domain.Filament {
 	var out []domain.Filament
 	for _, sp := range spools {
-		if sp.Archived {
+		if sp.Archived || (sp.RemainingWeight != nil && *sp.RemainingWeight == 0) {
 			continue
 		}
 		f := domain.Filament{

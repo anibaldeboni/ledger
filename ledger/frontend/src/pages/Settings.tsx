@@ -22,15 +22,16 @@ function DeleteButton({ onConfirm, label = "Excluir" }: { onConfirm: () => void;
 }
 
 export default function Settings() {
+  const [filamentsRefreshKey, setFilamentsRefreshKey] = useState(0);
   return (
     <div>
       <div className="page-head">
-        <h1>Cadastros</h1>
+        <h1>Configurações</h1>
       </div>
       <PrintersSection />
       <TariffsSection />
-      <FilamentsSection />
-      <SpoolmanSection />
+      <FilamentsSection refreshKey={filamentsRefreshKey} />
+      <SpoolmanSection onImported={() => setFilamentsRefreshKey((key) => key + 1)} />
       <CostCategoriesSection />
     </div>
   );
@@ -243,8 +244,8 @@ function TariffsSection() {
 
 // --- Filamentos (S3) -----------------------------------------------------------
 
-function FilamentsSection() {
-  const list = useAsync(() => LedgerService.ListFilaments(), []);
+function FilamentsSection({ refreshKey }: { refreshKey: number }) {
+  const list = useAsync(() => LedgerService.ListFilaments(), [refreshKey]);
   const [form, setForm] = useState({ id: 0, name: "", material: "", color: "#8b93a9", price: "" });
   const [err, setErr, clearErr] = useActionError();
   const { busy, run } = useSubmission();
@@ -348,7 +349,7 @@ function FilamentsSection() {
 
 // --- Spoolman (S3, S4) ---------------------------------------------------------
 
-function SpoolmanSection() {
+function SpoolmanSection({ onImported }: { onImported: () => void }) {
   const config = useAsync(() => LedgerService.GetSpoolmanURL(), []);
   const [url, setUrl] = useState<string | null>(null);
   const [err, setErr, clearErr] = useActionError();
@@ -389,6 +390,7 @@ function SpoolmanSection() {
     setBusy(true);
     try {
       const n = await LedgerService.ImportSpoolman(value.trim());
+      onImported();
       setStatus(`${n} filamento(s) importados/atualizados.`);
     } catch (e) {
       setErr(e);

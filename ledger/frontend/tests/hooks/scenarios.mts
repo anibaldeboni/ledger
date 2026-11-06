@@ -154,4 +154,11 @@ assert.match(quoteForm, /const \{ busy, run: runExclusive \} = useSubmission\(\)
 assert.match(quoteForm, /await runExclusive\(async \(\) => \{/);
 assert.match(quoteForm, /disabled=\{!newCat\.name\.trim\(\) \|\| busy\}/);
 
+// Importing from Spoolman refreshes the independently loaded filament list.
+assert.match(settings, /<FilamentsSection refreshKey=\{filamentsRefreshKey\} \/>/);
+assert.match(settings, /<SpoolmanSection onImported=\{\(\) => setFilamentsRefreshKey\(\(key\) => key \+ 1\)\} \/>/);
+assert.match(settings, /function FilamentsSection\(\{ refreshKey \}: \{ refreshKey: number \}\)/);
+assert.match(settings, /useAsync\(\(\) => LedgerService\.ListFilaments\(\), \[refreshKey\]\)/);
+assert.match(settings, /const n = await LedgerService\.ImportSpoolman\(value\.trim\(\)\);\s+onImported\(\);/);
+
 console.log("T10 hook and UI regression probes passed.");

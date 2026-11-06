@@ -26,7 +26,7 @@ export default function App() {
           aria-current={view.page === "settings" ? "page" : undefined}
           onClick={() => setView({ page: "settings" })}
         >
-          Cadastros
+          Configurações
         </button>
       </nav>
       <main className="content">

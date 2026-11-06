@@ -46,6 +46,24 @@ a `xcb_*`/`gcry_*`), rode o build sem o linuxbrew no PATH:
 env PATH=$(echo $PATH | tr ':' '\n' | grep -v linuxbrew | paste -sd:) wails3 task build EXTRA_TAGS=gtk3
 ```
 
+## Makefile
+
+From the repository root, run one target at a time:
+
+```bash
+make help
+make dev
+make test
+make build
+make build EXTRA_TAGS=gtk3  # Ubuntu 22.04 / legacy GTK 3 path
+make build-windows
+```
+
+`make build-windows` creates `ledger/bin/ledger.exe` for Windows/amd64. The
+Windows task uses `CGO_ENABLED=0` by default; the project uses the pure-Go
+`modernc.org/sqlite` driver, so no C cross-compiler is needed. The target
+Windows machine still needs the WebView2 Runtime to run the app.
+
 ## Como o preço é calculado
 
 Regras herdadas do `calc3d`, adaptadas para multi-filamento:

@@ -10,12 +10,14 @@ const sampleSpools = `[
   {
     "id": 7,
     "archived": false,
+    "remaining_weight": 250,
     "price": 100.0,
     "filament": {"name": "PLA Preto", "material": "PLA", "color_hex": "000000", "weight": 1000, "price": 90.0}
   },
   {
     "id": 9,
     "archived": false,
+    "remaining_weight": 0,
     "price": null,
     "filament": {"name": "", "material": "PETG", "color_hex": "FF0000", "weight": 750, "price": 60.0}
   },
@@ -89,6 +91,22 @@ func TestFilaments(t *testing.T) {
 	}
 	if second.PricePerKg != 80 { // spool.price null → filament.price 60 / 750 g → 80 R$/kg
 		t.Errorf("preço/kg do filament.price: esperado 80, obtido %.2f", second.PricePerKg)
+	}
+}
+
+func TestFilamentsExcludeZeroRemainingWeight(t *testing.T) {
+	c, _ := newServer(t)
+	spools, err := c.Spools()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got := Filaments(spools)
+	if len(got) != 1 {
+		t.Fatalf("esperado 1 filamento com peso restante, obtido %d", len(got))
+	}
+	if got[0].SpoolmanID == nil || *got[0].SpoolmanID != 7 {
+		t.Errorf("esperado o spool #7, obtido %+v", got[0])
 	}
 }
 

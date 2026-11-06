@@ -207,22 +207,24 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
           const bad = p.filamentId === 0 || (p.time !== "" && (parseNum(p.time) ?? 0) <= 0) || (p.weight !== "" && (parseNum(p.weight) ?? 0) <= 0);
           return (
             <div className="plate-row" key={i}>
-              <span className="chip" style={fil?.color ? { background: fil.color } : undefined} aria-hidden="true" />
-              <select
-                value={p.filamentId}
-                className={p.filamentId === 0 ? "invalid" : undefined}
-                onChange={(e) =>
-                  setPlates((ps) => ps.map((row, j) => (j === i ? { ...row, filamentId: Number(e.target.value) } : row)))
-                }
-              >
-                <option value={0}>Selecione o filamento…</option>
-                {filaments.map((f: Filament) => (
-                  <option key={f.id} value={f.id}>
-                    {f.name}
-                    {f.material ? ` · ${f.material}` : ""} · {brl(f.pricePerKg)}/kg
-                  </option>
-                ))}
-              </select>
+              <div className="plate-picker">
+                <span className="chip" style={fil?.color ? { background: fil.color } : undefined} aria-hidden="true" />
+                <select
+                  value={p.filamentId}
+                  className={p.filamentId === 0 ? "invalid" : undefined}
+                  onChange={(e) =>
+                    setPlates((ps) => ps.map((row, j) => (j === i ? { ...row, filamentId: Number(e.target.value) } : row)))
+                  }
+                >
+                  <option value={0}>Selecione o filamento…</option>
+                  {filaments.map((f: Filament) => (
+                    <option key={f.id} value={f.id}>
+                      {f.name}
+                      {f.material ? ` · ${f.material}` : ""} · {brl(f.pricePerKg)}/kg
+                    </option>
+                  ))}
+                </select>
+              </div>
               <label className="field">
                 Tempo (h)
                 <input
@@ -264,7 +266,7 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
       <section className="block">
         <h2>Custos fixos</h2>
         {fixed.map((f, i) => (
-          <div className="plate-row" key={i} style={{ gridTemplateColumns: "1fr 130px auto" }}>
+          <div className="plate-row" key={i} style={{ gridTemplateColumns: "1fr 130px auto", alignItems: "end" }}>
             <select value={f.categoryId} onChange={(e) => pickCategory(i, Number(e.target.value))}>
               <option value={0}>Selecione a categoria…</option>
               {categories.map((c: CostCategory) => (

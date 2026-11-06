@@ -249,10 +249,21 @@ section.block > h2 {
 /* Filamento no orçamento: chip + select + tempo + peso */
 .plate-row {
   display: grid;
-  grid-template-columns: 18px 1fr 110px 110px auto;
+  grid-template-columns: 1fr 110px 110px auto;
   gap: 10px;
-  align-items: center;
+  align-items: end;
   margin-bottom: 8px;
+}
+
+.plate-picker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.plate-picker select {
+  flex: 1;
 }
 
 .chip {

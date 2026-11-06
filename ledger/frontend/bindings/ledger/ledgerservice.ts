@@ -51,8 +51,8 @@ export function GetSpoolmanURL(): $CancellablePromise<string> {
 }
 
 /**
- * ImportSpoolman importa (faz upsert de) todos os spools não arquivados da
- * instância informada e devolve a quantidade importada.
+ * ImportSpoolman imports (upserts) non-archived spools whose remaining weight
+ * is not explicitly zero, and returns the number imported.
  */
 export function ImportSpoolman(url: string): $CancellablePromise<number> {
     return $Call.ByID(2966826340, url);
