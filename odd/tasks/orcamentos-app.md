@@ -4,7 +4,7 @@ App desktop (Wails v3) para orçamentos de impressão 3D — nova versão do `ca
 com SQLite, múltiplos filamentos por orçamento e integração Spoolman.
 Branch: `feature/orcamentos-app` · Estratégia de entrega: branch local com commits
 por unidade de trabalho (sem remote configurado; push/PR ficam a cargo do usuário).
-Test runner: `go test ./...` (backend) + `npm run build` em `ledger/frontend` (frontend).
+Test runner: `go test -tags gtk3 ./...` (backend) + `npm run test:hooks && npm run build` em `ledger/frontend` (frontend; hook probes require Node 22.12+).
 
 ## Specs
 
@@ -32,6 +32,7 @@ Test runner: `go test ./...` (backend) + `npm run build` em `ledger/frontend` (f
 - [x] T7 — S1–S5: frontend — páginas de cadastros (impressoras, bandeiras, filamentos, spoolman, categorias). (inline) — commit (UI)
 - [x] T8 — S10,S11: frontend — home com listagem, salvar/editar orçamento. (inline) — commit (UI)
 - [x] T9 — S12: build completo (wails3), suite Go, glossário e README. (inline) — binário `bin/ledger` gerado com `wails3 task build EXTRA_TAGS=gtk3` (linuxbrew `ld` precisa sair do PATH); smoke test OK (janela abre, banco criado com 8 tabelas); `go test -tags gtk3 ./...` 11/11.
+- [x] T10 — S1–S5,S10–S11: address the three accepted frontend resilience advisories: surface quote-deletion errors; serialize settings and inline-category submissions; ignore stale `useAsync` responses. (inline; Risk item 4 — async ordering and concurrent-submit guard); tests and independent verification passed; commit identity follows in the log.
 
 ## Log
 
@@ -44,3 +45,5 @@ Test runner: `go test ./...` (backend) + `npm run build` em `ledger/frontend` (f
 - 2026-11-06: dependência instalada pelo usuário. Ajustes finais de build: bindings em modo produção geram **interfaces** (não classes) com arrays nullable e campos obrigatórios → frontend usa literais + `import type`; link precisa do `ld` do sistema (linuxbrew fora do PATH). Binário `bin/ledger` OK, smoke test OK, `go test -tags gtk3 ./...` 11/11, schema com 8 tabelas confirmado no banco.
 - 2026-11-06: RDD — candidato inteiro (base main, 4.859 linhas) excedeu o orçamento de contexto (`lens_context_budget_exceeded`); dividido. Parte 1 (d731093..HEAD, frontend, consentida): revisores risk+resilience admitidos → refutador abriu correção delimitada; gastei a única correção no item de modo executável do `.desktop` (evidência do assess) mas o achado real congelado era **R4-spoolman-test-unsaved-url (CRITICAL)**: Testar/Importar Spoolman usavam a URL persistida em vez da em edição. Validador rejeitou a correção → transação terminal `escalated`/`native_stop_required`. **Bug corrigido em política ordinária** (commit 98d9421: TestSpoolman/ImportSpoolman agora recebem a URL; frontend passa o valor da tela) + modo do `.desktop` corrigido (4cdfa2e).
 - 2026-11-06: RDD parte 2 — nova transação sobre o candidato corrigido (lineage review-67046b85c8accb6b, 24 arquivos/2.466 linhas, consentida pelo usuário): risk sem achados (confirma o CRITICAL corrigido); resilience aprovou com 3 achados advisory não-bloqueantes. **Acknowledgement executado, autoridade queimada — revisão APPROVED, terminal.** Boundary revisada avança para HEAD. Achados advisory (trabalho futuro, não reabrem a revisão): (1) R4-quotes-delete-error-swallowed (WARNING): erro de exclusão de orçamento capturado em estado nunca renderizado — falha silenciosa em Quotes.tsx; (2) R4-settings-save-no-inflight-guard (WARNING): botões Salvar dos cadastros sem guarda busy → duplo clique pode duplicar insert; (3) R4-useasync-stale-response-race (SUGGESTION): useAsync sem token in-flight, resposta antiga pode sobrescrever nova.
+- 2026-11-06: The user authorized the three advisory fixes with the exact request "pode corrigir agora"; this does not expand the original feature scope.
+- 2026-11-06: Added dependency-free T10 regression probes using the real hook with production React DOM and a small fake DOM. They cover out-of-order async results, invalidation on dependency change/unmount, visible quote-delete errors, and concurrent-submit prevention. Independent verification observed RED against baseline and GREEN for the candidate in scratch. Persisted runner: `npm run test:hooks` (pass); `npm run build` (pass); `go test -tags gtk3 ./...` (11 tests/7 packages, pass); Wails build (pass); independent verifier: pass, no blockers. Full Wails UI click-through remains unavailable in this verification environment.

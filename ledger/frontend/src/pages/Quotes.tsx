@@ -6,9 +6,10 @@ import { useActionError, useAsync } from "../lib/hooks";
 export default function Quotes({ onNew, onEdit }: { onNew: () => void; onEdit: (id: number) => void }) {
   const quotes = useAsync(() => LedgerService.ListQuotes(), []);
   const [confirmId, setConfirmId] = useState<number | null>(null);
-  const [, setActionError] = useActionError();
+  const [actionError, setActionError, clearActionError] = useActionError();
 
   async function remove(id: number) {
+    clearActionError();
     try {
       await LedgerService.DeleteQuote(id);
       setConfirmId(null);
@@ -30,6 +31,7 @@ export default function Quotes({ onNew, onEdit }: { onNew: () => void; onEdit: (
       </div>
 
       {quotes.error ? <p className="error-text">{quotes.error}</p> : null}
+      {actionError ? <p className="error-text" role="alert">{actionError}</p> : null}
 
       {list.length === 0 ? (
         <div className="empty">Nenhum orçamento ainda. Crie o primeiro para calcular o preço de uma impressão.</div>

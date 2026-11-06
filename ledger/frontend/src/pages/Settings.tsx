@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { LedgerService } from "../../bindings/ledger";
 import { brl, parseNum } from "../lib/format";
-import { useActionError, useAsync } from "../lib/hooks";
+import { useActionError, useAsync, useSubmission } from "../lib/hooks";
 
 /** Exclusão em dois passos, sem diálogo nativo. */
 function DeleteButton({ onConfirm, label = "Excluir" }: { onConfirm: () => void; label?: string }) {
@@ -42,24 +42,27 @@ function PrintersSection() {
   const list = useAsync(() => LedgerService.ListPrinters(), []);
   const [form, setForm] = useState({ id: 0, name: "", purchase: "", resale: "", lifespan: "", watts: "" });
   const [err, setErr, clearErr] = useActionError();
+  const { busy, run } = useSubmission();
   const editing = form.id !== 0;
 
   async function save() {
-    clearErr();
-    try {
-      await LedgerService.SavePrinter({
-        id: form.id,
-        name: form.name.trim(),
-        purchasePrice: parseNum(form.purchase) ?? 0,
-        resalePrice: parseNum(form.resale) ?? 0,
-        lifespanHours: parseNum(form.lifespan) ?? 0,
-        powerWatts: parseNum(form.watts) ?? 0,
-      });
-      setForm({ id: 0, name: "", purchase: "", resale: "", lifespan: "", watts: "" });
-      list.reload();
-    } catch (e) {
-      setErr(e);
-    }
+    await run(async () => {
+      clearErr();
+      try {
+        await LedgerService.SavePrinter({
+          id: form.id,
+          name: form.name.trim(),
+          purchasePrice: parseNum(form.purchase) ?? 0,
+          resalePrice: parseNum(form.resale) ?? 0,
+          lifespanHours: parseNum(form.lifespan) ?? 0,
+          powerWatts: parseNum(form.watts) ?? 0,
+        });
+        setForm({ id: 0, name: "", purchase: "", resale: "", lifespan: "", watts: "" });
+        list.reload();
+      } catch (e) {
+        setErr(e);
+      }
+    });
   }
 
   async function remove(id: number) {
@@ -139,8 +142,8 @@ function PrintersSection() {
           <input inputMode="decimal" value={form.watts} onChange={(e) => setForm({ ...form, watts: e.target.value })} placeholder="250" />
         </label>
         <div className="actions">
-          <button className="btn btn-primary" disabled={!form.name.trim()} onClick={save}>
-            {editing ? "Salvar" : "Adicionar"}
+          <button className="btn btn-primary" disabled={!form.name.trim() || busy} onClick={save}>
+            {busy ? "Salvando…" : editing ? "Salvar" : "Adicionar"}
           </button>
           {editing ? (
             <button className="btn" onClick={() => setForm({ id: 0, name: "", purchase: "", resale: "", lifespan: "", watts: "" })}>
@@ -159,20 +162,23 @@ function TariffsSection() {
   const list = useAsync(() => LedgerService.ListTariffs(), []);
   const [form, setForm] = useState({ id: 0, name: "", kwh: "" });
   const [err, setErr, clearErr] = useActionError();
+  const { busy, run } = useSubmission();
 
   async function save() {
-    clearErr();
-    try {
-      await LedgerService.SaveTariff({
-        id: form.id,
-        name: form.name.trim(),
-        kwhPrice: parseNum(form.kwh) ?? 0,
-      });
-      setForm({ id: 0, name: "", kwh: "" });
-      list.reload();
-    } catch (e) {
-      setErr(e);
-    }
+    await run(async () => {
+      clearErr();
+      try {
+        await LedgerService.SaveTariff({
+          id: form.id,
+          name: form.name.trim(),
+          kwhPrice: parseNum(form.kwh) ?? 0,
+        });
+        setForm({ id: 0, name: "", kwh: "" });
+        list.reload();
+      } catch (e) {
+        setErr(e);
+      }
+    });
   }
 
   async function remove(id: number) {
@@ -225,8 +231,8 @@ function TariffsSection() {
           <input inputMode="decimal" value={form.kwh} onChange={(e) => setForm({ ...form, kwh: e.target.value })} placeholder="0,80" />
         </label>
         <div className="actions">
-          <button className="btn btn-primary" disabled={!form.name.trim()} onClick={save}>
-            {form.id ? "Salvar" : "Adicionar"}
+          <button className="btn btn-primary" disabled={!form.name.trim() || busy} onClick={save}>
+            {busy ? "Salvando…" : form.id ? "Salvar" : "Adicionar"}
           </button>
           {form.id ? <button className="btn" onClick={() => setForm({ id: 0, name: "", kwh: "" })}>Cancelar</button> : null}
         </div>
@@ -241,24 +247,27 @@ function FilamentsSection() {
   const list = useAsync(() => LedgerService.ListFilaments(), []);
   const [form, setForm] = useState({ id: 0, name: "", material: "", color: "#8b93a9", price: "" });
   const [err, setErr, clearErr] = useActionError();
+  const { busy, run } = useSubmission();
 
   async function save() {
-    clearErr();
-    try {
-      await LedgerService.SaveFilament({
-        id: form.id,
-        name: form.name.trim(),
-        material: form.material.trim(),
-        color: form.color,
-        pricePerKg: parseNum(form.price) ?? 0,
-        source: "manual",
-        spoolmanId: null,
-      });
-      setForm({ id: 0, name: "", material: "", color: "#8b93a9", price: "" });
-      list.reload();
-    } catch (e) {
-      setErr(e);
-    }
+    await run(async () => {
+      clearErr();
+      try {
+        await LedgerService.SaveFilament({
+          id: form.id,
+          name: form.name.trim(),
+          material: form.material.trim(),
+          color: form.color,
+          pricePerKg: parseNum(form.price) ?? 0,
+          source: "manual",
+          spoolmanId: null,
+        });
+        setForm({ id: 0, name: "", material: "", color: "#8b93a9", price: "" });
+        list.reload();
+      } catch (e) {
+        setErr(e);
+      }
+    });
   }
 
   async function remove(id: number) {
@@ -327,8 +336,8 @@ function FilamentsSection() {
           <input inputMode="decimal" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="99" />
         </label>
         <div className="actions">
-          <button className="btn btn-primary" disabled={!form.name.trim()} onClick={save}>
-            {form.id ? "Salvar" : "Adicionar"}
+          <button className="btn btn-primary" disabled={!form.name.trim() || busy} onClick={save}>
+            {busy ? "Salvando…" : form.id ? "Salvar" : "Adicionar"}
           </button>
           {form.id ? <button className="btn" onClick={() => setForm({ id: 0, name: "", material: "", color: "#8b93a9", price: "" })}>Cancelar</button> : null}
         </div>
@@ -426,20 +435,23 @@ function CostCategoriesSection() {
   const list = useAsync(() => LedgerService.ListCostCategories(), []);
   const [form, setForm] = useState({ id: 0, name: "", value: "" });
   const [err, setErr, clearErr] = useActionError();
+  const { busy, run } = useSubmission();
 
   async function save() {
-    clearErr();
-    try {
-      await LedgerService.SaveCostCategory({
-        id: form.id,
-        name: form.name.trim(),
-        defaultValue: parseNum(form.value) ?? 0,
-      });
-      setForm({ id: 0, name: "", value: "" });
-      list.reload();
-    } catch (e) {
-      setErr(e);
-    }
+    await run(async () => {
+      clearErr();
+      try {
+        await LedgerService.SaveCostCategory({
+          id: form.id,
+          name: form.name.trim(),
+          defaultValue: parseNum(form.value) ?? 0,
+        });
+        setForm({ id: 0, name: "", value: "" });
+        list.reload();
+      } catch (e) {
+        setErr(e);
+      }
+    });
   }
 
   async function remove(id: number) {
@@ -492,8 +504,8 @@ function CostCategoriesSection() {
           <input inputMode="decimal" value={form.value} onChange={(e) => setForm({ ...form, value: e.target.value })} placeholder="0" />
         </label>
         <div className="actions">
-          <button className="btn btn-primary" disabled={!form.name.trim()} onClick={save}>
-            {form.id ? "Salvar" : "Adicionar"}
+          <button className="btn btn-primary" disabled={!form.name.trim() || busy} onClick={save}>
+            {busy ? "Salvando…" : form.id ? "Salvar" : "Adicionar"}
           </button>
           {form.id ? <button className="btn" onClick={() => setForm({ id: 0, name: "", value: "" })}>Cancelar</button> : null}
         </div>

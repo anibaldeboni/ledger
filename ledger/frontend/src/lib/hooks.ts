@@ -20,17 +20,28 @@ export function useAsync<T>(fn: () => Promise<T>, deps: unknown[]): Async<T> {
   });
   const fnRef = useRef(fn);
   fnRef.current = fn;
+  const requestId = useRef(0);
 
   const run = useCallback(() => {
+    const currentRequest = ++requestId.current;
     setState((s) => ({ ...s, loading: true, error: null }));
-    fnRef
-      .current()
-      .then((data) => setState({ data, error: null, loading: false }))
-      .catch((e) => setState((s) => ({ ...s, error: errText(e), loading: false })));
+    Promise.resolve()
+      .then(() => fnRef.current())
+      .then((data) => {
+        if (requestId.current === currentRequest) setState({ data, error: null, loading: false });
+      })
+      .catch((e) => {
+        if (requestId.current === currentRequest) {
+          setState((s) => ({ ...s, error: errText(e), loading: false }));
+        }
+      });
   }, []);
 
   useEffect(() => {
     run();
+    return () => {
+      requestId.current++;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
@@ -43,4 +54,23 @@ export function useActionError(): [string | null, (e: unknown) => void, () => vo
   const set = useCallback((e: unknown) => setError(errText(e)), []);
   const clear = useCallback(() => setError(null), []);
   return [error, set, clear];
+}
+
+// Guarda um handler assíncrono contra submits simultâneos, inclusive antes do
+// próximo render atualizar o estado `busy` usado pelo botão.
+export function useSubmission() {
+  const inFlight = useRef(false);
+  const [busy, setBusy] = useState(false);
+  const run = useCallback(async <T,>(action: () => Promise<T>): Promise<T | undefined> => {
+    if (inFlight.current) return undefined;
+    inFlight.current = true;
+    setBusy(true);
+    try {
+      return await action();
+    } finally {
+      inFlight.current = false;
+      setBusy(false);
+    }
+  }, []);
+  return { busy, run };
 }

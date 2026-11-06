@@ -22,8 +22,11 @@ wails3 dev          # hot-reload do frontend, rebuild do Go
 ## Testes
 
 ```bash
-go test ./...
+go test -tags gtk3 ./...
+cd frontend && npm run test:hooks && npm run build
 ```
+
+The hook regression tests use Node's built-in TypeScript stripping and require Node 22.12 or newer; they add no npm dependencies.
 
 ## Build
 

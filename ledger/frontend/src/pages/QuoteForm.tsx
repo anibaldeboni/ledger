@@ -10,7 +10,7 @@ import {
 } from "../../bindings/ledger/internal/domain/models";
 import { brl } from "../lib/format";
 import { parseNum } from "../lib/format";
-import { useActionError, useAsync } from "../lib/hooks";
+import { useActionError, useAsync, useSubmission } from "../lib/hooks";
 
 /** Um "plate": filamento + tempo + peso. */
 type PlateForm = { filamentId: number; time: string; weight: string };
@@ -34,6 +34,7 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
     [quoteId],
   );
   const [actionError, setActionError, clearError] = useActionError();
+  const { busy, run: runExclusive } = useSubmission();
 
   const [name, setName] = useState("");
   const [printerId, setPrinterId] = useState(0);
@@ -43,7 +44,6 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
   const [fixed, setFixed] = useState<FixedForm[]>([]);
   const [result, setResult] = useState<Costs | null>(null);
   const [newCat, setNewCat] = useState({ name: "", value: "" });
-  const [busy, setBusy] = useState(false);
 
   // Pré-preenche a partir do orçamento carregado (edição).
   useEffect(() => {
@@ -104,45 +104,45 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
   }
 
   async function calculate() {
-    clearError();
-    setBusy(true);
-    try {
-      setResult(await LedgerService.CalculateQuote(buildQuote()));
-    } catch (e) {
-      setActionError(e);
-    } finally {
-      setBusy(false);
-    }
+    await runExclusive(async () => {
+      clearError();
+      try {
+        setResult(await LedgerService.CalculateQuote(buildQuote()));
+      } catch (e) {
+        setActionError(e);
+      }
+    });
   }
 
   async function save() {
-    clearError();
-    setBusy(true);
-    try {
-      await LedgerService.SaveQuote(buildQuote());
-      onBack();
-    } catch (e) {
-      setActionError(e);
-    } finally {
-      setBusy(false);
-    }
+    await runExclusive(async () => {
+      clearError();
+      try {
+        await LedgerService.SaveQuote(buildQuote());
+        onBack();
+      } catch (e) {
+        setActionError(e);
+      }
+    });
   }
 
   async function createCategory() {
     if (!newCat.name.trim()) return;
-    clearError();
-    try {
-      const saved = await LedgerService.SaveCostCategory({
-        id: 0,
-        name: newCat.name.trim(),
-        defaultValue: parseNum(newCat.value) ?? 0,
-      });
-      setFixed((f) => [...f, { categoryId: saved.id, value: newCat.value || "0" }]);
-      setNewCat({ name: "", value: "" });
-      lists.reload();
-    } catch (e) {
-      setActionError(e);
-    }
+    await runExclusive(async () => {
+      clearError();
+      try {
+        const saved = await LedgerService.SaveCostCategory({
+          id: 0,
+          name: newCat.name.trim(),
+          defaultValue: parseNum(newCat.value) ?? 0,
+        });
+        setFixed((f) => [...f, { categoryId: saved.id, value: newCat.value || "0" }]);
+        setNewCat({ name: "", value: "" });
+        lists.reload();
+      } catch (e) {
+        setActionError(e);
+      }
+    });
   }
 
   function pickCategory(i: number, categoryId: number) {
@@ -317,7 +317,7 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
               onChange={(e) => setNewCat((c) => ({ ...c, value: e.target.value }))}
             />
           </label>
-          <button className="btn btn-sm" onClick={createCategory} disabled={!newCat.name.trim()}>
+          <button className="btn btn-sm" onClick={createCategory} disabled={!newCat.name.trim() || busy}>
             Criar e adicionar
           </button>
         </div>
