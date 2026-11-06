@@ -1,0 +1,421 @@
+/* Ledger · Orçamentos 3D — design system
+   Bancada escura de oficina: cromo quieto, cor viva só nos dados
+   (chips de filamento, preço em âmbar de nozzle aquecido). */
+
+@font-face {
+  font-family: "Inter";
+  src: url("/Inter-Medium.ttf") format("truetype");
+  font-weight: 400 600;
+}
+
+:root {
+  --bg: #0b0e16;
+  --surface: #131726;
+  --surface-2: #1a2032;
+  --border: #262e45;
+  --border-strong: #38425f;
+  --text: #e8eaf2;
+  --muted: #8b93a9;
+  --accent: #f5a524;
+  --accent-ink: #241700;
+  --danger: #e5484d;
+  --ok: #46a758;
+  --radius: 8px;
+  --font: "Inter", system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* --- Estrutura ---------------------------------------------------------------- */
+
+.app {
+  display: grid;
+  grid-template-columns: 216px 1fr;
+  height: 100vh;
+}
+
+.sidebar {
+  border-right: 1px solid var(--border);
+  padding: 20px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.brand {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0 12px 18px;
+  color: var(--text);
+}
+
+.brand span {
+  color: var(--accent);
+}
+
+.nav-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: var(--radius);
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  cursor: pointer;
+}
+
+.nav-item:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.nav-item[aria-current="page"] {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.content {
+  overflow-y: auto;
+  padding: 28px 36px 48px;
+  max-width: 980px;
+}
+
+/* --- Cabeçalhos e botões ------------------------------------------------------ */
+
+.page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.page-head h1 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.btn {
+  font: inherit;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: 7px 14px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  border-color: var(--muted);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #ffb84d;
+  border-color: #ffb84d;
+}
+
+.btn-danger {
+  background: none;
+  border-color: transparent;
+  color: var(--danger);
+  padding: 4px 8px;
+}
+
+.btn-danger:hover {
+  border-color: var(--danger);
+}
+
+.btn-ghost {
+  background: none;
+  border-color: transparent;
+  color: var(--muted);
+  padding: 4px 8px;
+}
+
+.btn-ghost:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.btn-sm {
+  padding: 4px 10px;
+  font-size: 13px;
+}
+
+/* --- Formulários -------------------------------------------------------------- */
+
+label.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--muted);
+  min-width: 0;
+}
+
+input,
+select {
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: 7px 10px;
+  min-width: 0;
+}
+
+input:focus-visible,
+select:focus-visible,
+.btn:focus-visible,
+.nav-item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+input.invalid {
+  border-color: var(--danger);
+}
+
+/* --- Seções ------------------------------------------------------------------- */
+
+section.block {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-bottom: 16px;
+  background: var(--surface);
+}
+
+section.block > h2 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 12px;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.row > label.field {
+  flex: 1 1 140px;
+}
+
+.grow {
+  flex: 1 1 auto;
+}
+
+/* Filamento no orçamento: chip + select + tempo + peso */
+.plate-row {
+  display: grid;
+  grid-template-columns: 18px 1fr 110px 110px auto;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.chip {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid var(--border-strong);
+  background: var(--muted);
+  flex: none;
+}
+
+/* --- Listas (tabelas) --------------------------------------------------------- */
+
+.list {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.list-row {
+  display: grid;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.list-row:last-child {
+  border-bottom: 0;
+}
+
+.list-row:hover {
+  background: var(--surface-2);
+}
+
+.row-head {
+  display: grid;
+  gap: 12px;
+  padding: 8px 16px;
+  color: var(--muted);
+  font-size: 12.5px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.money {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.cols-quote {
+  grid-template-columns: 1fr 90px 150px 160px 150px;
+}
+
+.cols-printer {
+  grid-template-columns: 1fr 110px 110px 110px 90px 110px;
+}
+
+.cols-tariff {
+  grid-template-columns: 1fr 130px 110px;
+}
+
+.cols-fil {
+  grid-template-columns: 18px 1fr 110px 130px 100px 110px;
+}
+
+.cols-cat {
+  grid-template-columns: 1fr 130px 110px;
+}
+
+.price {
+  color: var(--accent);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Painel de resultado ------------------------------------------------------ */
+
+.result {
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, rgba(245, 165, 36, 0.06), rgba(245, 165, 36, 0) 60%), var(--surface);
+  padding: 18px 20px;
+}
+
+.result-line {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  color: var(--muted);
+}
+
+.result-line strong {
+  color: var(--text);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.result-final {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-strong);
+}
+
+.result-final .value {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Estados ------------------------------------------------------------------ */
+
+.empty {
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  padding: 28px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.error-text {
+  color: var(--danger);
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+
+.ok-text {
+  color: var(--ok);
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 12.5px;
+  margin: 6px 0 0;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

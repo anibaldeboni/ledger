@@ -23,18 +23,21 @@ Test runner: `go test ./...` (backend) + `npm run build` em `ledger/frontend` (f
 
 ## Tasks
 
-- [ ] T1 — S12: limpar scaffold (remover demo greet/time), renomear módulo `changeme`→`ledger`. (inline)
-- [ ] T2 — S6: motor de cálculo em `ledger/internal/domain` com testes (RED→GREEN), regras portadas do calc3d. (inline)
-- [ ] T3 — S1,S2,S3,S5,S12: store SQLite (schema + CRUD) em `ledger/internal/store`. (inline)
-- [ ] T4 — S1–S5,S7,S10,S11: serviços Wails (CRUDs + orçamentos + calcular) e wiring em `main.go`. (inline)
-- [ ] T5 — S3,S4: cliente Spoolman (config, testar conexão, importar spools). (inline)
-- [ ] T6 — S7,S8,S9: frontend — formulário de orçamento (multi-filamento, validação, resultado). (inline)
-- [ ] T7 — S1–S5: frontend — páginas de cadastros (impressoras, bandeiras, filamentos, spoolman, categorias). (inline)
-- [ ] T8 — S10,S11: frontend — home com listagem, salvar/editar orçamento. (inline)
-- [ ] T9 — S12: build completo (wails3), suite Go, glossário e README. (inline)
+- [x] T1 — S12: limpar scaffold (remover demo greet/time), renomear módulo `changeme`→`ledger`. (inline) — commit fe1ef8b..0e1fad0
+- [x] T2 — S6: motor de cálculo em `ledger/internal/domain` com testes (RED→GREEN), regras portadas do calc3d. (inline) — commit 0e1fad0
+- [x] T3 — S1,S2,S3,S5,S12: store SQLite (schema + CRUD) em `ledger/internal/store`. (inline) — commit 0e1fad0
+- [x] T4 — S1–S5,S7,S10,S11: serviços Wails (CRUDs + orçamentos + calcular) e wiring em `main.go`. (inline) — commit d731093
+- [x] T5 — S3,S4: cliente Spoolman (config, testar conexão, importar spools). (inline) — commit d731093
+- [x] T6 — S7,S8,S9: frontend — formulário de orçamento (multi-filamento, validação, resultado). (inline) — commit (UI)
+- [x] T7 — S1–S5: frontend — páginas de cadastros (impressoras, bandeiras, filamentos, spoolman, categorias). (inline) — commit (UI)
+- [x] T8 — S10,S11: frontend — home com listagem, salvar/editar orçamento. (inline) — commit (UI)
+- [ ] T9 — S12: build completo (wails3), suite Go, glossário e README. (inline) — bloqueado em `sudo apt install libwebkit2gtk-4.1-dev` (usuário instalaria); glossário e README feitos.
 
 ## Log
 
 - **L1** (2026-11-06, usuário): pedido original verbatim: "Criar uma nova versão de ../calc3d com interface gráfica desktop usando Wails" + contexto de feedback dos usuários (alterar preço/quantidade de filamento e tempo por orçamento; múltiplos filamentos por orçamento para impressões coloridas multi-partes em que cada Plate é uma cor; integração com Spoolman como fonte da verdade para preço e inventário) + features e fluxo detalhados (S1–S11) + stack.
 - Decisão do usuário (2026-11-06): projeto no diretório atual `/home/anibal/ledger` (scaffold Wails v3 já existente em `ledger/`); amortização pela perda líquida (preço de compra − preço de revenda).
 - Previsão de entrega: ~2000–2500 linhas autoradas; commits por unidade de trabalho na branch local; RDD global ativo → `gentle-ai review assess` por commit de unidade.
+- 2026-11-06: bloqueio de ambiente — Wails v3 (v3.0.0 e v3.1.0) exige GTK ≥ 4.10 incondicionalmente (GtkFileDialog); Ubuntu 22.04 tem 4.6.9. Caminho suportado: build legado `-tags gtk3` + `libwebkit2gtk-4.1-dev` (disponível no apt jammy). Usuário optou por instalar e avisar. Enquanto isso: `go test ./internal/...` passa (11 testes), frontend `npm run build` passa; `go test ./...` na raiz e o binário desktop aguardam a dependência. Comando de build: `wails3 task build EXTRA_TAGS=gtk3`.
+- 2026-11-06: backend completo (domínio+cálculo, store, spoolman, serviços, bindings; 11 testes GREEN). RDD assess pós-commits 0e1fad0/d731093: medium / under_budget (revisão pendente na slice).
+- 2026-11-06: frontend completo (home/listagem, formulário com validação S8 e resultado S9, cadastros S1–S5, spoolman S4). Design: dark "bancada" (#0B0E16) + âmbar #F5A524, cor viva só nos chips de filamento; Inter tabular-nums.
