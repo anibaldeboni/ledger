@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Name=My Product
+Comment=A ledger application
+# The Exec line includes %u to pass the URL to the application
+Exec=/usr/local/bin/ledger %u
+Terminal=false
+Type=Application
+Icon=ledger
+Categories=Utility;
+StartupWMClass=ledger
+
+ 

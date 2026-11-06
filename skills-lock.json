@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "wails3": {
+      "source": "mirai3103/aiodb-studio",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/wails3/SKILL.md",
+      "computedHash": "c6736d3a116bce7b4ad2683cc8bcfd16449cecaa6193c1287edf9848346d2e52"
+    }
+  }
+}
