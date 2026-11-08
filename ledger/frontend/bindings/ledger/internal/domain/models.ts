@@ -81,15 +81,15 @@ export interface Printer {
 }
 
 /**
- * Quote é um orçamento salvo. Timestamps em RFC3339.
+ * QuoteEditor is the Wails form DTO; print times stay in slicer notation here.
  */
-export interface Quote {
+export interface QuoteEditor {
     "id": number;
     "name": string;
     "printerId": number;
     "tariffId": number;
     "marginPercent": number;
-    "filaments": QuoteFilament[] | null;
+    "filaments": QuoteEditorFilament[] | null;
     "fixedCosts": QuoteFixedCost[] | null;
     "finalPrice": number;
     "createdAt": string;
@@ -97,11 +97,11 @@ export interface Quote {
 }
 
 /**
- * QuoteFilament é o uso de um filamento no orçamento.
+ * QuoteEditorFilament carries the user-entered duration before domain conversion.
  */
-export interface QuoteFilament {
+export interface QuoteEditorFilament {
     "filamentId": number;
-    "printTimeHours": number;
+    "printTime": string;
     "weightG": number;
 }
 

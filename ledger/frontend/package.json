@@ -8,6 +8,7 @@
     "build:dev": "tsc && vite build --minify false --mode development",
     "build": "tsc && vite build --mode production",
     "test:hooks": "node scripts/test-hooks.mjs",
+    "test:print-time": "node --experimental-strip-types tests/print-time/scenarios.mts",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -5,18 +5,20 @@ import {
   type Costs,
   type Filament,
   type Printer,
-  type Quote,
+  type QuoteEditor,
   type Tariff,
 } from "../../bindings/ledger/internal/domain/models";
 import { brl } from "../lib/format";
 import { parseNum } from "../lib/format";
 import { useActionError, useAsync, useSubmission } from "../lib/hooks";
+import { isValidPrintDuration } from "../lib/print-time";
 
 /** Um "plate": filamento + tempo + peso. */
 type PlateForm = { filamentId: number; time: string; weight: string };
 type FixedForm = { categoryId: number; value: string };
 
 const emptyPlate: PlateForm = { filamentId: 0, time: "", weight: "" };
+const printTimeFormatHint = "Duração maior que zero; use valores inteiros com d, h, m e/ou s nessa ordem. Espaços entre unidades são opcionais. Exemplos: 2d6h55m, 1h57m, 2m ou 35s.";
 
 export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBack: () => void }) {
   const lists = useAsync(
@@ -56,7 +58,7 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
     setPlates(
       (q.filaments ?? []).map((f) => ({
         filamentId: f.filamentId,
-        time: String(f.printTimeHours),
+        time: f.printTime,
         weight: String(f.weightG),
       })),
     );
@@ -74,14 +76,14 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
     plates.every(
       (p) =>
         p.filamentId > 0 &&
-        (parseNum(p.time) ?? 0) > 0 &&
+        isValidPrintDuration(p.time) &&
         (parseNum(p.weight) ?? 0) > 0,
     );
   const marginNum = parseNum(margin);
   const valid =
     printerId > 0 && tariffId > 0 && platesValid && marginNum !== null && marginNum > 0 && marginNum < 100;
 
-  function buildQuote(): Quote {
+  function buildQuote(): QuoteEditor {
     return {
       id: quoteId ?? 0,
       name: name.trim(),
@@ -90,7 +92,7 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
       marginPercent: marginNum ?? 0,
       filaments: plates.map((p) => ({
         filamentId: p.filamentId,
-        printTimeHours: parseNum(p.time) ?? 0,
+        printTime: p.time,
         weightG: parseNum(p.weight) ?? 0,
       })),
       fixedCosts: fixed.map((f) => ({
@@ -204,7 +206,9 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
         <h2>Filamentos (um por cor/plate)</h2>
         {plates.map((p, i) => {
           const fil = filById.get(p.filamentId);
-          const bad = p.filamentId === 0 || (p.time !== "" && (parseNum(p.time) ?? 0) <= 0) || (p.weight !== "" && (parseNum(p.weight) ?? 0) <= 0);
+          const printTimeValid = isValidPrintDuration(p.time);
+          const bad = p.filamentId === 0 || (p.time !== "" && !printTimeValid) || (p.weight !== "" && (parseNum(p.weight) ?? 0) <= 0);
+          const invalidTime = bad && !printTimeValid;
           return (
             <div className="plate-row" key={i}>
               <div className="plate-picker">
@@ -226,12 +230,14 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
                 </select>
               </div>
               <label className="field">
-                Tempo (h)
+                Tempo de impressão
                 <input
-                  inputMode="decimal"
-                  className={bad && (parseNum(p.time) ?? 0) <= 0 ? "invalid" : undefined}
+                  className={invalidTime ? "invalid" : undefined}
+                  aria-invalid={invalidTime}
                   value={p.time}
-                  placeholder="1,5"
+                  placeholder="1h57m"
+                  title={printTimeFormatHint}
+                  spellCheck={false}
                   onChange={(e) => setPlates((ps) => ps.map((row, j) => (j === i ? { ...row, time: e.target.value } : row)))}
                 />
               </label>

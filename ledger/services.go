@@ -111,18 +111,32 @@ func (s *LedgerService) ListQuotes() ([]domain.QuoteSummary, error) {
 	return s.store.ListQuotes()
 }
 
-func (s *LedgerService) GetQuote(id int64) (domain.Quote, error) {
-	return s.store.GetQuote(id)
+func (s *LedgerService) GetQuote(id int64) (domain.QuoteEditor, error) {
+	quote, err := s.store.GetQuote(id)
+	if err != nil {
+		return domain.QuoteEditor{}, err
+	}
+	return domain.QuoteEditorFromQuote(quote), nil
 }
 
 // CalculateQuote calcula o orçamento sem salvá-lo (botão Calcular do formulário).
-func (s *LedgerService) CalculateQuote(q domain.Quote) (domain.Costs, error) {
-	return s.store.CalculateQuote(&q)
+func (s *LedgerService) CalculateQuote(form domain.QuoteEditor) (domain.Costs, error) {
+	quote, err := domain.QuoteFromEditor(form)
+	if err != nil {
+		return domain.Costs{}, err
+	}
+	return s.store.CalculateQuote(&quote)
 }
 
-func (s *LedgerService) SaveQuote(q domain.Quote) (domain.Quote, error) {
-	err := s.store.SaveQuote(&q)
-	return q, err
+func (s *LedgerService) SaveQuote(form domain.QuoteEditor) (domain.QuoteEditor, error) {
+	quote, err := domain.QuoteFromEditor(form)
+	if err != nil {
+		return domain.QuoteEditor{}, err
+	}
+	if err := s.store.SaveQuote(&quote); err != nil {
+		return domain.QuoteEditor{}, err
+	}
+	return domain.QuoteEditorFromQuote(quote), nil
 }
 
 func (s *LedgerService) DeleteQuote(id int64) error {

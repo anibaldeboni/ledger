@@ -6,8 +6,8 @@ export type {
     Costs,
     Filament,
     Printer,
-    Quote,
-    QuoteFilament,
+    QuoteEditor,
+    QuoteEditorFilament,
     QuoteFixedCost,
     QuoteSummary,
     Tariff

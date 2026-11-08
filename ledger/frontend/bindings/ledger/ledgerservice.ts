@@ -18,8 +18,8 @@ import * as domain$0 from "./internal/domain/models.js";
 /**
  * CalculateQuote calcula o orçamento sem salvá-lo (botão Calcular do formulário).
  */
-export function CalculateQuote(q: domain$0.Quote): $CancellablePromise<domain$0.Costs> {
-    return $Call.ByID(4227971064, q);
+export function CalculateQuote(form: domain$0.QuoteEditor): $CancellablePromise<domain$0.Costs> {
+    return $Call.ByID(4227971064, form);
 }
 
 export function DeleteCostCategory(id: number): $CancellablePromise<void> {
@@ -42,7 +42,7 @@ export function DeleteTariff(id: number): $CancellablePromise<void> {
     return $Call.ByID(2535301505, id);
 }
 
-export function GetQuote(id: number): $CancellablePromise<domain$0.Quote> {
+export function GetQuote(id: number): $CancellablePromise<domain$0.QuoteEditor> {
     return $Call.ByID(1944333232, id);
 }
 
@@ -90,8 +90,8 @@ export function SavePrinter(p: domain$0.Printer): $CancellablePromise<domain$0.P
     return $Call.ByID(1997871711, p);
 }
 
-export function SaveQuote(q: domain$0.Quote): $CancellablePromise<domain$0.Quote> {
-    return $Call.ByID(338868535, q);
+export function SaveQuote(form: domain$0.QuoteEditor): $CancellablePromise<domain$0.QuoteEditor> {
+    return $Call.ByID(338868535, form);
 }
 
 export function SaveTariff(t: domain$0.Tariff): $CancellablePromise<domain$0.Tariff> {
