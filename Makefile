@@ -17,7 +17,7 @@ dev:
 
 # Prefer system binutils so cgo does not resolve a Linuxbrew `ld` first.
 test:
-	@cd "$(APP_DIR)" && PATH="/usr/bin:/bin:$$PATH" go test -tags gtk3 ./...
+	@cd "$(APP_DIR)" && PATH="/usr/bin:/bin:$$PATH" go test ./...
 	@cd "$(APP_DIR)/frontend" && npm run test:hooks && npm run test:print-time && npm run build
 
 build:

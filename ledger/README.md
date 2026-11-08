@@ -22,7 +22,7 @@ wails3 dev          # hot-reload do frontend, rebuild do Go
 ## Testes
 
 ```bash
-go test -tags gtk3 ./...
+go test ./...
 cd frontend && npm run test:hooks && npm run build
 ```
 
