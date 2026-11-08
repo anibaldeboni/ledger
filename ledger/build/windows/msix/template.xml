@@ -10,24 +10,24 @@
     <Installer
         Path="ledger"
         Arguments=""
-        InstallLocation="C:\Program Files\My Company\My Product">
+        InstallLocation="C:\Program Files\Manuc Design\Ledger">
     </Installer>
     <PackageInformation
-        PackageName="My Product"
-        PackageDisplayName="My Product"
-        PublisherName="CN=My Company"
-        PublisherDisplayName="My Company"
+        PackageName="Ledger"
+        PackageDisplayName="Ledger"
+        PublisherName="CN=Manuc Design"
+        PublisherDisplayName="Manuc Design"
         Version="0.1.0.0"
-        PackageDescription="A ledger application">
+        PackageDescription="A 3D printing cost estimation tool">
         <Capabilities>
             <Capability Name="runFullTrust" />
             
         </Capabilities>
         <Applications>
             <Application
-                Id="br.anibaldeboni.ledger"
-                Description="A ledger application"
-                DisplayName="My Product"
+                Id="design.manuc.ledger"
+                Description="A 3D printing cost estimation tool"
+                DisplayName="Ledger"
                 ExecutableName="ledger"
                 EntryPoint="Windows.FullTrustApplication">
                 
@@ -41,9 +41,9 @@
         </Dependencies>
         <Properties>
             <Framework>false</Framework>
-            <DisplayName>My Product</DisplayName>
-            <PublisherDisplayName>My Company</PublisherDisplayName>
-            <Description>A ledger application</Description>
+            <DisplayName>Ledger</DisplayName>
+            <PublisherDisplayName>Manuc Design</PublisherDisplayName>
+            <Description>A 3D printing cost estimation tool</Description>
             <Logo>Assets\AppIcon.png</Logo>
         </Properties>
     </PackageInformation>

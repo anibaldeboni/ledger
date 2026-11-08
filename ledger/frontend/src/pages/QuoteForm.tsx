@@ -230,7 +230,7 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
                 </select>
               </div>
               <label className="field">
-                Tempo de impressão
+                Duração
                 <input
                   className={invalidTime ? "invalid" : undefined}
                   aria-invalid={invalidTime}

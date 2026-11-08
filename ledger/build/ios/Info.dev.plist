@@ -5,7 +5,7 @@
     <key>CFBundleExecutable</key>
     <string>ledger</string>
     <key>CFBundleIdentifier</key>
-    <string>br.anibaldeboni.ledger.dev</string>
+    <string>design.manuc.ledger.dev</string>
     <key>CFBundleName</key>
     <string>My Product (Dev)</string>
     <key>CFBundleDisplayName</key>

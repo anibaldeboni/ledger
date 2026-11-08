@@ -5,11 +5,11 @@
 	"info": {
 		"0409": {
 			"ProductVersion": "0.1.0",
-			"CompanyName": "My Company",
-			"FileDescription": "A ledger application",
-			"LegalCopyright": "© 2026, My Company",
-			"ProductName": "My Product",
-			"Comments": "This is a comment"
+			"CompanyName": "Manuc Design",
+			"FileDescription": "A 3D printing cost estimation tool",
+			"LegalCopyright": "© 2026, Manuc Design",
+			"ProductName": "Ledger",
+			"Comments": "3d printing cost was never so easy"
 		}
 	}
 }

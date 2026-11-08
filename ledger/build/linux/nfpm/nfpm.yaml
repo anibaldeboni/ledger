@@ -10,9 +10,9 @@ version: "0.1.0"
 section: "default"
 priority: "extra"
 maintainer: ${GIT_COMMITTER_NAME} <${GIT_COMMITTER_EMAIL}>
-description: "A ledger application"
-vendor: "My Company"
-homepage: "https://wails.io"
+description: "A 3D printing cost estimation tool"
+vendor: "Manuc Design"
+homepage: "https://instagram.com/manuc.design"
 license: "MIT"
 release: "1"
 

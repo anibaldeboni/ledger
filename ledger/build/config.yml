@@ -1,15 +1,15 @@
 # This file contains the configuration for this project.
 # When you update `info` or `fileAssociations`, run `wails3 task common:update:build-assets` to update the assets.
 # Note that this will overwrite any changes you have made to the assets.
-version: '3'
+version: "3"
 
 # This information is used to generate the build assets.
 info:
-  companyName: "My Company" # The name of the company
-  productName: "My Product" # The name of the application
-  productIdentifier: "com.mycompany.myproduct" # The unique product identifier
-  description: "A program that does X" # The application description
-  copyright: "(c) 2025, My Company" # Copyright text
+  companyName: "Manuc Design" # The name of the company
+  productName: "Ledger" # The name of the application
+  productIdentifier: "design.manuc.ledger" # The unique product identifier
+  description: "3D printing cost estimation tool" # The application description
+  copyright: "(c) 2025, Manuc Design" # Copyright text
   comments: "Some Product Comments" # Comments
   version: "0.0.1" # The application version
   # cfBundleIconName: "appicon" # The macOS icon name in Assets.car icon bundles (optional)
