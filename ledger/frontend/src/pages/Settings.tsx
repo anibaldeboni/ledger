@@ -1,22 +1,27 @@
 
 import { useState } from "react";
+import { Check, Pencil, Trash2 } from "lucide-react";
 import { LedgerService } from "../../bindings/ledger";
 import { brl, parseNum } from "../lib/format";
 import { useActionError, useAsync, useSubmission } from "../lib/hooks";
 
 /** Exclusão em dois passos, sem diálogo nativo. */
-function DeleteButton({ onConfirm, label = "Excluir" }: { onConfirm: () => void; label?: string }) {
+function DeleteButton({ onConfirm, item }: { onConfirm: () => void; item: string }) {
   const [armed, setArmed] = useState(false);
+  const label = armed ? `Confirmar exclusão: ${item}` : `Excluir ${item}`;
   return (
     <button
-      className="btn btn-danger btn-sm"
+      type="button"
+      className="btn btn-danger btn-icon"
+      aria-label={label}
+      title={label}
       onClick={() => {
         if (armed) onConfirm();
         else setArmed(true);
       }}
       onBlur={() => setArmed(false)}
     >
-      {armed ? "Confirmar?" : label}
+      {armed ? <Check size={16} aria-hidden="true" /> : <Trash2 size={16} aria-hidden="true" />}
     </button>
   );
 }
@@ -94,28 +99,31 @@ function PrintersSection() {
           </div>
           {(list.data ?? []).map((p) => (
             <div className="list-row cols-printer" key={p.id}>
-              <button
-                className="btn-ghost"
-                style={{ textAlign: "left", font: "inherit", padding: 0 }}
-                onClick={() =>
-                  setForm({
-                    id: p.id,
-                    name: p.name,
-                    purchase: String(p.purchasePrice),
-                    resale: String(p.resalePrice),
-                    lifespan: String(p.lifespanHours),
-                    watts: String(p.powerWatts),
-                  })
-                }
-              >
-                {p.name}
-              </button>
+              <span>{p.name}</span>
               <span className="money">{brl(p.purchasePrice)}</span>
               <span className="money">{brl(p.resalePrice)}</span>
               <span className="money">{p.lifespanHours.toLocaleString("pt-BR")}</span>
               <span className="money">{p.powerWatts.toLocaleString("pt-BR")}</span>
               <span className="actions" style={{ justifySelf: "end" }}>
-                <DeleteButton onConfirm={() => remove(p.id)} />
+                <button
+                  type="button"
+                  className="btn btn-icon"
+                  aria-label={`Editar impressora ${p.name}`}
+                  title={`Editar impressora ${p.name}`}
+                  onClick={() =>
+                    setForm({
+                      id: p.id,
+                      name: p.name,
+                      purchase: String(p.purchasePrice),
+                      resale: String(p.resalePrice),
+                      lifespan: String(p.lifespanHours),
+                      watts: String(p.powerWatts),
+                    })
+                  }
+                >
+                  <Pencil size={16} aria-hidden="true" />
+                </button>
+                <DeleteButton item={`impressora ${p.name}`} onConfirm={() => remove(p.id)} />
               </span>
             </div>
           ))}
@@ -207,16 +215,19 @@ function TariffsSection() {
           </div>
           {(list.data ?? []).map((t) => (
             <div className="list-row cols-tariff" key={t.id}>
-              <button
-                className="btn-ghost"
-                style={{ textAlign: "left", font: "inherit", padding: 0 }}
-                onClick={() => setForm({ id: t.id, name: t.name, kwh: String(t.kwhPrice) })}
-              >
-                {t.name}
-              </button>
+              <span>{t.name}</span>
               <span className="money">{brl(t.kwhPrice)}</span>
               <span className="actions" style={{ justifySelf: "end" }}>
-                <DeleteButton onConfirm={() => remove(t.id)} />
+                <button
+                  type="button"
+                  className="btn btn-icon"
+                  aria-label={`Editar bandeira tarifária ${t.name}`}
+                  title={`Editar bandeira tarifária ${t.name}`}
+                  onClick={() => setForm({ id: t.id, name: t.name, kwh: String(t.kwhPrice) })}
+                >
+                  <Pencil size={16} aria-hidden="true" />
+                </button>
+                <DeleteButton item={`bandeira tarifária ${t.name}`} onConfirm={() => remove(t.id)} />
               </span>
             </div>
           ))}
@@ -300,20 +311,23 @@ function FilamentsSection({ refreshKey }: { refreshKey: number }) {
           {(list.data ?? []).map((f) => (
             <div className="list-row cols-fil" key={f.id}>
               <span className="chip" style={{ background: f.color || undefined }} aria-hidden="true" />
-              <button
-                className="btn-ghost"
-                style={{ textAlign: "left", font: "inherit", padding: 0 }}
-                onClick={() =>
-                  setForm({ id: f.id, name: f.name, material: f.material, color: f.color || "#8b93a9", price: String(f.pricePerKg) })
-                }
-              >
-                {f.name}
-              </button>
+              <span>{f.name}</span>
               <span className="muted">{f.material || "—"}</span>
               <span className="money">{brl(f.pricePerKg)}</span>
               <span className="muted">{f.source === "spoolman" ? "Spoolman" : "Manual"}</span>
               <span className="actions" style={{ justifySelf: "end" }}>
-                <DeleteButton onConfirm={() => remove(f.id)} />
+                <button
+                  type="button"
+                  className="btn btn-icon"
+                  aria-label={`Editar filamento ${f.name}`}
+                  title={`Editar filamento ${f.name}`}
+                  onClick={() =>
+                    setForm({ id: f.id, name: f.name, material: f.material, color: f.color || "#8b93a9", price: String(f.pricePerKg) })
+                  }
+                >
+                  <Pencil size={16} aria-hidden="true" />
+                </button>
+                <DeleteButton item={`filamento ${f.name}`} onConfirm={() => remove(f.id)} />
               </span>
             </div>
           ))}
@@ -481,16 +495,19 @@ function CostCategoriesSection() {
           </div>
           {(list.data ?? []).map((c) => (
             <div className="list-row cols-cat" key={c.id}>
-              <button
-                className="btn-ghost"
-                style={{ textAlign: "left", font: "inherit", padding: 0 }}
-                onClick={() => setForm({ id: c.id, name: c.name, value: String(c.defaultValue) })}
-              >
-                {c.name}
-              </button>
+              <span>{c.name}</span>
               <span className="money">{brl(c.defaultValue)}</span>
               <span className="actions" style={{ justifySelf: "end" }}>
-                <DeleteButton onConfirm={() => remove(c.id)} />
+                <button
+                  type="button"
+                  className="btn btn-icon"
+                  aria-label={`Editar categoria de custo ${c.name}`}
+                  title={`Editar categoria de custo ${c.name}`}
+                  onClick={() => setForm({ id: c.id, name: c.name, value: String(c.defaultValue) })}
+                >
+                  <Pencil size={16} aria-hidden="true" />
+                </button>
+                <DeleteButton item={`categoria de custo ${c.name}`} onConfirm={() => remove(c.id)} />
               </span>
             </div>
           ))}

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Check, Pencil, Plus, Trash2 } from "lucide-react";
 import { LedgerService } from "../../bindings/ledger";
 import { brl, dt } from "../lib/format";
 import { useActionError, useAsync } from "../lib/hooks";
@@ -25,8 +26,14 @@ export default function Quotes({ onNew, onEdit }: { onNew: () => void; onEdit: (
     <div>
       <div className="page-head">
         <h1>Orçamentos</h1>
-        <button className="btn btn-primary" onClick={onNew}>
-          Novo orçamento
+        <button
+          type="button"
+          className="btn btn-primary btn-icon"
+          aria-label="Criar novo orçamento"
+          title="Criar novo orçamento"
+          onClick={onNew}
+        >
+          <Plus size={18} aria-hidden="true" />
         </button>
       </div>
 
@@ -46,24 +53,39 @@ export default function Quotes({ onNew, onEdit }: { onNew: () => void; onEdit: (
           </div>
           {list.map((q) => (
             <div className="list-row cols-quote" key={q.id}>
-              <button
-                className="btn-ghost"
-                style={{ textAlign: "left", font: "inherit", padding: 0 }}
-                onClick={() => onEdit(q.id)}
-              >
-                {q.name}
-              </button>
+              <span>{q.name}</span>
               <span className="money">{q.marginPercent.toLocaleString("pt-BR")}%</span>
               <span className="money price">{brl(q.finalPrice)}</span>
               <span className="money muted">{dt(q.updatedAt)}</span>
               <span className="actions" style={{ justifySelf: "end" }}>
+                <button
+                  type="button"
+                  className="btn btn-icon"
+                  aria-label={`Editar orçamento ${q.name}`}
+                  title={`Editar orçamento ${q.name}`}
+                  onClick={() => onEdit(q.id)}
+                >
+                  <Pencil size={16} aria-hidden="true" />
+                </button>
                 {confirmId === q.id ? (
-                  <button className="btn btn-danger btn-sm" onClick={() => remove(q.id)}>
-                    Confirmar exclusão
+                  <button
+                    type="button"
+                    className="btn btn-danger btn-icon"
+                    aria-label={`Confirmar exclusão do orçamento ${q.name}`}
+                    title={`Confirmar exclusão do orçamento ${q.name}`}
+                    onClick={() => remove(q.id)}
+                  >
+                    <Check size={16} aria-hidden="true" />
                   </button>
                 ) : (
-                  <button className="btn btn-danger btn-sm" onClick={() => setConfirmId(q.id)}>
-                    Excluir
+                  <button
+                    type="button"
+                    className="btn btn-danger btn-icon"
+                    aria-label={`Excluir orçamento ${q.name}`}
+                    title={`Excluir orçamento ${q.name}`}
+                    onClick={() => setConfirmId(q.id)}
+                  >
+                    <Trash2 size={16} aria-hidden="true" />
                   </button>
                 )}
               </span>

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Calculator, Settings as SettingsIcon } from "lucide-react";
+import appIcon from "../../assets/app.png";
 import Quotes from "./pages/Quotes";
 import QuoteForm from "./pages/QuoteForm";
 import Settings from "./pages/Settings";
@@ -12,21 +14,26 @@ export default function App() {
     <div className="app">
       <nav className="sidebar">
         <div className="brand">
-          Led<span>ger</span>
+          <img className="brand-icon" src={appIcon} alt="" />
+          <div>
+            Led<span>ger</span>
+          </div>
         </div>
         <button
           className="nav-item"
           aria-current={view.page === "quotes" || view.page === "form" ? "page" : undefined}
           onClick={() => setView({ page: "quotes" })}
         >
-          Orçamentos
+          <Calculator size={18} aria-hidden="true" />
+          <span>Orçamentos</span>
         </button>
         <button
           className="nav-item"
           aria-current={view.page === "settings" ? "page" : undefined}
           onClick={() => setView({ page: "settings" })}
         >
-          Configurações
+          <SettingsIcon size={18} aria-hidden="true" />
+          <span>Configurações</span>
         </button>
       </nav>
       <main className="content">
