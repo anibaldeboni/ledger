@@ -156,7 +156,10 @@ assert.match(quoteForm, /disabled=\{!newCat\.name\.trim\(\) \|\| busy\}/);
 
 // Importing from Spoolman refreshes the independently loaded filament list.
 assert.match(settings, /<FilamentsSection refreshKey=\{filamentsRefreshKey\} \/>/);
-assert.match(settings, /<SpoolmanSection onImported=\{\(\) => setFilamentsRefreshKey\(\(key\) => key \+ 1\)\} \/>/);
+assert.match(
+  settings,
+  /<SpoolmanSection\s+onImported=\{\(\)\s*=>\s*setFilamentsRefreshKey\(\(key\)\s*=>\s*key\s*\+\s*1\)\}\s*\/>/,
+);
 assert.match(settings, /function FilamentsSection\(\{ refreshKey \}: \{ refreshKey: number \}\)/);
 assert.match(settings, /useAsync\(\(\) => LedgerService\.ListFilaments\(\), \[refreshKey\]\)/);
 assert.match(settings, /const n = await LedgerService\.ImportSpoolman\(value\.trim\(\)\);\s+onImported\(\);/);

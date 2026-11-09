@@ -12,15 +12,23 @@ import { brl } from "../lib/format";
 import { parseNum } from "../lib/format";
 import { useActionError, useAsync, useSubmission } from "../lib/hooks";
 import { isValidPrintDuration } from "../lib/print-time";
+import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 
 /** Um "plate": filamento + tempo + peso. */
 type PlateForm = { filamentId: number; time: string; weight: string };
 type FixedForm = { categoryId: number; value: string };
 
 const emptyPlate: PlateForm = { filamentId: 0, time: "", weight: "" };
-const printTimeFormatHint = "Duração maior que zero; use valores inteiros com d, h, m e/ou s nessa ordem. Espaços entre unidades são opcionais. Exemplos: 2d6h55m, 1h57m, 2m ou 35s.";
+const printTimeFormatHint =
+  "Duração maior que zero; use valores inteiros com d, h, m e/ou s nessa ordem. Espaços entre unidades são opcionais. Exemplos: 2d6h55m, 1h57m, 2m ou 35s.";
 
-export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBack: () => void }) {
+export default function QuoteForm({
+  quoteId,
+  onBack,
+}: {
+  quoteId?: number;
+  onBack: () => void;
+}) {
   const lists = useAsync(
     () =>
       Promise.all([
@@ -62,7 +70,12 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
         weight: String(f.weightG),
       })),
     );
-    setFixed((q.fixedCosts ?? []).map((c) => ({ categoryId: c.categoryId, value: String(c.value) })));
+    setFixed(
+      (q.fixedCosts ?? []).map((c) => ({
+        categoryId: c.categoryId,
+        value: String(c.value),
+      })),
+    );
   }, [editing.data]);
 
   const printers = lists.data?.[0] ?? [];
@@ -81,7 +94,12 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
     );
   const marginNum = parseNum(margin);
   const valid =
-    printerId > 0 && tariffId > 0 && platesValid && marginNum !== null && marginNum > 0 && marginNum < 100;
+    printerId > 0 &&
+    tariffId > 0 &&
+    platesValid &&
+    marginNum !== null &&
+    marginNum > 0 &&
+    marginNum < 100;
 
   function buildQuote(): QuoteEditor {
     return {
@@ -138,7 +156,10 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
           name: newCat.name.trim(),
           defaultValue: parseNum(newCat.value) ?? 0,
         });
-        setFixed((f) => [...f, { categoryId: saved.id, value: newCat.value || "0" }]);
+        setFixed((f) => [
+          ...f,
+          { categoryId: saved.id, value: newCat.value || "0" },
+        ]);
         setNewCat({ name: "", value: "" });
         lists.reload();
       } catch (e) {
@@ -152,7 +173,11 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
     setFixed((f) =>
       f.map((row, j) =>
         j === i
-          ? { categoryId, value: row.value === "" && cat ? String(cat.defaultValue) : row.value }
+          ? {
+              categoryId,
+              value:
+                row.value === "" && cat ? String(cat.defaultValue) : row.value,
+            }
           : row,
       ),
     );
@@ -165,8 +190,8 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
     <div>
       <div className="page-head">
         <h1>{quoteId ? "Editar orçamento" : "Novo orçamento"}</h1>
-        <button className="btn" onClick={onBack}>
-          Voltar
+        <button className="btn btn-icon" onClick={onBack}>
+          <ArrowLeft size={20} aria-hidden="true" />
         </button>
       </div>
 
@@ -179,7 +204,10 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
         <div className="row">
           <label className="field">
             Impressora
-            <select value={printerId} onChange={(e) => setPrinterId(Number(e.target.value))}>
+            <select
+              value={printerId}
+              onChange={(e) => setPrinterId(Number(e.target.value))}
+            >
               <option value={0}>Selecione…</option>
               {printers.map((p: Printer) => (
                 <option key={p.id} value={p.id}>
@@ -190,7 +218,10 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
           </label>
           <label className="field">
             Bandeira tarifária
-            <select value={tariffId} onChange={(e) => setTariffId(Number(e.target.value))}>
+            <select
+              value={tariffId}
+              onChange={(e) => setTariffId(Number(e.target.value))}
+            >
               <option value={0}>Selecione…</option>
               {tariffs.map((t: Tariff) => (
                 <option key={t.id} value={t.id}>
@@ -203,28 +234,42 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
       </section>
 
       <section className="block">
-        <h2>Filamentos (um por cor/plate)</h2>
+        <h2>Filamentos (um por plate)</h2>
         {plates.map((p, i) => {
           const fil = filById.get(p.filamentId);
           const printTimeValid = isValidPrintDuration(p.time);
-          const bad = p.filamentId === 0 || (p.time !== "" && !printTimeValid) || (p.weight !== "" && (parseNum(p.weight) ?? 0) <= 0);
+          const bad =
+            p.filamentId === 0 ||
+            (p.time !== "" && !printTimeValid) ||
+            (p.weight !== "" && (parseNum(p.weight) ?? 0) <= 0);
           const invalidTime = bad && !printTimeValid;
           return (
             <div className="plate-row" key={i}>
               <div className="plate-picker">
-                <span className="chip" style={fil?.color ? { background: fil.color } : undefined} aria-hidden="true" />
+                <span
+                  className="chip"
+                  style={fil?.color ? { background: fil.color } : undefined}
+                  aria-hidden="true"
+                />
                 <select
                   value={p.filamentId}
                   className={p.filamentId === 0 ? "invalid" : undefined}
                   onChange={(e) =>
-                    setPlates((ps) => ps.map((row, j) => (j === i ? { ...row, filamentId: Number(e.target.value) } : row)))
+                    setPlates((ps) =>
+                      ps.map((row, j) =>
+                        j === i
+                          ? { ...row, filamentId: Number(e.target.value) }
+                          : row,
+                      ),
+                    )
                   }
                 >
                   <option value={0}>Selecione o filamento…</option>
                   {filaments.map((f: Filament) => (
                     <option key={f.id} value={f.id}>
                       {f.name}
-                      {f.material ? ` · ${f.material}` : ""} · {brl(f.pricePerKg)}/kg
+                      {f.material ? ` · ${f.material}` : ""} ·{" "}
+                      {brl(f.pricePerKg)}/kg
                     </option>
                   ))}
                 </select>
@@ -238,42 +283,73 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
                   placeholder="1h57m"
                   title={printTimeFormatHint}
                   spellCheck={false}
-                  onChange={(e) => setPlates((ps) => ps.map((row, j) => (j === i ? { ...row, time: e.target.value } : row)))}
+                  onChange={(e) =>
+                    setPlates((ps) =>
+                      ps.map((row, j) =>
+                        j === i ? { ...row, time: e.target.value } : row,
+                      ),
+                    )
+                  }
                 />
               </label>
               <label className="field">
                 Peso (g)
                 <input
                   inputMode="decimal"
-                  className={bad && (parseNum(p.weight) ?? 0) <= 0 ? "invalid" : undefined}
+                  className={
+                    bad && (parseNum(p.weight) ?? 0) <= 0
+                      ? "invalid"
+                      : undefined
+                  }
                   value={p.weight}
                   placeholder="35"
-                  onChange={(e) => setPlates((ps) => ps.map((row, j) => (j === i ? { ...row, weight: e.target.value } : row)))}
+                  onChange={(e) =>
+                    setPlates((ps) =>
+                      ps.map((row, j) =>
+                        j === i ? { ...row, weight: e.target.value } : row,
+                      ),
+                    )
+                  }
                 />
               </label>
               <button
-                className="btn btn-ghost"
+                className="btn btn-danger btn-icon"
                 aria-label="Remover filamento"
+                title="Remover filamento"
                 onClick={() => setPlates((ps) => ps.filter((_, j) => j !== i))}
               >
-                ✕
+                <Trash2 size={16} aria-hidden="true" />
               </button>
             </div>
           );
         })}
         <div className="toolbar" style={{ marginTop: 8 }}>
-          <button className="btn btn-sm" onClick={() => setPlates((ps) => [...ps, { ...emptyPlate }])}>
-            + Adicionar filamento
+          <button
+            className="btn btn-primary btn-icon"
+            aria-label="Adicionar filamento"
+            title="Adicionar filamento"
+            onClick={() => setPlates((ps) => [...ps, { ...emptyPlate }])}
+          >
+            <Plus size={18} aria-hidden="true" />
           </button>
-          {plates.length === 0 ? <p className="hint">Adicione ao menos um filamento.</p> : null}
+          {plates.length === 0 ? (
+            <p className="hint">Adicione ao menos um filamento.</p>
+          ) : null}
         </div>
       </section>
 
       <section className="block">
         <h2>Custos fixos</h2>
         {fixed.map((f, i) => (
-          <div className="plate-row" key={i} style={{ gridTemplateColumns: "1fr 130px auto", alignItems: "end" }}>
-            <select value={f.categoryId} onChange={(e) => pickCategory(i, Number(e.target.value))}>
+          <div
+            className="plate-row"
+            key={i}
+            style={{ gridTemplateColumns: "1fr 130px auto", alignItems: "end" }}
+          >
+            <select
+              value={f.categoryId}
+              onChange={(e) => pickCategory(i, Number(e.target.value))}
+            >
               <option value={0}>Selecione a categoria…</option>
               {categories.map((c: CostCategory) => (
                 <option key={c.id} value={c.id}>
@@ -287,33 +363,53 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
                 inputMode="decimal"
                 value={f.value}
                 placeholder="0"
-                onChange={(e) => setFixed((fs) => fs.map((row, j) => (j === i ? { ...row, value: e.target.value } : row)))}
+                onChange={(e) =>
+                  setFixed((fs) =>
+                    fs.map((row, j) =>
+                      j === i ? { ...row, value: e.target.value } : row,
+                    ),
+                  )
+                }
               />
             </label>
             <button
-              className="btn btn-ghost"
+              className="btn btn-danger btn-icon"
               aria-label="Remover custo"
+              title="Remover custo"
               onClick={() => setFixed((fs) => fs.filter((_, j) => j !== i))}
             >
-              ✕
+              <Trash2 size={16} aria-hidden="true" />
             </button>
           </div>
         ))}
         <div className="row" style={{ marginTop: 8 }}>
           <button
-            className="btn btn-sm"
-            onClick={() => setFixed((fs) => [...fs, { categoryId: 0, value: "" }])}
+            className="btn btn-primary btn-icon"
+            title="Adicionar custo"
+            aria-label="Adicionar custo"
+            onClick={() =>
+              setFixed((fs) => [...fs, { categoryId: 0, value: "" }])
+            }
           >
-            + Adicionar custo
+            <Plus size={18} aria-hidden="true" />
           </button>
         </div>
-        <div className="row" style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--border)" }}>
+        <div
+          className="row"
+          style={{
+            marginTop: 12,
+            paddingTop: 12,
+            borderTop: "1px solid var(--border)",
+          }}
+        >
           <label className="field">
             Nova categoria
             <input
               value={newCat.name}
               placeholder="Ex.: Pós-processamento"
-              onChange={(e) => setNewCat((c) => ({ ...c, name: e.target.value }))}
+              onChange={(e) =>
+                setNewCat((c) => ({ ...c, name: e.target.value }))
+              }
             />
           </label>
           <label className="field" style={{ flexBasis: 120 }}>
@@ -322,10 +418,16 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
               inputMode="decimal"
               value={newCat.value}
               placeholder="0"
-              onChange={(e) => setNewCat((c) => ({ ...c, value: e.target.value }))}
+              onChange={(e) =>
+                setNewCat((c) => ({ ...c, value: e.target.value }))
+              }
             />
           </label>
-          <button className="btn btn-sm" onClick={createCategory} disabled={!newCat.name.trim() || busy}>
+          <button
+            className="btn btn-sm"
+            onClick={createCategory}
+            disabled={!newCat.name.trim() || busy}
+          >
             Criar e adicionar
           </button>
         </div>
@@ -348,10 +450,19 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
       </section>
 
       <div className="toolbar" style={{ marginBottom: 16 }}>
-        <button className="btn btn-primary" disabled={!valid || busy} onClick={calculate}>
+        <button
+          className="btn btn-primary"
+          disabled={!valid || busy}
+          onClick={calculate}
+        >
           Calcular
         </button>
-        {!valid ? <p className="hint">Preencha impressora, bandeira, ao menos um filamento (tempo e peso) e a margem.</p> : null}
+        {!valid ? (
+          <p className="hint">
+            Preencha impressora, bandeira, ao menos um filamento (tempo e peso)
+            e a margem.
+          </p>
+        ) : null}
       </div>
 
       {result ? (
@@ -387,13 +498,23 @@ export default function QuoteForm({ quoteId, onBack }: { quoteId?: number; onBac
           <div className="row" style={{ marginTop: 16 }}>
             <label className="field" style={{ flexBasis: 260 }}>
               Nome do orçamento
-              <input value={name} placeholder="Ex.: Capivara articulada" onChange={(e) => setName(e.target.value)} />
+              <input
+                value={name}
+                placeholder="Ex.: Capivara articulada"
+                onChange={(e) => setName(e.target.value)}
+              />
             </label>
-            <button className="btn btn-primary" disabled={!canSave || busy} onClick={save}>
+            <button
+              className="btn btn-primary"
+              disabled={!canSave || busy}
+              onClick={save}
+            >
               {quoteId ? "Salvar alterações" : "Salvar orçamento"}
             </button>
           </div>
-          {!canSave && result ? <p className="hint">Dê um nome ao orçamento para salvá-lo.</p> : null}
+          {!canSave && result ? (
+            <p className="hint">Dê um nome ao orçamento para salvá-lo.</p>
+          ) : null}
         </section>
       ) : null}
     </div>

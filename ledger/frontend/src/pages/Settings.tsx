@@ -1,12 +1,24 @@
-
 import { useState } from "react";
-import { Check, Pencil, Trash2 } from "lucide-react";
+import {
+  Check,
+  CloudSync,
+  Pencil,
+  PhoneOutgoing,
+  Save,
+  Trash2,
+} from "lucide-react";
 import { LedgerService } from "../../bindings/ledger";
 import { brl, parseNum } from "../lib/format";
 import { useActionError, useAsync, useSubmission } from "../lib/hooks";
 
 /** Exclusão em dois passos, sem diálogo nativo. */
-function DeleteButton({ onConfirm, item }: { onConfirm: () => void; item: string }) {
+function DeleteButton({
+  onConfirm,
+  item,
+}: {
+  onConfirm: () => void;
+  item: string;
+}) {
   const [armed, setArmed] = useState(false);
   const label = armed ? `Confirmar exclusão: ${item}` : `Excluir ${item}`;
   return (
@@ -21,7 +33,11 @@ function DeleteButton({ onConfirm, item }: { onConfirm: () => void; item: string
       }}
       onBlur={() => setArmed(false)}
     >
-      {armed ? <Check size={16} aria-hidden="true" /> : <Trash2 size={16} aria-hidden="true" />}
+      {armed ? (
+        <Check size={16} aria-hidden="true" />
+      ) : (
+        <Trash2 size={16} aria-hidden="true" />
+      )}
     </button>
   );
 }
@@ -36,7 +52,9 @@ export default function Settings() {
       <PrintersSection />
       <TariffsSection />
       <FilamentsSection refreshKey={filamentsRefreshKey} />
-      <SpoolmanSection onImported={() => setFilamentsRefreshKey((key) => key + 1)} />
+      <SpoolmanSection
+        onImported={() => setFilamentsRefreshKey((key) => key + 1)}
+      />
       <CostCategoriesSection />
     </div>
   );
@@ -46,7 +64,14 @@ export default function Settings() {
 
 function PrintersSection() {
   const list = useAsync(() => LedgerService.ListPrinters(), []);
-  const [form, setForm] = useState({ id: 0, name: "", purchase: "", resale: "", lifespan: "", watts: "" });
+  const [form, setForm] = useState({
+    id: 0,
+    name: "",
+    purchase: "",
+    resale: "",
+    lifespan: "",
+    watts: "",
+  });
   const [err, setErr, clearErr] = useActionError();
   const { busy, run } = useSubmission();
   const editing = form.id !== 0;
@@ -63,7 +88,14 @@ function PrintersSection() {
           lifespanHours: parseNum(form.lifespan) ?? 0,
           powerWatts: parseNum(form.watts) ?? 0,
         });
-        setForm({ id: 0, name: "", purchase: "", resale: "", lifespan: "", watts: "" });
+        setForm({
+          id: 0,
+          name: "",
+          purchase: "",
+          resale: "",
+          lifespan: "",
+          watts: "",
+        });
         list.reload();
       } catch (e) {
         setErr(e);
@@ -102,8 +134,12 @@ function PrintersSection() {
               <span>{p.name}</span>
               <span className="money">{brl(p.purchasePrice)}</span>
               <span className="money">{brl(p.resalePrice)}</span>
-              <span className="money">{p.lifespanHours.toLocaleString("pt-BR")}</span>
-              <span className="money">{p.powerWatts.toLocaleString("pt-BR")}</span>
+              <span className="money">
+                {p.lifespanHours.toLocaleString("pt-BR")}
+              </span>
+              <span className="money">
+                {p.powerWatts.toLocaleString("pt-BR")}
+              </span>
               <span className="actions" style={{ justifySelf: "end" }}>
                 <button
                   type="button"
@@ -123,7 +159,10 @@ function PrintersSection() {
                 >
                   <Pencil size={16} aria-hidden="true" />
                 </button>
-                <DeleteButton item={`impressora ${p.name}`} onConfirm={() => remove(p.id)} />
+                <DeleteButton
+                  item={`impressora ${p.name}`}
+                  onConfirm={() => remove(p.id)}
+                />
               </span>
             </div>
           ))}
@@ -132,30 +171,70 @@ function PrintersSection() {
       <div className="row">
         <label className="field">
           Nome
-          <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Ex.: Bambu A1" />
+          <input
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            placeholder="Ex.: Bambu A1"
+          />
         </label>
         <label className="field">
           Preço de compra (R$)
-          <input inputMode="decimal" value={form.purchase} onChange={(e) => setForm({ ...form, purchase: e.target.value })} placeholder="4500" />
+          <input
+            inputMode="decimal"
+            value={form.purchase}
+            onChange={(e) => setForm({ ...form, purchase: e.target.value })}
+            placeholder="4500"
+          />
         </label>
         <label className="field">
           Revenda (R$)
-          <input inputMode="decimal" value={form.resale} onChange={(e) => setForm({ ...form, resale: e.target.value })} placeholder="500" />
+          <input
+            inputMode="decimal"
+            value={form.resale}
+            onChange={(e) => setForm({ ...form, resale: e.target.value })}
+            placeholder="500"
+          />
         </label>
         <label className="field">
           Vida útil (h)
-          <input inputMode="decimal" value={form.lifespan} onChange={(e) => setForm({ ...form, lifespan: e.target.value })} placeholder="5000" />
+          <input
+            inputMode="decimal"
+            value={form.lifespan}
+            onChange={(e) => setForm({ ...form, lifespan: e.target.value })}
+            placeholder="5000"
+          />
         </label>
         <label className="field">
           Potência (W)
-          <input inputMode="decimal" value={form.watts} onChange={(e) => setForm({ ...form, watts: e.target.value })} placeholder="250" />
+          <input
+            inputMode="decimal"
+            value={form.watts}
+            onChange={(e) => setForm({ ...form, watts: e.target.value })}
+            placeholder="250"
+          />
         </label>
         <div className="actions">
-          <button className="btn btn-primary" disabled={!form.name.trim() || busy} onClick={save}>
+          <button
+            className="btn btn-primary"
+            disabled={!form.name.trim() || busy}
+            onClick={save}
+          >
             {busy ? "Salvando…" : editing ? "Salvar" : "Adicionar"}
           </button>
           {editing ? (
-            <button className="btn" onClick={() => setForm({ id: 0, name: "", purchase: "", resale: "", lifespan: "", watts: "" })}>
+            <button
+              className="btn"
+              onClick={() =>
+                setForm({
+                  id: 0,
+                  name: "",
+                  purchase: "",
+                  resale: "",
+                  lifespan: "",
+                  watts: "",
+                })
+              }
+            >
               Cancelar
             </button>
           ) : null}
@@ -223,11 +302,16 @@ function TariffsSection() {
                   className="btn btn-icon"
                   aria-label={`Editar bandeira tarifária ${t.name}`}
                   title={`Editar bandeira tarifária ${t.name}`}
-                  onClick={() => setForm({ id: t.id, name: t.name, kwh: String(t.kwhPrice) })}
+                  onClick={() =>
+                    setForm({ id: t.id, name: t.name, kwh: String(t.kwhPrice) })
+                  }
                 >
                   <Pencil size={16} aria-hidden="true" />
                 </button>
-                <DeleteButton item={`bandeira tarifária ${t.name}`} onConfirm={() => remove(t.id)} />
+                <DeleteButton
+                  item={`bandeira tarifária ${t.name}`}
+                  onConfirm={() => remove(t.id)}
+                />
               </span>
             </div>
           ))}
@@ -236,17 +320,37 @@ function TariffsSection() {
       <div className="row">
         <label className="field">
           Nome
-          <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Ex.: Verde" />
+          <input
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            placeholder="Ex.: Verde"
+          />
         </label>
         <label className="field">
           Valor do kWh (R$)
-          <input inputMode="decimal" value={form.kwh} onChange={(e) => setForm({ ...form, kwh: e.target.value })} placeholder="0,80" />
+          <input
+            inputMode="decimal"
+            value={form.kwh}
+            onChange={(e) => setForm({ ...form, kwh: e.target.value })}
+            placeholder="0,80"
+          />
         </label>
         <div className="actions">
-          <button className="btn btn-primary" disabled={!form.name.trim() || busy} onClick={save}>
+          <button
+            className="btn btn-primary"
+            disabled={!form.name.trim() || busy}
+            onClick={save}
+          >
             {busy ? "Salvando…" : form.id ? "Salvar" : "Adicionar"}
           </button>
-          {form.id ? <button className="btn" onClick={() => setForm({ id: 0, name: "", kwh: "" })}>Cancelar</button> : null}
+          {form.id ? (
+            <button
+              className="btn"
+              onClick={() => setForm({ id: 0, name: "", kwh: "" })}
+            >
+              Cancelar
+            </button>
+          ) : null}
         </div>
       </div>
     </section>
@@ -257,7 +361,13 @@ function TariffsSection() {
 
 function FilamentsSection({ refreshKey }: { refreshKey: number }) {
   const list = useAsync(() => LedgerService.ListFilaments(), [refreshKey]);
-  const [form, setForm] = useState({ id: 0, name: "", material: "", color: "#8b93a9", price: "" });
+  const [form, setForm] = useState({
+    id: 0,
+    name: "",
+    material: "",
+    color: "#8b93a9",
+    price: "",
+  });
   const [err, setErr, clearErr] = useActionError();
   const { busy, run } = useSubmission();
 
@@ -297,7 +407,10 @@ function FilamentsSection({ refreshKey }: { refreshKey: number }) {
       <h2>Filamentos</h2>
       {err ? <p className="error-text">{err}</p> : null}
       {(list.data ?? []).length === 0 ? (
-        <p className="hint">Nenhum filamento cadastrado — crie manualmente ou importe do Spoolman abaixo.</p>
+        <p className="hint">
+          Nenhum filamento cadastrado — crie manualmente ou importe do Spoolman
+          abaixo.
+        </p>
       ) : (
         <div className="list" style={{ marginBottom: 14 }}>
           <div className="row-head cols-fil">
@@ -310,11 +423,17 @@ function FilamentsSection({ refreshKey }: { refreshKey: number }) {
           </div>
           {(list.data ?? []).map((f) => (
             <div className="list-row cols-fil" key={f.id}>
-              <span className="chip" style={{ background: f.color || undefined }} aria-hidden="true" />
+              <span
+                className="chip"
+                style={{ background: f.color || undefined }}
+                aria-hidden="true"
+              />
               <span>{f.name}</span>
               <span className="muted">{f.material || "—"}</span>
               <span className="money">{brl(f.pricePerKg)}</span>
-              <span className="muted">{f.source === "spoolman" ? "Spoolman" : "Manual"}</span>
+              <span className="muted">
+                {f.source === "spoolman" ? "Spoolman" : "Manual"}
+              </span>
               <span className="actions" style={{ justifySelf: "end" }}>
                 <button
                   type="button"
@@ -322,12 +441,21 @@ function FilamentsSection({ refreshKey }: { refreshKey: number }) {
                   aria-label={`Editar filamento ${f.name}`}
                   title={`Editar filamento ${f.name}`}
                   onClick={() =>
-                    setForm({ id: f.id, name: f.name, material: f.material, color: f.color || "#8b93a9", price: String(f.pricePerKg) })
+                    setForm({
+                      id: f.id,
+                      name: f.name,
+                      material: f.material,
+                      color: f.color || "#8b93a9",
+                      price: String(f.pricePerKg),
+                    })
                   }
                 >
                   <Pencil size={16} aria-hidden="true" />
                 </button>
-                <DeleteButton item={`filamento ${f.name}`} onConfirm={() => remove(f.id)} />
+                <DeleteButton
+                  item={`filamento ${f.name}`}
+                  onConfirm={() => remove(f.id)}
+                />
               </span>
             </div>
           ))}
@@ -336,25 +464,62 @@ function FilamentsSection({ refreshKey }: { refreshKey: number }) {
       <div className="row">
         <label className="field">
           Nome
-          <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Ex.: PLA Preto" />
+          <input
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            placeholder="Ex.: PLA Preto"
+          />
         </label>
         <label className="field">
           Material
-          <input value={form.material} onChange={(e) => setForm({ ...form, material: e.target.value })} placeholder="PLA" />
+          <input
+            value={form.material}
+            onChange={(e) => setForm({ ...form, material: e.target.value })}
+            placeholder="PLA"
+          />
         </label>
         <label className="field" style={{ flexBasis: 90 }}>
           Cor
-          <input type="color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} style={{ padding: 3, height: 35 }} />
+          <input
+            type="color"
+            value={form.color}
+            onChange={(e) => setForm({ ...form, color: e.target.value })}
+            style={{ padding: 3, height: 35 }}
+          />
         </label>
         <label className="field">
           Preço/kg (R$)
-          <input inputMode="decimal" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="99" />
+          <input
+            inputMode="decimal"
+            value={form.price}
+            onChange={(e) => setForm({ ...form, price: e.target.value })}
+            placeholder="99"
+          />
         </label>
         <div className="actions">
-          <button className="btn btn-primary" disabled={!form.name.trim() || busy} onClick={save}>
+          <button
+            className="btn btn-primary"
+            disabled={!form.name.trim() || busy}
+            onClick={save}
+          >
             {busy ? "Salvando…" : form.id ? "Salvar" : "Adicionar"}
           </button>
-          {form.id ? <button className="btn" onClick={() => setForm({ id: 0, name: "", material: "", color: "#8b93a9", price: "" })}>Cancelar</button> : null}
+          {form.id ? (
+            <button
+              className="btn"
+              onClick={() =>
+                setForm({
+                  id: 0,
+                  name: "",
+                  material: "",
+                  color: "#8b93a9",
+                  price: "",
+                })
+              }
+            >
+              Cancelar
+            </button>
+          ) : null}
         </div>
       </div>
     </section>
@@ -429,18 +594,38 @@ function SpoolmanSection({ onImported }: { onImported: () => void }) {
           />
         </label>
         <div className="actions">
-          <button className="btn" onClick={persist}>
-            Salvar
+          <button
+            className="btn btn-icon"
+            title="Salvar"
+            aria-label="Salvar"
+            onClick={persist}
+          >
+            <Save size={22} aria-hidden="true" />
           </button>
-          <button className="btn" disabled={busy || !value.trim()} onClick={test}>
-            Testar conexão
+          <button
+            className="btn btn-icon"
+            title="Testar conexão"
+            aria-label="Testar conexão"
+            disabled={busy || !value.trim()}
+            onClick={test}
+          >
+            <PhoneOutgoing size={22} aria-hidden="true" />
           </button>
-          <button className="btn btn-primary" disabled={busy || !value.trim()} onClick={importSpools}>
-            Importar spools
+          <button
+            className="btn btn-primary btn-icon"
+            title="Importar spools"
+            aria-label="Importar spools"
+            disabled={busy || !value.trim()}
+            onClick={importSpools}
+          >
+            <CloudSync size={22} aria-hidden="true" />
           </button>
         </div>
       </div>
-      <p className="hint">Importar atualiza os filamentos existentes (por spool) e adiciona os novos; spools arquivados são ignorados.</p>
+      <p className="hint">
+        Importar atualiza os filamentos existentes (por spool) e adiciona os
+        novos; spools arquivados são ignorados.
+      </p>
     </section>
   );
 }
@@ -503,11 +688,20 @@ function CostCategoriesSection() {
                   className="btn btn-icon"
                   aria-label={`Editar categoria de custo ${c.name}`}
                   title={`Editar categoria de custo ${c.name}`}
-                  onClick={() => setForm({ id: c.id, name: c.name, value: String(c.defaultValue) })}
+                  onClick={() =>
+                    setForm({
+                      id: c.id,
+                      name: c.name,
+                      value: String(c.defaultValue),
+                    })
+                  }
                 >
                   <Pencil size={16} aria-hidden="true" />
                 </button>
-                <DeleteButton item={`categoria de custo ${c.name}`} onConfirm={() => remove(c.id)} />
+                <DeleteButton
+                  item={`categoria de custo ${c.name}`}
+                  onConfirm={() => remove(c.id)}
+                />
               </span>
             </div>
           ))}
@@ -516,17 +710,37 @@ function CostCategoriesSection() {
       <div className="row">
         <label className="field">
           Nome
-          <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Ex.: Mão de Obra" />
+          <input
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            placeholder="Ex.: Mão de Obra"
+          />
         </label>
         <label className="field">
           Valor padrão (R$)
-          <input inputMode="decimal" value={form.value} onChange={(e) => setForm({ ...form, value: e.target.value })} placeholder="0" />
+          <input
+            inputMode="decimal"
+            value={form.value}
+            onChange={(e) => setForm({ ...form, value: e.target.value })}
+            placeholder="0"
+          />
         </label>
         <div className="actions">
-          <button className="btn btn-primary" disabled={!form.name.trim() || busy} onClick={save}>
+          <button
+            className="btn btn-primary"
+            disabled={!form.name.trim() || busy}
+            onClick={save}
+          >
             {busy ? "Salvando…" : form.id ? "Salvar" : "Adicionar"}
           </button>
-          {form.id ? <button className="btn" onClick={() => setForm({ id: 0, name: "", value: "" })}>Cancelar</button> : null}
+          {form.id ? (
+            <button
+              className="btn"
+              onClick={() => setForm({ id: 0, name: "", value: "" })}
+            >
+              Cancelar
+            </button>
+          ) : null}
         </div>
       </div>
     </section>
