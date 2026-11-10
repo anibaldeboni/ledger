@@ -3,10 +3,12 @@ import { Check, Pencil, Plus, Trash2 } from "lucide-react";
 import { LedgerService } from "../../bindings/ledger";
 import { brl, dt } from "../lib/format";
 import { useActionError, useAsync } from "../lib/hooks";
+import { filterQuotesByName } from "../lib/search";
 
 export default function Quotes({ onNew, onEdit }: { onNew: () => void; onEdit: (id: number) => void }) {
   const quotes = useAsync(() => LedgerService.ListQuotes(), []);
   const [confirmId, setConfirmId] = useState<number | null>(null);
+  const [search, setSearch] = useState("");
   const [actionError, setActionError, clearActionError] = useActionError();
 
   async function remove(id: number) {
@@ -21,20 +23,31 @@ export default function Quotes({ onNew, onEdit }: { onNew: () => void; onEdit: (
   }
 
   const list = quotes.data ?? [];
+  const filtered = filterQuotesByName(list, search);
 
   return (
     <div>
-      <div className="page-head">
+      <div className="page-head quotes-head">
         <h1>Orçamentos</h1>
-        <button
-          type="button"
-          className="btn btn-primary btn-icon"
-          aria-label="Criar novo orçamento"
-          title="Criar novo orçamento"
-          onClick={onNew}
-        >
-          <Plus size={18} aria-hidden="true" />
-        </button>
+        <div className="page-head-actions">
+          <input
+            type="search"
+            className="search-input"
+            placeholder="Buscar orçamento (mín. 3 letras)"
+            aria-label="Buscar orçamento pelo nome"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <button
+            type="button"
+            className="btn btn-primary btn-icon"
+            aria-label="Criar novo orçamento"
+            title="Criar novo orçamento"
+            onClick={onNew}
+          >
+            <Plus size={18} aria-hidden="true" />
+          </button>
+        </div>
       </div>
 
       {quotes.error ? <p className="error-text">{quotes.error}</p> : null}
@@ -42,6 +55,8 @@ export default function Quotes({ onNew, onEdit }: { onNew: () => void; onEdit: (
 
       {list.length === 0 ? (
         <div className="empty">Nenhum orçamento ainda. Crie o primeiro para calcular o preço de uma impressão.</div>
+      ) : filtered.length === 0 ? (
+        <div className="empty">Nenhum orçamento encontrado para “{search.trim()}”.</div>
       ) : (
         <div className="list">
           <div className="row-head cols-quote">
@@ -51,7 +66,7 @@ export default function Quotes({ onNew, onEdit }: { onNew: () => void; onEdit: (
             <span className="money">Atualizado</span>
             <span />
           </div>
-          {list.map((q) => (
+          {filtered.map((q) => (
             <div className="list-row cols-quote" key={q.id}>
               <span>{q.name}</span>
               <span className="money">{q.marginPercent.toLocaleString("pt-BR")}%</span>

@@ -164,4 +164,19 @@ assert.match(settings, /function FilamentsSection\(\{ refreshKey \}: \{ refreshK
 assert.match(settings, /useAsync\(\(\) => LedgerService\.ListFilaments\(\), \[refreshKey\]\)/);
 assert.match(settings, /const n = await LedgerService\.ImportSpoolman\(value\.trim\(\)\);\s+onImported\(\);/);
 
+// Search by quote name filters from the third typed character on, ignoring
+// case and accents; shorter or blank terms keep the full list.
+const { filterQuotesByName } = await import("../../src/lib/search.ts");
+const quoteNames = [{ name: "Suporte de fone" }, { name: "Vaso Geométrico" }, { name: "Caixa" }];
+const names = (term: string) => filterQuotesByName(quoteNames, term).map((q) => q.name);
+assert.deepEqual(names(""), ["Suporte de fone", "Vaso Geométrico", "Caixa"]);
+assert.equal(names("su").length, 3);
+assert.deepEqual(names("sup"), ["Suporte de fone"]);
+assert.deepEqual(names("SUP"), ["Suporte de fone"]);
+assert.deepEqual(names("geometrico"), ["Vaso Geométrico"]);
+assert.deepEqual(names("  vas  "), ["Vaso Geométrico"]);
+assert.deepEqual(names("xyz"), []);
+assert.match(quotes, /import \{ filterQuotesByName \} from "\.\.\/lib\/search";/);
+assert.match(quotes, /<input[^>]*type="search"/);
+
 console.log("T10 hook and UI regression probes passed.");
