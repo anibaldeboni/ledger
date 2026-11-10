@@ -20,7 +20,7 @@ type FixedForm = { categoryId: number; value: string };
 
 const emptyPlate: PlateForm = { filamentId: 0, time: "", weight: "" };
 const printTimeFormatHint =
-  "Duração maior que zero; use valores inteiros com d, h, m e/ou s nessa ordem. Espaços entre unidades são opcionais. Exemplos: 2d6h55m, 1h57m, 2m ou 35s.";
+  "Duração maior que zero; use valores inteiros com d, h, m e/ou s nessa ordem.\nEspaços entre unidades são opcionais. \nExemplos: 2d6h55m, 1h57m, 2m ou 35s.";
 
 export default function QuoteForm({
   quoteId,
