@@ -1,8 +1,11 @@
 package store
 
 import (
+	"database/sql"
 	"path/filepath"
+	"strings"
 	"testing"
+	"testing/fstest"
 
 	"ledger/internal/domain"
 )
@@ -15,6 +18,119 @@ func newTestStore(t *testing.T) *Store {
 	}
 	t.Cleanup(func() { s.Close() })
 	return s
+}
+
+func TestOpenMigratesExistingDatabaseWithoutLosingData(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "legacy.db")
+	legacyDB, err := sql.Open("sqlite", "file:"+path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = legacyDB.Exec(`
+		CREATE TABLE printers (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			name TEXT NOT NULL,
+			purchase_price REAL NOT NULL DEFAULT 0,
+			resale_price REAL NOT NULL DEFAULT 0,
+			lifespan_hours REAL NOT NULL DEFAULT 0,
+			power_watts REAL NOT NULL DEFAULT 0
+		);
+		INSERT INTO printers (name, purchase_price) VALUES ('Impressora existente', 123.45);
+	`)
+	if err != nil {
+		legacyDB.Close()
+		t.Fatal(err)
+	}
+	if err := legacyDB.Close(); err != nil {
+		t.Fatal(err)
+	}
+
+	s, err := Open(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { s.Close() })
+
+	var name string
+	var purchasePrice float64
+	if err := s.db.QueryRow(`SELECT name, purchase_price FROM printers WHERE id = 1`).Scan(&name, &purchasePrice); err != nil {
+		t.Fatal(err)
+	}
+	if name != "Impressora existente" || purchasePrice != 123.45 {
+		t.Fatalf("migration altered existing data: name=%q purchase_price=%v", name, purchasePrice)
+	}
+
+	var version int
+	if err := s.db.QueryRow(`SELECT version FROM schema_migrations`).Scan(&version); err != nil {
+		t.Fatal(err)
+	}
+	if version != 1 {
+		t.Fatalf("migration version = %d, want 1", version)
+	}
+}
+
+func TestOpenAcceptsAlreadyAppliedMigrations(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "test.db")
+	first, err := Open(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := first.Close(); err != nil {
+		t.Fatal(err)
+	}
+
+	second, err := Open(path)
+	if err != nil {
+		t.Fatalf("Open failed when all migrations were already applied: %v", err)
+	}
+	t.Cleanup(func() { second.Close() })
+}
+
+func TestOpenReturnsMigrationFailureWithoutChangingData(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "broken.db")
+	legacyDB, err := sql.Open("sqlite", "file:"+path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = legacyDB.Exec(`
+		CREATE TABLE printers (id INTEGER PRIMARY KEY, name TEXT NOT NULL);
+		INSERT INTO printers (id, name) VALUES (1, 'Original');
+	`)
+	if err != nil {
+		legacyDB.Close()
+		t.Fatal(err)
+	}
+	if err := legacyDB.Close(); err != nil {
+		t.Fatal(err)
+	}
+
+	migrations := fstest.MapFS{
+		"migrations/000001_invalid.up.sql": &fstest.MapFile{Data: []byte("UPDATE printers SET name = 'Alterado'; CREATE TABLE broken (")},
+	}
+	s, err := open(path, migrations)
+	if err == nil {
+		t.Fatal("open succeeded with an invalid migration")
+	}
+	if s != nil {
+		s.Close()
+		t.Fatal("open returned a store after a migration failure")
+	}
+	if !strings.Contains(err.Error(), "migrar schema") {
+		t.Fatalf("migration error lacks startup context: %v", err)
+	}
+
+	checkDB, err := sql.Open("sqlite", "file:"+path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { checkDB.Close() })
+	var name string
+	if err := checkDB.QueryRow(`SELECT name FROM printers WHERE id = 1`).Scan(&name); err != nil {
+		t.Fatal(err)
+	}
+	if name != "Original" {
+		t.Fatalf("rejected migration changed existing data: name=%q", name)
+	}
 }
 
 func TestQuoteRoundTrip(t *testing.T) {
