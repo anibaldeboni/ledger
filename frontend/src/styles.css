@@ -653,3 +653,372 @@ section.block > h2 {
     @apply font-sans;
   }
 }
+
+/* --- Production Kanban -------------------------------------------------------- */
+
+.skip-link {
+  position: absolute;
+  z-index: 5;
+  top: 8px;
+  left: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  transform: translateY(-150%);
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+.production-page {
+  display: grid;
+  gap: 16px;
+}
+
+.production-page .page-head {
+  margin-bottom: 0;
+}
+
+.production-page .page-head .hint {
+  margin: 4px 0 0;
+}
+
+.production-create-card {
+  border-color: var(--border);
+}
+
+.production-create-form,
+.production-stage-add {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.production-create-fields,
+.production-stage-fields {
+  flex: 1 1 220px;
+  width: auto;
+}
+
+.production-board-controls {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.production-order-filter {
+  min-width: 220px;
+}
+
+.production-order-filter > summary,
+.production-stage-manager > summary {
+  cursor: pointer;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.production-order-filter > summary:focus-visible,
+.production-stage-manager > summary:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+  border-radius: var(--radius);
+}
+
+.production-filter-count {
+  margin-left: 8px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.production-filter-content {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  min-width: 220px;
+  margin-top: 8px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.production-filter-options {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.production-filter-option-list {
+  gap: 8px;
+}
+
+.production-filter-option {
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.production-sort {
+  flex: 1 1 220px;
+  max-width: 320px;
+  width: auto;
+}
+
+.production-sort select,
+.production-add-ticket select,
+.production-ticket-stage-select select {
+  width: 100%;
+}
+
+.production-stage-manager {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.production-stage-manager .hint {
+  margin: 0;
+}
+
+.production-stage-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.production-stage-row {
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.production-stage-row form {
+  display: grid;
+  grid-template-columns: minmax(140px, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.production-stage-name-group {
+  min-width: 0;
+  width: auto;
+}
+
+.production-stage-protected {
+  color: var(--primary);
+  font-size: 11px;
+}
+
+.production-board-scroll {
+  max-width: 100%;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  overscroll-behavior-x: contain;
+}
+
+.production-board-scroll:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.production-board-table {
+  width: max-content;
+  min-width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.production-board-table th,
+.production-board-table td {
+  padding: 10px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.production-board-table thead th {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  min-width: 220px;
+  background: var(--bg);
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+
+.production-board-table th:first-child,
+.production-board-table td:first-child {
+  position: sticky;
+  z-index: 1;
+  left: 0;
+  width: 250px;
+  min-width: 250px;
+  background: var(--surface);
+}
+
+.production-board-table thead th:first-child {
+  z-index: 3;
+  background: var(--bg);
+}
+
+.production-board-table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.production-order-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.production-order-title {
+  overflow-wrap: anywhere;
+  margin: 0;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.production-order-id,
+.production-order-meta {
+  color: var(--muted-foreground);
+  font-size: 11px;
+}
+
+.production-order-meta {
+  margin: 4px 0 0;
+}
+
+.production-order-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.production-order-status {
+  margin: 6px 0 0;
+  color: var(--primary);
+  font-size: 12px;
+}
+
+.production-add-ticket {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.production-add-ticket-fields {
+  width: auto;
+}
+
+.production-add-ticket .hint {
+  margin: 0;
+}
+
+.production-stage-cell {
+  width: 220px;
+  min-width: 220px;
+  min-height: 150px;
+  background: var(--surface);
+}
+
+.production-stage-cell.is-drop-target {
+  background: color-mix(in srgb, var(--primary) 10%, var(--surface));
+}
+
+.production-stage-role {
+  display: block;
+  margin-top: 3px;
+  color: var(--primary);
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.production-drop-hint {
+  margin: 0;
+  padding: 10px 6px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  color: var(--muted-foreground);
+  font-size: 11px;
+  text-align: center;
+}
+
+.production-ticket-stack,
+.production-ticket-content {
+  display: grid;
+  gap: 8px;
+}
+
+.production-ticket-card {
+  width: 100%;
+  cursor: grab;
+}
+
+.production-ticket-card:active {
+  cursor: grabbing;
+}
+
+.production-ticket-card.is-dragging {
+  opacity: 0.65;
+  user-select: none;
+}
+
+.production-ticket-title {
+  overflow-wrap: anywhere;
+}
+
+.production-ticket-content .hint {
+  margin: 0;
+}
+
+.production-filament-estimates {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 11px;
+}
+
+.production-filament-estimates li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.production-ticket-stage-select {
+  margin-top: 0;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .production-stage-row form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

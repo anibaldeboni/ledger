@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Calculator, Settings as SettingsIcon } from "lucide-react";
+import { Calculator, Factory, Settings as SettingsIcon } from "lucide-react";
 import appIcon from "../../assets/app.png";
 import { languageOptions } from "./i18n";
+import ProductionBoard from "./pages/ProductionBoard";
 import Quotes from "./pages/Quotes";
 import QuoteForm from "./pages/QuoteForm";
 import Settings from "./pages/Settings";
 
-type View = { page: "quotes" } | { page: "settings" } | { page: "form"; quoteId?: number };
+type View = { page: "quotes" } | { page: "production" } | { page: "settings" } | { page: "form"; quoteId?: number };
 
 export default function App() {
   const [view, setView] = useState<View>({ page: "quotes" });
@@ -15,6 +16,7 @@ export default function App() {
 
   return (
     <div className="app">
+      <a className="skip-link" href="#main-content">{t("common.skipToContent")}</a>
       <nav className="sidebar">
         <div className="brand">
           <img className="brand-icon" src={appIcon} alt="" />
@@ -29,6 +31,14 @@ export default function App() {
         >
           <Calculator size={18} aria-hidden="true" />
           <span>{t("nav.quotes")}</span>
+        </button>
+        <button
+          className="nav-item"
+          aria-current={view.page === "production" ? "page" : undefined}
+          onClick={() => setView({ page: "production" })}
+        >
+          <Factory size={18} aria-hidden="true" />
+          <span>{t("nav.production")}</span>
         </button>
         <button
           className="nav-item"
@@ -53,7 +63,7 @@ export default function App() {
           </select>
         </label>
       </nav>
-      <main className="content">
+      <main id="main-content" className="content">
         {view.page === "quotes" ? (
           <Quotes
             onNew={() => setView({ page: "form" })}
@@ -61,6 +71,8 @@ export default function App() {
           />
         ) : view.page === "form" ? (
           <QuoteForm quoteId={view.quoteId} onBack={() => setView({ page: "quotes" })} />
+        ) : view.page === "production" ? (
+          <ProductionBoard />
         ) : (
           <Settings />
         )}

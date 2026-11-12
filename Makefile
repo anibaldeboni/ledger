@@ -18,7 +18,7 @@ dev:
 # Prefer system binutils so cgo does not resolve a Linuxbrew `ld` first.
 test:
 	@cd "$(APP_DIR)" && PATH="/usr/bin:/bin:$$PATH" go test ./...
-	@cd "$(APP_DIR)/frontend" && npm run test:hooks && npm run test:print-time && npm run test:theme && npm run build
+	@cd "$(APP_DIR)/frontend" && npm run test:production-board && npm run test:hooks && npm run test:print-time && npm run test:theme && npm run build
 
 build:
 	@cd "$(APP_DIR)" && wails3 task build $(if $(EXTRA_TAGS),EXTRA_TAGS=$(EXTRA_TAGS))
