@@ -22,11 +22,23 @@ wails3 dev          # hot-reload do frontend, rebuild do Go
 ## Testes
 
 ```bash
-go test ./...
-cd frontend && npm run test:hooks && npm run build
+make test
+cd frontend && npm run test:i18n
 ```
 
-The hook regression tests use Node's built-in TypeScript stripping and require Node 22.12 or newer; they add no npm dependencies.
+`make test` executa `go test ./...`, os testes do quadro e dos relatórios de produção, hooks, duração de impressão e tema, e a build do frontend. Execute `cd frontend && npm run test:i18n` separadamente.
+
+## Pedidos de produção
+
+Abra **Produção** na navegação e escolha uma guia:
+
+- **Quadro**: crie um pedido e adicione orçamentos salvos. Cada ticket representa uma execução; mova-o arrastando para outra etapa ou usando o seletor do ticket. Em **Etapas do Kanban**, renomeie, reordene ou adicione etapas. A etapa de conclusão é protegida; etapas com tickets não podem ser excluídas.
+- **Arquivo**: consulte pedidos concluídos que foram arquivados. Os tickets continuam vinculados aos orçamentos atuais, então as estimativas exibidas podem mudar quando um orçamento é editado.
+- **Relatórios**: informe as datas inicial e final do calendário local (ambas inclusivas) para listar pedidos concluídos pela data de conclusão. O relatório mostra o tempo acumulado de cada ticket por etapa, duração do pedido (criação até conclusão) e estimativas de impressão e filamento do orçamento atual. Esses valores são estimativas, não consumo medido. Pedidos excluídos aparecem apenas na contagem de cancelados, pela data da exclusão; eles não são listados individualmente. Use **Exportar CSV** para baixar o resumo e os detalhes por pedido, ticket e etapa.
+
+Excluir um pedido é uma exclusão lógica: ele some do quadro, mas tickets e histórico são preservados. Para concluir um pedido manualmente, use a ação **Concluir pedido**; quando todos os tickets chegam à etapa de conclusão, o app pede confirmação antes de registrar a data de conclusão.
+
+Os testes de cenário do frontend usam o suporte nativo do Node.js para remover tipos TypeScript e requerem Node 22.12 ou mais recente; não adicionam dependências npm.
 
 ## Translation contributions
 

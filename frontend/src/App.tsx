@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Calculator, Factory, Settings as SettingsIcon } from "lucide-react";
 import appIcon from "../../assets/app.png";
 import { languageOptions } from "./i18n";
-import ProductionBoard from "./pages/ProductionBoard";
+import ProductionWorkspace from "./pages/ProductionWorkspace";
 import Quotes from "./pages/Quotes";
 import QuoteForm from "./pages/QuoteForm";
 import Settings from "./pages/Settings";
@@ -72,7 +72,7 @@ export default function App() {
         ) : view.page === "form" ? (
           <QuoteForm quoteId={view.quoteId} onBack={() => setView({ page: "quotes" })} />
         ) : view.page === "production" ? (
-          <ProductionBoard />
+          <ProductionWorkspace />
         ) : (
           <Settings />
         )}

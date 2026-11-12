@@ -8,6 +8,9 @@ Linguagem do domínio do Ledger. Termos em pt-BR, como na interface.
 - **Etapa de produção** — uma coluna do quadro que identifica o ponto do processo de fabricação; seu nome e sua posição podem ser ajustados.
 - **Pedido concluído** — pedido cujo trabalho foi finalizado pelo usuário; quando todos os tickets chegam à etapa de conclusão, o app pede confirmação.
 - **Pedido arquivado** — pedido concluído retirado do quadro ativo e mantido para consulta e relatórios.
+- **Pedido cancelado (relatório)** — pedido excluído logicamente, contado apenas de forma agregada pela data de exclusão; não representa tickets na etapa **Cancelado**.
+- **Relatório de produção** — visão por período dos pedidos concluídos, com tempo acumulado por etapa, duração do pedido e estimativas dos orçamentos vinculados. Pedidos excluídos aparecem somente na contagem agregada de cancelados.
+- **Consumo estimado de filamento** — gramas e tempo de impressão calculados a partir do orçamento atualmente vinculado; não é uma medição do material realmente consumido.
 - **Impressora** — a máquina que executa a impressão. Tem preço de compra, preço de revenda ao final da vida útil, vida útil estimada em horas e consumo de energia em watts.
 - **Bandeira tarifária** — a faixa de preço da energia, com o valor do kWh vigente naquela bandeira.
 - **Filamento** — um material de impressão do inventário, com preço por kg, material e cor. Pode ser cadastrado manualmente ou importado do Spoolman.

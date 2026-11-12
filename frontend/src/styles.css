@@ -1012,6 +1012,16 @@ section.block > h2 {
   gap: 8px;
 }
 
+.production-filament-estimates li > span:first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.production-filament-estimates li > span:last-child {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+
 .production-ticket-stage-select {
   margin-top: 0;
   width: 100%;
@@ -1019,6 +1029,161 @@ section.block > h2 {
 
 @media (max-width: 640px) {
   .production-stage-row form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.production-workspace {
+  width: 100%;
+}
+
+.production-workspace [data-slot="tabs-list"] {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.production-archive-list,
+.production-report-order-list {
+  display: grid;
+  gap: 12px;
+}
+
+.production-archive-order,
+.production-report-order {
+  border-color: var(--border);
+}
+
+.production-archive-order [data-slot="card-title"],
+.production-report-order [data-slot="card-title"] {
+  overflow-wrap: anywhere;
+}
+
+.production-archive-tickets,
+.production-report-tickets {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.production-archive-tickets > h3,
+.production-report-tickets > .production-section-label {
+  margin: 0;
+  font-size: 14px;
+}
+
+.production-archive-ticket,
+.production-report-ticket {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.production-archive-ticket h4,
+.production-report-ticket h4 {
+  overflow-wrap: anywhere;
+  margin: 0;
+  font-size: 14px;
+}
+
+.production-report-ticket-heading > div {
+  min-width: 0;
+}
+
+.production-report-ticket-heading h3 {
+  overflow-wrap: anywhere;
+  margin: 0;
+  font-size: 14px;
+}
+
+.production-archive-ticket .production-order-meta,
+.production-report-ticket .production-order-meta {
+  margin: 4px 0 0;
+}
+
+.production-estimated-filaments-title {
+  margin: 0 0 4px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.production-report-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px 16px;
+  margin: 0;
+}
+
+.production-report-metrics > div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.production-report-metrics dt {
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+
+.production-report-metrics dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+.production-report-period {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.production-report-date-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  flex: 1 1 320px;
+  width: auto;
+  gap: 12px;
+}
+
+.production-report-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.production-report-summary .hint {
+  margin: 0;
+}
+
+.production-report-export {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.production-report-ticket-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.production-report-ticket-heading p {
+  margin: 0;
+}
+
+.production-report-stage-table {
+  margin-top: 8px;
+}
+
+@media (max-width: 640px) {
+  .production-report-date-fields,
+  .production-report-summary {
     grid-template-columns: minmax(0, 1fr);
   }
 }
