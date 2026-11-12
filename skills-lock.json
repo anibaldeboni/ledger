@@ -1,6 +1,12 @@
 {
   "version": 2,
   "skills": {
+    "SQLite Database Expert": {
+      "source": "martinholovsky/claude-skills-generator",
+      "sourceType": "github",
+      "skillPath": "skills/sqlite/SKILL.md",
+      "computedHash": "6f28d3eb81bf26f421adcc2e3b5585eadec597f715f0e91f9eb04fa95e68db12"
+    },
     "shadcn": {
       "source": "shadcn-ui/ui",
       "sourceType": "github",
