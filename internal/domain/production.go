@@ -71,10 +71,11 @@ type ProductionOrderReport struct {
 	Tickets              []ProductionTicketReport  `json:"tickets"`
 }
 
-// ProductionReport contains completed orders whose completion time is in range.
+// ProductionReport contains completed-order details and a count of soft-deleted orders in range.
 type ProductionReport struct {
-	StartAt             string                  `json:"startAt"`
-	EndAt               string                  `json:"endAt"`
+	StartAt string `json:"startAt"`
+	EndAt   string `json:"endAt"`
+	// CancelledOrderCount counts soft-deleted orders by deleted_at; it is not the number of tickets in the Cancelado stage.
 	CancelledOrderCount int64                   `json:"cancelledOrderCount"`
 	Orders              []ProductionOrderReport `json:"orders"`
 }

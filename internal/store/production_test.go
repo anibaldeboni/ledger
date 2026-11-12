@@ -424,20 +424,30 @@ func TestProductionReportCountsSoftDeletedOrdersByDeletionDate(t *testing.T) {
 		"2025-12-01T00:00:00Z", "2026-01-02T00:00:00Z", "2026-01-02T00:00:00Z", order.ID); err != nil {
 		t.Fatal(err)
 	}
+	startBoundary, err := s.CreateProductionOrder("Canceled at period start")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := s.DeleteProductionOrder(startBoundary.ID); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.db.Exec(`UPDATE production_orders SET created_at = ?, deleted_at = ? WHERE id = ?`, "2025-12-01T00:00:00Z", "2026-01-01T00:00:00Z", startBoundary.ID); err != nil {
+		t.Fatal(err)
+	}
 
 	inside, err := s.GenerateProductionReport("2026-01-01T00:00:00Z", "2026-01-03T00:00:00Z")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if inside.CancelledOrderCount != 1 || len(inside.Orders) != 0 {
+	if inside.CancelledOrderCount != 2 || len(inside.Orders) != 0 {
 		t.Fatalf("soft-deleted order must appear only in the cancellation count: %+v", inside)
 	}
 	outside, err := s.GenerateProductionReport("2026-01-01T00:00:00Z", "2026-01-02T00:00:00Z")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if outside.CancelledOrderCount != 0 {
-		t.Fatalf("cancellation outside the report range was counted: %+v", outside)
+	if outside.CancelledOrderCount != 1 {
+		t.Fatalf("inclusive start or exclusive end bound is incorrect: %+v", outside)
 	}
 }
 

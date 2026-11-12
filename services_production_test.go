@@ -93,7 +93,10 @@ func TestProductionServiceKeepsLiveQuoteAndArchivesReportableOrder(t *testing.T)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(report.Orders) != 1 || report.CancelledOrderCount != 1 || report.Orders[0].EstimatedPrintHours != 2 || len(report.Orders[0].Filaments) != 1 || report.Orders[0].Filaments[0].WeightG != 40 {
+	if len(report.Orders) != 1 || report.CancelledOrderCount != 1 {
+		t.Fatalf("report should include one completed order and one cancelled-order count: %+v", report)
+	}
+	if report.Orders[0].EstimatedPrintHours != 2 || len(report.Orders[0].Filaments) != 1 || report.Orders[0].Filaments[0].WeightG != 40 {
 		t.Fatalf("archived order report did not use current quote estimates: %+v", report)
 	}
 }

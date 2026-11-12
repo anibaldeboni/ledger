@@ -129,11 +129,15 @@ export interface ProductionOrderReport {
 }
 
 /**
- * ProductionReport contains completed orders whose completion time is in range.
+ * ProductionReport contains completed-order details and a count of soft-deleted orders in range.
  */
 export interface ProductionReport {
     "startAt": string;
     "endAt": string;
+
+    /**
+     * CancelledOrderCount counts soft-deleted orders by deleted_at; it is not the number of tickets in the Cancelado stage.
+     */
     "cancelledOrderCount": number;
     "orders": ProductionOrderReport[] | null;
 }
