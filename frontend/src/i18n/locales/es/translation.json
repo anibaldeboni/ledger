@@ -1,0 +1,170 @@
+{
+  "app": {
+    "title": "Ledger · Presupuestos 3D"
+  },
+  "language": {
+    "label": "Idioma"
+  },
+  "nav": {
+    "quotes": "Presupuestos",
+    "settings": "Configuración"
+  },
+  "common": {
+    "add": "Añadir",
+    "back": "Volver",
+    "cancel": "Cancelar",
+    "editItem": "Editar {{item}}",
+    "deleteItem": "Eliminar {{item}}",
+    "confirmDeleteItem": "Confirmar eliminación: {{item}}",
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "select": "Seleccionar…"
+  },
+  "quotes": {
+    "title": "Presupuestos",
+    "searchPlaceholder": "Buscar presupuestos (mín. 3 letras)",
+    "searchLabel": "Buscar presupuestos por nombre",
+    "create": "Crear un presupuesto",
+    "empty": "Aún no hay presupuestos. Crea el primero para calcular el precio de una impresión.",
+    "noResults": "No se encontraron presupuestos para “{{term}}”.",
+    "item": "presupuesto {{name}}",
+    "sort": {
+      "ascending": "ascendente",
+      "descending": "descendente",
+      "active": "{{label}}, {{direction}}. Haz clic para invertir el orden.",
+      "by": "Ordenar por {{label}}"
+    },
+    "table": {
+      "name": "Nombre",
+      "margin": "Margen",
+      "finalPrice": "Precio final",
+      "updated": "Actualizado"
+    }
+  },
+  "quoteForm": {
+    "title": {
+      "new": "Nuevo presupuesto",
+      "edit": "Editar presupuesto"
+    },
+    "sections": {
+      "printerAndEnergy": "Impresora y energía",
+      "filaments": "Filamentos (uno por placa)",
+      "fixedCosts": "Costes fijos",
+      "profitMargin": "Margen de beneficio"
+    },
+    "fields": {
+      "printer": "Impresora",
+      "tariff": "Tarifa eléctrica",
+      "filament": "Filamento",
+      "duration": "Duración",
+      "weight": "Peso (g)",
+      "fixedCost": "Importe ($)",
+      "newCategory": "Nueva categoría",
+      "defaultValue": "Valor predeterminado ($)",
+      "margin": "Margen (%)",
+      "quoteName": "Nombre del presupuesto"
+    },
+    "options": {
+      "chooseFilament": "Selecciona un filamento…",
+      "chooseCategory": "Selecciona una categoría…"
+    },
+    "printTimeHint": "La duración debe ser mayor que cero; introduce números enteros con d, h, m y/o s, en ese orden.\nLos espacios entre unidades son opcionales.\nEjemplos: 2d6h55m, 1h57m, 2m o 35s.",
+    "removeFilament": "Quitar filamento",
+    "addFilament": "Añadir filamento",
+    "needFilament": "Añade al menos un filamento.",
+    "removeCost": "Quitar coste",
+    "addCost": "Añadir coste",
+    "placeholders": {
+      "newCategory": "P. ej.: Posprocesado",
+      "margin": "50",
+      "quoteName": "P. ej.: Capibara articulada"
+    },
+    "createAndAddCategory": "Crear y añadir",
+    "finalPriceFormula": "Precio final = coste total ÷ (1 − margen/100).",
+    "calculate": "Calcular",
+    "requiredFields": "Introduce una impresora, una tarifa, al menos un filamento (tiempo y peso) y el margen.",
+    "result": {
+      "filament": "Filamento",
+      "energy": "Energía",
+      "amortization": "Amortización",
+      "fixedCosts": "Costes fijos",
+      "totalCost": "Coste total",
+      "profit": "Beneficio",
+      "finalPrice": "Precio final"
+    },
+    "saveChanges": "Guardar cambios",
+    "saveQuote": "Guardar presupuesto",
+    "needName": "Asigna un nombre al presupuesto para guardarlo."
+  },
+  "settings": {
+    "title": "Configuración",
+    "items": {
+      "printer": "impresora {{name}}",
+      "tariff": "tarifa eléctrica {{name}}",
+      "filament": "filamento {{name}}",
+      "category": "categoría de coste {{name}}"
+    },
+    "printers": {
+      "title": "Impresoras",
+      "empty": "No hay impresoras registradas.",
+      "table": {
+        "name": "Nombre",
+        "purchase": "Compra",
+        "resale": "Reventa",
+        "lifespan": "Vida útil (h)",
+        "power": "Potencia (W)"
+      },
+      "fields": {
+        "name": "Nombre",
+        "purchase": "Precio de compra ($)",
+        "resale": "Reventa ($)",
+        "lifespan": "Vida útil (h)",
+        "power": "Potencia (W)"
+      },
+      "namePlaceholder": "P. ej.: Bambu A1"
+    },
+    "tariffs": {
+      "title": "Tarifas eléctricas",
+      "empty": "No hay tarifas registradas.",
+      "name": "Nombre",
+      "kwh": "kWh",
+      "namePlaceholder": "P. ej.: Verde",
+      "pricePlaceholder": "0,80",
+      "pricePerKwh": "Precio por kWh ($)"
+    },
+    "filaments": {
+      "title": "Filamentos",
+      "empty": "No hay filamentos registrados; crea uno manualmente o impórtalo desde Spoolman abajo.",
+      "name": "Nombre",
+      "material": "Material",
+      "pricePerKg": "Precio/kg",
+      "source": "Origen",
+      "manual": "Manual",
+      "namePlaceholder": "P. ej.: PLA negro",
+      "materialPlaceholder": "PLA",
+      "color": "Color",
+      "price": "Precio/kg ($)"
+    },
+    "spoolman": {
+      "title": "Spoolman",
+      "url": "URL de Spoolman",
+      "urlPlaceholder": "http://localhost:8000",
+      "urlSaved": "URL guardada.",
+      "connectionOk": "Conexión correcta.",
+      "imported_one": "{{count}} filamento importado/actualizado.",
+      "imported_other": "{{count}} filamentos importados/actualizados.",
+      "save": "Guardar",
+      "testConnection": "Probar conexión",
+      "import": "Importar bobinas",
+      "hint": "La importación actualiza los filamentos existentes (por bobina) y añade los nuevos; se ignoran las bobinas archivadas."
+    },
+    "categories": {
+      "title": "Categorías de costes fijos",
+      "empty": "No hay categorías registradas.",
+      "name": "Nombre",
+      "defaultValue": "Valor predeterminado",
+      "namePlaceholder": "P. ej.: Mano de obra",
+      "value": "Valor predeterminado ($)"
+    }
+  }
+}

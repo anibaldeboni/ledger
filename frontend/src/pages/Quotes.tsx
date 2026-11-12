@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ArrowDown, ArrowUp, Check, Pencil, Plus, Trash2 } from "lucide-react";
 import { LedgerService } from "../../bindings/ledger";
 import { brl, dt } from "../lib/format";
@@ -7,6 +8,7 @@ import { filterQuotesByName, sortQuotes, type QuoteSort } from "../lib/search";
 
 function SortButton(props: { label: string; active: boolean; dir: QuoteSort["dir"]; onClick: () => void }) {
   const { label, active, dir, onClick } = props;
+  const { t } = useTranslation();
   return (
     <button
       type="button"
@@ -14,8 +16,11 @@ function SortButton(props: { label: string; active: boolean; dir: QuoteSort["dir
       onClick={onClick}
       aria-label={
         active
-          ? `${label}, ${dir === "asc" ? "crescente" : "decrescente"}. Clique para inverter.`
-          : `Ordenar por ${label}`
+          ? t("quotes.sort.active", {
+              label,
+              direction: t(dir === "asc" ? "quotes.sort.ascending" : "quotes.sort.descending"),
+            })
+          : t("quotes.sort.by", { label })
       }
     >
       {label}
@@ -25,6 +30,8 @@ function SortButton(props: { label: string; active: boolean; dir: QuoteSort["dir
 }
 
 export default function Quotes({ onNew, onEdit }: { onNew: () => void; onEdit: (id: number) => void }) {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.resolvedLanguage ?? i18n.language;
   const quotes = useAsync(() => LedgerService.ListQuotes(), []);
   const [confirmId, setConfirmId] = useState<number | null>(null);
   const [search, setSearch] = useState("");
@@ -55,21 +62,21 @@ export default function Quotes({ onNew, onEdit }: { onNew: () => void; onEdit: (
   return (
     <div>
       <div className="page-head quotes-head">
-        <h1>Orçamentos</h1>
+        <h1>{t("quotes.title")}</h1>
         <div className="page-head-actions">
           <input
             type="search"
             className="search-input"
-            placeholder="Buscar orçamento (mín. 3 letras)"
-            aria-label="Buscar orçamento pelo nome"
+            placeholder={t("quotes.searchPlaceholder")}
+            aria-label={t("quotes.searchLabel")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           <button
             type="button"
             className="btn btn-primary btn-icon"
-            aria-label="Criar novo orçamento"
-            title="Criar novo orçamento"
+            aria-label={t("quotes.create")}
+            title={t("quotes.create")}
             onClick={onNew}
           >
             <Plus size={18} aria-hidden="true" />
@@ -81,20 +88,20 @@ export default function Quotes({ onNew, onEdit }: { onNew: () => void; onEdit: (
       {actionError ? <p className="error-text" role="alert">{actionError}</p> : null}
 
       {list.length === 0 ? (
-        <div className="empty">Nenhum orçamento ainda. Crie o primeiro para calcular o preço de uma impressão.</div>
+        <div className="empty">{t("quotes.empty")}</div>
       ) : filtered.length === 0 ? (
-        <div className="empty">Nenhum orçamento encontrado para “{search.trim()}”.</div>
+        <div className="empty">{t("quotes.noResults", { term: search.trim() })}</div>
       ) : (
         <div className="list">
           <div className="row-head cols-quote">
             <span>
-              <SortButton label="Nome" active={sort.key === "name"} dir={sort.dir} onClick={() => toggleSort("name")} />
+              <SortButton label={t("quotes.table.name")} active={sort.key === "name"} dir={sort.dir} onClick={() => toggleSort("name")} />
             </span>
-            <span className="money">Margem</span>
-            <span className="money">Preço final</span>
+            <span className="money">{t("quotes.table.margin")}</span>
+            <span className="money">{t("quotes.table.finalPrice")}</span>
             <span className="money">
               <SortButton
-                label="Atualizado"
+                label={t("quotes.table.updated")}
                 active={sort.key === "updated"}
                 dir={sort.dir}
                 onClick={() => toggleSort("updated")}
@@ -105,15 +112,15 @@ export default function Quotes({ onNew, onEdit }: { onNew: () => void; onEdit: (
           {rows.map((q) => (
             <div className="list-row cols-quote" key={q.id}>
               <span>{q.name}</span>
-              <span className="money">{q.marginPercent.toLocaleString("pt-BR")}%</span>
-              <span className="money price">{brl(q.finalPrice)}</span>
-              <span className="money muted">{dt(q.updatedAt)}</span>
+              <span className="money">{q.marginPercent.toLocaleString(locale)}%</span>
+              <span className="money price">{brl(q.finalPrice, locale)}</span>
+              <span className="money muted">{dt(q.updatedAt, locale)}</span>
               <span className="actions" style={{ justifySelf: "end" }}>
                 <button
                   type="button"
                   className="btn btn-icon"
-                  aria-label={`Editar orçamento ${q.name}`}
-                  title={`Editar orçamento ${q.name}`}
+                  aria-label={t("common.editItem", { item: t("quotes.item", { name: q.name }) })}
+                  title={t("common.editItem", { item: t("quotes.item", { name: q.name }) })}
                   onClick={() => onEdit(q.id)}
                 >
                   <Pencil size={16} aria-hidden="true" />
@@ -122,8 +129,8 @@ export default function Quotes({ onNew, onEdit }: { onNew: () => void; onEdit: (
                   <button
                     type="button"
                     className="btn btn-danger btn-icon"
-                    aria-label={`Confirmar exclusão do orçamento ${q.name}`}
-                    title={`Confirmar exclusão do orçamento ${q.name}`}
+                    aria-label={t("common.confirmDeleteItem", { item: t("quotes.item", { name: q.name }) })}
+                    title={t("common.confirmDeleteItem", { item: t("quotes.item", { name: q.name }) })}
                     onClick={() => remove(q.id)}
                   >
                     <Check size={16} aria-hidden="true" />
@@ -132,8 +139,8 @@ export default function Quotes({ onNew, onEdit }: { onNew: () => void; onEdit: (
                   <button
                     type="button"
                     className="btn btn-danger btn-icon"
-                    aria-label={`Excluir orçamento ${q.name}`}
-                    title={`Excluir orçamento ${q.name}`}
+                    aria-label={t("common.deleteItem", { item: t("quotes.item", { name: q.name }) })}
+                    title={t("common.deleteItem", { item: t("quotes.item", { name: q.name }) })}
                     onClick={() => setConfirmId(q.id)}
                   >
                     <Trash2 size={16} aria-hidden="true" />

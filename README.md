@@ -28,6 +28,10 @@ cd frontend && npm run test:hooks && npm run build
 
 The hook regression tests use Node's built-in TypeScript stripping and require Node 22.12 or newer; they add no npm dependencies.
 
+## Translation contributions
+
+UI translations live in `frontend/src/i18n/locales/<locale>/translation.json`. To add a language, copy the `pt-BR` catalog, translate its values without changing keys or `{{placeholders}}`, then register the locale and its native name in `frontend/src/i18n.ts`. Run `cd frontend && npm run test:i18n && npm run build` before opening a contribution.
+
 ## Build
 
 Linux (Ubuntu 22.04 / GTK 4.6 — usa o caminho legado gtk3):

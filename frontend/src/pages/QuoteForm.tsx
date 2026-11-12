@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { LedgerService } from "../../bindings/ledger";
 import {
   type CostCategory,
@@ -19,8 +20,6 @@ type PlateForm = { filamentId: number; time: string; weight: string };
 type FixedForm = { categoryId: number; value: string };
 
 const emptyPlate: PlateForm = { filamentId: 0, time: "", weight: "" };
-const printTimeFormatHint =
-  "Duração maior que zero; use valores inteiros com d, h, m e/ou s nessa ordem.\nEspaços entre unidades são opcionais. \nExemplos: 2d6h55m, 1h57m, 2m ou 35s.";
 
 export default function QuoteForm({
   quoteId,
@@ -29,6 +28,8 @@ export default function QuoteForm({
   quoteId?: number;
   onBack: () => void;
 }) {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.resolvedLanguage ?? i18n.language;
   const lists = useAsync(
     () =>
       Promise.all([
@@ -189,8 +190,8 @@ export default function QuoteForm({
   return (
     <div>
       <div className="page-head">
-        <h1>{quoteId ? "Editar orçamento" : "Novo orçamento"}</h1>
-        <button className="btn btn-icon" onClick={onBack}>
+        <h1>{quoteId ? t("quoteForm.title.edit") : t("quoteForm.title.new")}</h1>
+        <button className="btn btn-icon" aria-label={t("common.back")} onClick={onBack}>
           <ArrowLeft size={20} aria-hidden="true" />
         </button>
       </div>
@@ -200,15 +201,15 @@ export default function QuoteForm({
       {actionError ? <p className="error-text">{actionError}</p> : null}
 
       <section className="block">
-        <h2>Impressora e energia</h2>
+        <h2>{t("quoteForm.sections.printerAndEnergy")}</h2>
         <div className="row">
           <label className="field">
-            Impressora
+            {t("quoteForm.fields.printer")}
             <select
               value={printerId}
               onChange={(e) => setPrinterId(Number(e.target.value))}
             >
-              <option value={0}>Selecione…</option>
+              <option value={0}>{t("common.select")}</option>
               {printers.map((p: Printer) => (
                 <option key={p.id} value={p.id}>
                   {p.name} · {p.powerWatts} W
@@ -217,15 +218,15 @@ export default function QuoteForm({
             </select>
           </label>
           <label className="field">
-            Bandeira tarifária
+            {t("quoteForm.fields.tariff")}
             <select
               value={tariffId}
               onChange={(e) => setTariffId(Number(e.target.value))}
             >
-              <option value={0}>Selecione…</option>
+              <option value={0}>{t("common.select")}</option>
               {tariffs.map((t: Tariff) => (
                 <option key={t.id} value={t.id}>
-                  {t.name} · {brl(t.kwhPrice)}/kWh
+                  {t.name} · {brl(t.kwhPrice, locale)}/kWh
                 </option>
               ))}
             </select>
@@ -234,7 +235,7 @@ export default function QuoteForm({
       </section>
 
       <section className="block">
-        <h2>Filamentos (um por plate)</h2>
+        <h2>{t("quoteForm.sections.filaments")}</h2>
         {plates.map((p, i) => {
           const fil = filById.get(p.filamentId);
           const printTimeValid = isValidPrintDuration(p.time);
@@ -264,24 +265,24 @@ export default function QuoteForm({
                     )
                   }
                 >
-                  <option value={0}>Selecione o filamento…</option>
+                  <option value={0}>{t("quoteForm.options.chooseFilament")}</option>
                   {filaments.map((f: Filament) => (
                     <option key={f.id} value={f.id}>
                       {f.name}
                       {f.material ? ` · ${f.material}` : ""} ·{" "}
-                      {brl(f.pricePerKg)}/kg
+                      {brl(f.pricePerKg, locale)}/kg
                     </option>
                   ))}
                 </select>
               </div>
               <label className="field">
-                Duração
+                {t("quoteForm.fields.duration")}
                 <input
                   className={invalidTime ? "invalid" : undefined}
                   aria-invalid={invalidTime}
                   value={p.time}
                   placeholder="1h57m"
-                  title={printTimeFormatHint}
+                  title={t("quoteForm.printTimeHint")}
                   spellCheck={false}
                   onChange={(e) =>
                     setPlates((ps) =>
@@ -293,7 +294,7 @@ export default function QuoteForm({
                 />
               </label>
               <label className="field">
-                Peso (g)
+                {t("quoteForm.fields.weight")}
                 <input
                   inputMode="decimal"
                   className={
@@ -314,8 +315,8 @@ export default function QuoteForm({
               </label>
               <button
                 className="btn btn-danger btn-icon"
-                aria-label="Remover filamento"
-                title="Remover filamento"
+                aria-label={t("quoteForm.removeFilament")}
+                title={t("quoteForm.removeFilament")}
                 onClick={() => setPlates((ps) => ps.filter((_, j) => j !== i))}
               >
                 <Trash2 size={16} aria-hidden="true" />
@@ -326,20 +327,20 @@ export default function QuoteForm({
         <div className="toolbar" style={{ marginTop: 8 }}>
           <button
             className="btn btn-primary btn-icon"
-            aria-label="Adicionar filamento"
-            title="Adicionar filamento"
+            aria-label={t("quoteForm.addFilament")}
+            title={t("quoteForm.addFilament")}
             onClick={() => setPlates((ps) => [...ps, { ...emptyPlate }])}
           >
             <Plus size={18} aria-hidden="true" />
           </button>
           {plates.length === 0 ? (
-            <p className="hint">Adicione ao menos um filamento.</p>
+            <p className="hint">{t("quoteForm.needFilament")}</p>
           ) : null}
         </div>
       </section>
 
       <section className="block">
-        <h2>Custos fixos</h2>
+        <h2>{t("quoteForm.sections.fixedCosts")}</h2>
         {fixed.map((f, i) => (
           <div
             className="plate-row"
@@ -350,7 +351,7 @@ export default function QuoteForm({
               value={f.categoryId}
               onChange={(e) => pickCategory(i, Number(e.target.value))}
             >
-              <option value={0}>Selecione a categoria…</option>
+              <option value={0}>{t("quoteForm.options.chooseCategory")}</option>
               {categories.map((c: CostCategory) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
@@ -358,7 +359,7 @@ export default function QuoteForm({
               ))}
             </select>
             <label className="field">
-              Valor (R$)
+              {t("quoteForm.fields.fixedCost")}
               <input
                 inputMode="decimal"
                 value={f.value}
@@ -374,8 +375,8 @@ export default function QuoteForm({
             </label>
             <button
               className="btn btn-danger btn-icon"
-              aria-label="Remover custo"
-              title="Remover custo"
+              aria-label={t("quoteForm.removeCost")}
+              title={t("quoteForm.removeCost")}
               onClick={() => setFixed((fs) => fs.filter((_, j) => j !== i))}
             >
               <Trash2 size={16} aria-hidden="true" />
@@ -385,8 +386,8 @@ export default function QuoteForm({
         <div className="row" style={{ marginTop: 8 }}>
           <button
             className="btn btn-primary btn-icon"
-            title="Adicionar custo"
-            aria-label="Adicionar custo"
+            title={t("quoteForm.addCost")}
+            aria-label={t("quoteForm.addCost")}
             onClick={() =>
               setFixed((fs) => [...fs, { categoryId: 0, value: "" }])
             }
@@ -403,17 +404,17 @@ export default function QuoteForm({
           }}
         >
           <label className="field">
-            Nova categoria
+            {t("quoteForm.fields.newCategory")}
             <input
               value={newCat.name}
-              placeholder="Ex.: Pós-processamento"
+              placeholder={t("quoteForm.placeholders.newCategory")}
               onChange={(e) =>
                 setNewCat((c) => ({ ...c, name: e.target.value }))
               }
             />
           </label>
           <label className="field" style={{ flexBasis: 120 }}>
-            Valor padrão (R$)
+            {t("quoteForm.fields.defaultValue")}
             <input
               inputMode="decimal"
               value={newCat.value}
@@ -428,24 +429,24 @@ export default function QuoteForm({
             onClick={createCategory}
             disabled={!newCat.name.trim() || busy}
           >
-            Criar e adicionar
+            {t("quoteForm.createAndAddCategory")}
           </button>
         </div>
       </section>
 
       <section className="block">
-        <h2>Margem de lucro</h2>
+        <h2>{t("quoteForm.sections.profitMargin")}</h2>
         <div className="row">
           <label className="field" style={{ flexBasis: 200 }}>
-            Margem (%)
+            {t("quoteForm.fields.margin")}
             <input
               inputMode="decimal"
               value={margin}
-              placeholder="50"
+              placeholder={t("quoteForm.placeholders.margin")}
               onChange={(e) => setMargin(e.target.value)}
             />
           </label>
-          <p className="hint">Preço final = custo total ÷ (1 − margem/100).</p>
+          <p className="hint">{t("quoteForm.finalPriceFormula")}</p>
         </div>
       </section>
 
@@ -455,12 +456,11 @@ export default function QuoteForm({
           disabled={!valid || busy}
           onClick={calculate}
         >
-          Calcular
+          {t("quoteForm.calculate")}
         </button>
         {!valid ? (
           <p className="hint">
-            Preencha impressora, bandeira, ao menos um filamento (tempo e peso)
-            e a margem.
+            {t("quoteForm.requiredFields")}
           </p>
         ) : null}
       </div>
@@ -468,39 +468,39 @@ export default function QuoteForm({
       {result ? (
         <section className="result">
           <div className="result-line">
-            <span>Filamento</span>
-            <strong>{brl(result.filament)}</strong>
+            <span>{t("quoteForm.result.filament")}</span>
+            <strong>{brl(result.filament, locale)}</strong>
           </div>
           <div className="result-line">
-            <span>Energia</span>
-            <strong>{brl(result.energy)}</strong>
+            <span>{t("quoteForm.result.energy")}</span>
+            <strong>{brl(result.energy, locale)}</strong>
           </div>
           <div className="result-line">
-            <span>Amortização</span>
-            <strong>{brl(result.amortization)}</strong>
+            <span>{t("quoteForm.result.amortization")}</span>
+            <strong>{brl(result.amortization, locale)}</strong>
           </div>
           <div className="result-line">
-            <span>Custos fixos</span>
-            <strong>{brl(result.fixedCosts)}</strong>
+            <span>{t("quoteForm.result.fixedCosts")}</span>
+            <strong>{brl(result.fixedCosts, locale)}</strong>
           </div>
           <div className="result-line">
-            <span>Custo total</span>
-            <strong>{brl(result.totalCost)}</strong>
+            <span>{t("quoteForm.result.totalCost")}</span>
+            <strong>{brl(result.totalCost, locale)}</strong>
           </div>
           <div className="result-line">
-            <span>Lucro</span>
-            <strong>{brl(result.profit)}</strong>
+            <span>{t("quoteForm.result.profit")}</span>
+            <strong>{brl(result.profit, locale)}</strong>
           </div>
           <div className="result-final">
-            <span>Preço final</span>
-            <span className="value">{brl(result.finalPrice)}</span>
+            <span>{t("quoteForm.result.finalPrice")}</span>
+            <span className="value">{brl(result.finalPrice, locale)}</span>
           </div>
           <div className="row" style={{ marginTop: 16 }}>
             <label className="field" style={{ flexBasis: 260 }}>
-              Nome do orçamento
+              {t("quoteForm.fields.quoteName")}
               <input
                 value={name}
-                placeholder="Ex.: Capivara articulada"
+                placeholder={t("quoteForm.placeholders.quoteName")}
                 onChange={(e) => setName(e.target.value)}
               />
             </label>
@@ -509,11 +509,11 @@ export default function QuoteForm({
               disabled={!canSave || busy}
               onClick={save}
             >
-              {quoteId ? "Salvar alterações" : "Salvar orçamento"}
+              {quoteId ? t("quoteForm.saveChanges") : t("quoteForm.saveQuote")}
             </button>
           </div>
           {!canSave && result ? (
-            <p className="hint">Dê um nome ao orçamento para salvá-lo.</p>
+            <p className="hint">{t("quoteForm.needName")}</p>
           ) : null}
         </section>
       ) : null}

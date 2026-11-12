@@ -1,0 +1,170 @@
+{
+  "app": {
+    "title": "Ledger · Orçamentos 3D"
+  },
+  "language": {
+    "label": "Idioma"
+  },
+  "nav": {
+    "quotes": "Orçamentos",
+    "settings": "Configurações"
+  },
+  "common": {
+    "add": "Adicionar",
+    "back": "Voltar",
+    "cancel": "Cancelar",
+    "editItem": "Editar {{item}}",
+    "deleteItem": "Excluir {{item}}",
+    "confirmDeleteItem": "Confirmar exclusão: {{item}}",
+    "save": "Salvar",
+    "saving": "Salvando…",
+    "select": "Selecione…"
+  },
+  "quotes": {
+    "title": "Orçamentos",
+    "searchPlaceholder": "Buscar orçamento (mín. 3 letras)",
+    "searchLabel": "Buscar orçamento pelo nome",
+    "create": "Criar novo orçamento",
+    "empty": "Nenhum orçamento ainda. Crie o primeiro para calcular o preço de uma impressão.",
+    "noResults": "Nenhum orçamento encontrado para “{{term}}”.",
+    "item": "orçamento {{name}}",
+    "sort": {
+      "ascending": "crescente",
+      "descending": "decrescente",
+      "active": "{{label}}, {{direction}}. Clique para inverter.",
+      "by": "Ordenar por {{label}}"
+    },
+    "table": {
+      "name": "Nome",
+      "margin": "Margem",
+      "finalPrice": "Preço final",
+      "updated": "Atualizado"
+    }
+  },
+  "quoteForm": {
+    "title": {
+      "new": "Novo orçamento",
+      "edit": "Editar orçamento"
+    },
+    "sections": {
+      "printerAndEnergy": "Impressora e energia",
+      "filaments": "Filamentos (um por plate)",
+      "fixedCosts": "Custos fixos",
+      "profitMargin": "Margem de lucro"
+    },
+    "fields": {
+      "printer": "Impressora",
+      "tariff": "Bandeira tarifária",
+      "filament": "Filamento",
+      "duration": "Duração",
+      "weight": "Peso (g)",
+      "fixedCost": "Valor ($)",
+      "newCategory": "Nova categoria",
+      "defaultValue": "Valor padrão ($)",
+      "margin": "Margem (%)",
+      "quoteName": "Nome do orçamento"
+    },
+    "options": {
+      "chooseFilament": "Selecione o filamento…",
+      "chooseCategory": "Selecione a categoria…"
+    },
+    "printTimeHint": "Duração maior que zero; use valores inteiros com d, h, m e/ou s nessa ordem.\nEspaços entre unidades são opcionais.\nExemplos: 2d6h55m, 1h57m, 2m ou 35s.",
+    "removeFilament": "Remover filamento",
+    "addFilament": "Adicionar filamento",
+    "needFilament": "Adicione ao menos um filamento.",
+    "removeCost": "Remover custo",
+    "addCost": "Adicionar custo",
+    "placeholders": {
+      "newCategory": "Ex.: Pós-processamento",
+      "margin": "50",
+      "quoteName": "Ex.: Capivara articulada"
+    },
+    "createAndAddCategory": "Criar e adicionar",
+    "finalPriceFormula": "Preço final = custo total ÷ (1 − margem/100).",
+    "calculate": "Calcular",
+    "requiredFields": "Preencha impressora, bandeira, ao menos um filamento (tempo e peso) e a margem.",
+    "result": {
+      "filament": "Filamento",
+      "energy": "Energia",
+      "amortization": "Amortização",
+      "fixedCosts": "Custos fixos",
+      "totalCost": "Custo total",
+      "profit": "Lucro",
+      "finalPrice": "Preço final"
+    },
+    "saveChanges": "Salvar alterações",
+    "saveQuote": "Salvar orçamento",
+    "needName": "Dê um nome ao orçamento para salvá-lo."
+  },
+  "settings": {
+    "title": "Configurações",
+    "items": {
+      "printer": "impressora {{name}}",
+      "tariff": "bandeira tarifária {{name}}",
+      "filament": "filamento {{name}}",
+      "category": "categoria de custo {{name}}"
+    },
+    "printers": {
+      "title": "Impressoras",
+      "empty": "Nenhuma impressora cadastrada.",
+      "table": {
+        "name": "Nome",
+        "purchase": "Compra",
+        "resale": "Revenda",
+        "lifespan": "Vida útil (h)",
+        "power": "Potência (W)"
+      },
+      "fields": {
+        "name": "Nome",
+        "purchase": "Preço de compra ($)",
+        "resale": "Revenda ($)",
+        "lifespan": "Vida útil (h)",
+        "power": "Potência (W)"
+      },
+      "namePlaceholder": "Ex.: Bambu A1"
+    },
+    "tariffs": {
+      "title": "Bandeiras tarifárias",
+      "empty": "Nenhuma bandeira cadastrada.",
+      "name": "Nome",
+      "kwh": "kWh",
+      "namePlaceholder": "Ex.: Verde",
+      "pricePlaceholder": "0,80",
+      "pricePerKwh": "Valor do kWh ($)"
+    },
+    "filaments": {
+      "title": "Filamentos",
+      "empty": "Nenhum filamento cadastrado — crie manualmente ou importe do Spoolman abaixo.",
+      "name": "Nome",
+      "material": "Material",
+      "pricePerKg": "Preço/kg",
+      "source": "Origem",
+      "manual": "Manual",
+      "namePlaceholder": "Ex.: PLA Preto",
+      "materialPlaceholder": "PLA",
+      "color": "Cor",
+      "price": "Preço/kg ($)"
+    },
+    "spoolman": {
+      "title": "Spoolman",
+      "url": "URL do Spoolman",
+      "urlPlaceholder": "http://localhost:8000",
+      "urlSaved": "URL salva.",
+      "connectionOk": "Conexão OK.",
+      "imported_one": "{{count}} filamento importado/atualizado.",
+      "imported_other": "{{count}} filamentos importados/atualizados.",
+      "save": "Salvar",
+      "testConnection": "Testar conexão",
+      "import": "Importar spools",
+      "hint": "Importar atualiza os filamentos existentes (por spool) e adiciona os novos; spools arquivados são ignorados."
+    },
+    "categories": {
+      "title": "Categorias de custo fixo",
+      "empty": "Nenhuma categoria cadastrada.",
+      "name": "Nome",
+      "defaultValue": "Valor padrão",
+      "namePlaceholder": "Ex.: Mão de Obra",
+      "value": "Valor padrão ($)"
+    }
+  }
+}

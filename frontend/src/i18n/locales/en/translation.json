@@ -1,0 +1,170 @@
+{
+  "app": {
+    "title": "Ledger · 3D Quotes"
+  },
+  "language": {
+    "label": "Language"
+  },
+  "nav": {
+    "quotes": "Quotes",
+    "settings": "Settings"
+  },
+  "common": {
+    "add": "Add",
+    "back": "Back",
+    "cancel": "Cancel",
+    "editItem": "Edit {{item}}",
+    "deleteItem": "Delete {{item}}",
+    "confirmDeleteItem": "Confirm delete: {{item}}",
+    "save": "Save",
+    "saving": "Saving…",
+    "select": "Select…"
+  },
+  "quotes": {
+    "title": "Quotes",
+    "searchPlaceholder": "Search quotes (at least 3 letters)",
+    "searchLabel": "Search quotes by name",
+    "create": "Create a new quote",
+    "empty": "No quotes yet. Create the first one to calculate a print price.",
+    "noResults": "No quotes found for “{{term}}”.",
+    "item": "quote {{name}}",
+    "sort": {
+      "ascending": "ascending",
+      "descending": "descending",
+      "active": "{{label}}, {{direction}}. Click to reverse.",
+      "by": "Sort by {{label}}"
+    },
+    "table": {
+      "name": "Name",
+      "margin": "Margin",
+      "finalPrice": "Final price",
+      "updated": "Updated"
+    }
+  },
+  "quoteForm": {
+    "title": {
+      "new": "New quote",
+      "edit": "Edit quote"
+    },
+    "sections": {
+      "printerAndEnergy": "Printer and energy",
+      "filaments": "Filaments (one per plate)",
+      "fixedCosts": "Fixed costs",
+      "profitMargin": "Profit margin"
+    },
+    "fields": {
+      "printer": "Printer",
+      "tariff": "Energy tariff",
+      "filament": "Filament",
+      "duration": "Duration",
+      "weight": "Weight (g)",
+      "fixedCost": "Amount ($)",
+      "newCategory": "New category",
+      "defaultValue": "Default value ($)",
+      "margin": "Margin (%)",
+      "quoteName": "Quote name"
+    },
+    "options": {
+      "chooseFilament": "Select a filament…",
+      "chooseCategory": "Select a category…"
+    },
+    "printTimeHint": "Duration must be greater than zero; enter whole numbers with d, h, m and/or s in that order.\nSpaces between units are optional.\nExamples: 2d6h55m, 1h57m, 2m, or 35s.",
+    "removeFilament": "Remove filament",
+    "addFilament": "Add filament",
+    "needFilament": "Add at least one filament.",
+    "removeCost": "Remove cost",
+    "addCost": "Add cost",
+    "placeholders": {
+      "newCategory": "e.g. Post-processing",
+      "margin": "50",
+      "quoteName": "e.g. Articulated capybara"
+    },
+    "createAndAddCategory": "Create and add",
+    "finalPriceFormula": "Final price = total cost ÷ (1 − margin/100).",
+    "calculate": "Calculate",
+    "requiredFields": "Enter a printer, tariff, at least one filament (time and weight), and the margin.",
+    "result": {
+      "filament": "Filament",
+      "energy": "Energy",
+      "amortization": "Depreciation",
+      "fixedCosts": "Fixed costs",
+      "totalCost": "Total cost",
+      "profit": "Profit",
+      "finalPrice": "Final price"
+    },
+    "saveChanges": "Save changes",
+    "saveQuote": "Save quote",
+    "needName": "Name the quote before saving it."
+  },
+  "settings": {
+    "title": "Settings",
+    "items": {
+      "printer": "printer {{name}}",
+      "tariff": "energy tariff {{name}}",
+      "filament": "filament {{name}}",
+      "category": "cost category {{name}}"
+    },
+    "printers": {
+      "title": "Printers",
+      "empty": "No printers have been added.",
+      "table": {
+        "name": "Name",
+        "purchase": "Purchase",
+        "resale": "Resale",
+        "lifespan": "Lifespan (h)",
+        "power": "Power (W)"
+      },
+      "fields": {
+        "name": "Name",
+        "purchase": "Purchase price ($)",
+        "resale": "Resale ($)",
+        "lifespan": "Lifespan (h)",
+        "power": "Power (W)"
+      },
+      "namePlaceholder": "e.g. Bambu A1"
+    },
+    "tariffs": {
+      "title": "Energy tariffs",
+      "empty": "No tariffs have been added.",
+      "name": "Name",
+      "kwh": "kWh",
+      "namePlaceholder": "e.g. Green",
+      "pricePlaceholder": "0.80",
+      "pricePerKwh": "Price per kWh ($)"
+    },
+    "filaments": {
+      "title": "Filaments",
+      "empty": "No filaments have been added — create one manually or import from Spoolman below.",
+      "name": "Name",
+      "material": "Material",
+      "pricePerKg": "Price/kg",
+      "source": "Source",
+      "manual": "Manual",
+      "namePlaceholder": "e.g. Black PLA",
+      "materialPlaceholder": "PLA",
+      "color": "Color",
+      "price": "Price/kg ($)"
+    },
+    "spoolman": {
+      "title": "Spoolman",
+      "url": "Spoolman URL",
+      "urlPlaceholder": "http://localhost:8000",
+      "urlSaved": "URL saved.",
+      "connectionOk": "Connection successful.",
+      "imported_one": "{{count}} filament imported/updated.",
+      "imported_other": "{{count}} filaments imported/updated.",
+      "save": "Save",
+      "testConnection": "Test connection",
+      "import": "Import spools",
+      "hint": "Import updates existing filaments (by spool) and adds new ones; archived spools are ignored."
+    },
+    "categories": {
+      "title": "Fixed-cost categories",
+      "empty": "No cost categories have been added.",
+      "name": "Name",
+      "defaultValue": "Default value",
+      "namePlaceholder": "e.g. Labor",
+      "value": "Default value ($)"
+    }
+  }
+}

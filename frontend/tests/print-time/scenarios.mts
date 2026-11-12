@@ -13,9 +13,12 @@ for (const duration of invalidDurations) {
 }
 
 const quoteForm = readFileSync(new URL("../../src/pages/QuoteForm.tsx", import.meta.url), "utf8");
+const ptTranslations = JSON.parse(
+  readFileSync(new URL("../../src/i18n/locales/pt-BR/translation.json", import.meta.url), "utf8"),
+);
 assert.match(quoteForm, /isValidPrintDuration\(p\.time\)/, "the form should validate duration text");
-assert.match(quoteForm, /title=\{printTimeFormatHint\}/, "the input should describe accepted durations");
-assert.match(quoteForm, /2d6h55m.*1h57m.*2m.*35s/);
+assert.match(quoteForm, /title=\{t\("quoteForm\.printTimeHint"\)\}/, "the input should describe accepted durations");
+assert.match(ptTranslations.quoteForm.printTimeHint, /2d6h55m.*1h57m.*2m.*35s/);
 assert.match(quoteForm, /printTime:\s*p\.time/);
 
 console.log("Print-time validation and form probes passed.");

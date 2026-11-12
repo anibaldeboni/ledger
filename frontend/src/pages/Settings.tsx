@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Check,
   CloudSync,
@@ -20,7 +21,10 @@ function DeleteButton({
   item: string;
 }) {
   const [armed, setArmed] = useState(false);
-  const label = armed ? `Confirmar exclusão: ${item}` : `Excluir ${item}`;
+  const { t } = useTranslation();
+  const label = armed
+    ? t("common.confirmDeleteItem", { item })
+    : t("common.deleteItem", { item });
   return (
     <button
       type="button"
@@ -43,11 +47,12 @@ function DeleteButton({
 }
 
 export default function Settings() {
+  const { t } = useTranslation();
   const [filamentsRefreshKey, setFilamentsRefreshKey] = useState(0);
   return (
     <div>
       <div className="page-head">
-        <h1>Configurações</h1>
+        <h1>{t("settings.title")}</h1>
       </div>
       <PrintersSection />
       <TariffsSection />
@@ -63,6 +68,8 @@ export default function Settings() {
 // --- Impressoras (S1) ----------------------------------------------------------
 
 function PrintersSection() {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.resolvedLanguage ?? i18n.language;
   const list = useAsync(() => LedgerService.ListPrinters(), []);
   const [form, setForm] = useState({
     id: 0,
@@ -115,37 +122,37 @@ function PrintersSection() {
 
   return (
     <section className="block">
-      <h2>Impressoras</h2>
+      <h2>{t("settings.printers.title")}</h2>
       {err ? <p className="error-text">{err}</p> : null}
       {(list.data ?? []).length === 0 ? (
-        <p className="hint">Nenhuma impressora cadastrada.</p>
+        <p className="hint">{t("settings.printers.empty")}</p>
       ) : (
         <div className="list" style={{ marginBottom: 14 }}>
           <div className="row-head cols-printer">
-            <span>Nome</span>
-            <span className="money">Compra</span>
-            <span className="money">Revenda</span>
-            <span className="money">Vida útil (h)</span>
-            <span className="money">Potência (W)</span>
+            <span>{t("settings.printers.table.name")}</span>
+            <span className="money">{t("settings.printers.table.purchase")}</span>
+            <span className="money">{t("settings.printers.table.resale")}</span>
+            <span className="money">{t("settings.printers.table.lifespan")}</span>
+            <span className="money">{t("settings.printers.table.power")}</span>
             <span />
           </div>
           {(list.data ?? []).map((p) => (
             <div className="list-row cols-printer" key={p.id}>
               <span>{p.name}</span>
-              <span className="money">{brl(p.purchasePrice)}</span>
-              <span className="money">{brl(p.resalePrice)}</span>
+              <span className="money">{brl(p.purchasePrice, locale)}</span>
+              <span className="money">{brl(p.resalePrice, locale)}</span>
               <span className="money">
-                {p.lifespanHours.toLocaleString("pt-BR")}
+                {p.lifespanHours.toLocaleString(locale)}
               </span>
               <span className="money">
-                {p.powerWatts.toLocaleString("pt-BR")}
+                {p.powerWatts.toLocaleString(locale)}
               </span>
               <span className="actions" style={{ justifySelf: "end" }}>
                 <button
                   type="button"
                   className="btn btn-icon"
-                  aria-label={`Editar impressora ${p.name}`}
-                  title={`Editar impressora ${p.name}`}
+                  aria-label={t("common.editItem", { item: t("settings.items.printer", { name: p.name }) })}
+                  title={t("common.editItem", { item: t("settings.items.printer", { name: p.name }) })}
                   onClick={() =>
                     setForm({
                       id: p.id,
@@ -160,7 +167,7 @@ function PrintersSection() {
                   <Pencil size={16} aria-hidden="true" />
                 </button>
                 <DeleteButton
-                  item={`impressora ${p.name}`}
+                  item={t("settings.items.printer", { name: p.name })}
                   onConfirm={() => remove(p.id)}
                 />
               </span>
@@ -170,15 +177,15 @@ function PrintersSection() {
       )}
       <div className="row">
         <label className="field">
-          Nome
+          {t("settings.printers.fields.name")}
           <input
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-            placeholder="Ex.: Bambu A1"
+            placeholder={t("settings.printers.namePlaceholder")}
           />
         </label>
         <label className="field">
-          Preço de compra (R$)
+          {t("settings.printers.fields.purchase")}
           <input
             inputMode="decimal"
             value={form.purchase}
@@ -187,7 +194,7 @@ function PrintersSection() {
           />
         </label>
         <label className="field">
-          Revenda (R$)
+          {t("settings.printers.fields.resale")}
           <input
             inputMode="decimal"
             value={form.resale}
@@ -196,7 +203,7 @@ function PrintersSection() {
           />
         </label>
         <label className="field">
-          Vida útil (h)
+          {t("settings.printers.fields.lifespan")}
           <input
             inputMode="decimal"
             value={form.lifespan}
@@ -205,7 +212,7 @@ function PrintersSection() {
           />
         </label>
         <label className="field">
-          Potência (W)
+          {t("settings.printers.fields.power")}
           <input
             inputMode="decimal"
             value={form.watts}
@@ -219,7 +226,7 @@ function PrintersSection() {
             disabled={!form.name.trim() || busy}
             onClick={save}
           >
-            {busy ? "Salvando…" : editing ? "Salvar" : "Adicionar"}
+            {busy ? t("common.saving") : editing ? t("common.save") : t("common.add")}
           </button>
           {editing ? (
             <button
@@ -235,7 +242,7 @@ function PrintersSection() {
                 })
               }
             >
-              Cancelar
+              {t("common.cancel")}
             </button>
           ) : null}
         </div>
@@ -247,6 +254,8 @@ function PrintersSection() {
 // --- Bandeiras tarifárias (S2) -------------------------------------------------
 
 function TariffsSection() {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.resolvedLanguage ?? i18n.language;
   const list = useAsync(() => LedgerService.ListTariffs(), []);
   const [form, setForm] = useState({ id: 0, name: "", kwh: "" });
   const [err, setErr, clearErr] = useActionError();
@@ -281,36 +290,36 @@ function TariffsSection() {
 
   return (
     <section className="block">
-      <h2>Bandeiras tarifárias</h2>
+      <h2>{t("settings.tariffs.title")}</h2>
       {err ? <p className="error-text">{err}</p> : null}
       {(list.data ?? []).length === 0 ? (
-        <p className="hint">Nenhuma bandeira cadastrada.</p>
+        <p className="hint">{t("settings.tariffs.empty")}</p>
       ) : (
         <div className="list" style={{ marginBottom: 14 }}>
           <div className="row-head cols-tariff">
-            <span>Nome</span>
-            <span className="money">kWh</span>
+            <span>{t("settings.tariffs.name")}</span>
+            <span className="money">{t("settings.tariffs.kwh")}</span>
             <span />
           </div>
-          {(list.data ?? []).map((t) => (
-            <div className="list-row cols-tariff" key={t.id}>
-              <span>{t.name}</span>
-              <span className="money">{brl(t.kwhPrice)}</span>
+          {(list.data ?? []).map((tariff) => (
+            <div className="list-row cols-tariff" key={tariff.id}>
+              <span>{tariff.name}</span>
+              <span className="money">{brl(tariff.kwhPrice, locale)}</span>
               <span className="actions" style={{ justifySelf: "end" }}>
                 <button
                   type="button"
                   className="btn btn-icon"
-                  aria-label={`Editar bandeira tarifária ${t.name}`}
-                  title={`Editar bandeira tarifária ${t.name}`}
+                  aria-label={t("common.editItem", { item: t("settings.items.tariff", { name: tariff.name }) })}
+                  title={t("common.editItem", { item: t("settings.items.tariff", { name: tariff.name }) })}
                   onClick={() =>
-                    setForm({ id: t.id, name: t.name, kwh: String(t.kwhPrice) })
+                    setForm({ id: tariff.id, name: tariff.name, kwh: String(tariff.kwhPrice) })
                   }
                 >
                   <Pencil size={16} aria-hidden="true" />
                 </button>
                 <DeleteButton
-                  item={`bandeira tarifária ${t.name}`}
-                  onConfirm={() => remove(t.id)}
+                  item={t("settings.items.tariff", { name: tariff.name })}
+                  onConfirm={() => remove(tariff.id)}
                 />
               </span>
             </div>
@@ -319,20 +328,20 @@ function TariffsSection() {
       )}
       <div className="row">
         <label className="field">
-          Nome
+          {t("settings.tariffs.name")}
           <input
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-            placeholder="Ex.: Verde"
+            placeholder={t("settings.tariffs.namePlaceholder")}
           />
         </label>
         <label className="field">
-          Valor do kWh (R$)
+          {t("settings.tariffs.pricePerKwh")}
           <input
             inputMode="decimal"
             value={form.kwh}
             onChange={(e) => setForm({ ...form, kwh: e.target.value })}
-            placeholder="0,80"
+            placeholder={t("settings.tariffs.pricePlaceholder")}
           />
         </label>
         <div className="actions">
@@ -341,14 +350,14 @@ function TariffsSection() {
             disabled={!form.name.trim() || busy}
             onClick={save}
           >
-            {busy ? "Salvando…" : form.id ? "Salvar" : "Adicionar"}
+            {busy ? t("common.saving") : form.id ? t("common.save") : t("common.add")}
           </button>
           {form.id ? (
             <button
               className="btn"
               onClick={() => setForm({ id: 0, name: "", kwh: "" })}
             >
-              Cancelar
+              {t("common.cancel")}
             </button>
           ) : null}
         </div>
@@ -360,6 +369,8 @@ function TariffsSection() {
 // --- Filamentos (S3) -----------------------------------------------------------
 
 function FilamentsSection({ refreshKey }: { refreshKey: number }) {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.resolvedLanguage ?? i18n.language;
   const list = useAsync(() => LedgerService.ListFilaments(), [refreshKey]);
   const [form, setForm] = useState({
     id: 0,
@@ -404,21 +415,18 @@ function FilamentsSection({ refreshKey }: { refreshKey: number }) {
 
   return (
     <section className="block">
-      <h2>Filamentos</h2>
+      <h2>{t("settings.filaments.title")}</h2>
       {err ? <p className="error-text">{err}</p> : null}
       {(list.data ?? []).length === 0 ? (
-        <p className="hint">
-          Nenhum filamento cadastrado — crie manualmente ou importe do Spoolman
-          abaixo.
-        </p>
+        <p className="hint">{t("settings.filaments.empty")}</p>
       ) : (
         <div className="list" style={{ marginBottom: 14 }}>
           <div className="row-head cols-fil">
             <span />
-            <span>Nome</span>
-            <span>Material</span>
-            <span className="money">Preço/kg</span>
-            <span>Origem</span>
+            <span>{t("settings.filaments.name")}</span>
+            <span>{t("settings.filaments.material")}</span>
+            <span className="money">{t("settings.filaments.pricePerKg")}</span>
+            <span>{t("settings.filaments.source")}</span>
             <span />
           </div>
           {(list.data ?? []).map((f) => (
@@ -430,16 +438,16 @@ function FilamentsSection({ refreshKey }: { refreshKey: number }) {
               />
               <span>{f.name}</span>
               <span className="muted">{f.material || "—"}</span>
-              <span className="money">{brl(f.pricePerKg)}</span>
+              <span className="money">{brl(f.pricePerKg, locale)}</span>
               <span className="muted">
-                {f.source === "spoolman" ? "Spoolman" : "Manual"}
+                {f.source === "spoolman" ? "Spoolman" : t("settings.filaments.manual")}
               </span>
               <span className="actions" style={{ justifySelf: "end" }}>
                 <button
                   type="button"
                   className="btn btn-icon"
-                  aria-label={`Editar filamento ${f.name}`}
-                  title={`Editar filamento ${f.name}`}
+                  aria-label={t("common.editItem", { item: t("settings.items.filament", { name: f.name }) })}
+                  title={t("common.editItem", { item: t("settings.items.filament", { name: f.name }) })}
                   onClick={() =>
                     setForm({
                       id: f.id,
@@ -453,7 +461,7 @@ function FilamentsSection({ refreshKey }: { refreshKey: number }) {
                   <Pencil size={16} aria-hidden="true" />
                 </button>
                 <DeleteButton
-                  item={`filamento ${f.name}`}
+                  item={t("settings.items.filament", { name: f.name })}
                   onConfirm={() => remove(f.id)}
                 />
               </span>
@@ -463,23 +471,23 @@ function FilamentsSection({ refreshKey }: { refreshKey: number }) {
       )}
       <div className="row">
         <label className="field">
-          Nome
+          {t("settings.filaments.name")}
           <input
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-            placeholder="Ex.: PLA Preto"
+            placeholder={t("settings.filaments.namePlaceholder")}
           />
         </label>
         <label className="field">
-          Material
+          {t("settings.filaments.material")}
           <input
             value={form.material}
             onChange={(e) => setForm({ ...form, material: e.target.value })}
-            placeholder="PLA"
+            placeholder={t("settings.filaments.materialPlaceholder")}
           />
         </label>
         <label className="field" style={{ flexBasis: 90 }}>
-          Cor
+          {t("settings.filaments.color")}
           <input
             type="color"
             value={form.color}
@@ -488,7 +496,7 @@ function FilamentsSection({ refreshKey }: { refreshKey: number }) {
           />
         </label>
         <label className="field">
-          Preço/kg (R$)
+          {t("settings.filaments.price")}
           <input
             inputMode="decimal"
             value={form.price}
@@ -502,7 +510,7 @@ function FilamentsSection({ refreshKey }: { refreshKey: number }) {
             disabled={!form.name.trim() || busy}
             onClick={save}
           >
-            {busy ? "Salvando…" : form.id ? "Salvar" : "Adicionar"}
+            {busy ? t("common.saving") : form.id ? t("common.save") : t("common.add")}
           </button>
           {form.id ? (
             <button
@@ -517,7 +525,7 @@ function FilamentsSection({ refreshKey }: { refreshKey: number }) {
                 })
               }
             >
-              Cancelar
+              {t("common.cancel")}
             </button>
           ) : null}
         </div>
@@ -529,10 +537,11 @@ function FilamentsSection({ refreshKey }: { refreshKey: number }) {
 // --- Spoolman (S3, S4) ---------------------------------------------------------
 
 function SpoolmanSection({ onImported }: { onImported: () => void }) {
+  const { t } = useTranslation();
   const config = useAsync(() => LedgerService.GetSpoolmanURL(), []);
   const [url, setUrl] = useState<string | null>(null);
   const [err, setErr, clearErr] = useActionError();
-  const [status, setStatus] = useState<string | null>(null);
+  const [status, setStatus] = useState<{ key: string; count?: number } | null>(null);
   const [busy, setBusy] = useState(false);
 
   const value = url ?? config.data ?? "";
@@ -543,7 +552,7 @@ function SpoolmanSection({ onImported }: { onImported: () => void }) {
     try {
       await LedgerService.SetSpoolmanURL(value.trim());
       setUrl(value.trim());
-      setStatus("URL salva.");
+      setStatus({ key: "settings.spoolman.urlSaved" });
     } catch (e) {
       setErr(e);
     }
@@ -555,7 +564,7 @@ function SpoolmanSection({ onImported }: { onImported: () => void }) {
     setBusy(true);
     try {
       await LedgerService.TestSpoolman(value.trim());
-      setStatus("Conexão OK.");
+      setStatus({ key: "settings.spoolman.connectionOk" });
     } catch (e) {
       setErr(e);
     } finally {
@@ -570,7 +579,7 @@ function SpoolmanSection({ onImported }: { onImported: () => void }) {
     try {
       const n = await LedgerService.ImportSpoolman(value.trim());
       onImported();
-      setStatus(`${n} filamento(s) importados/atualizados.`);
+      setStatus({ key: "settings.spoolman.imported", count: n });
     } catch (e) {
       setErr(e);
     } finally {
@@ -580,32 +589,32 @@ function SpoolmanSection({ onImported }: { onImported: () => void }) {
 
   return (
     <section className="block">
-      <h2>Spoolman</h2>
+      <h2>{t("settings.spoolman.title")}</h2>
       {err ? <p className="error-text">{err}</p> : null}
-      {status ? <p className="ok-text">{status}</p> : null}
+      {status ? <p className="ok-text">{t(status.key, { count: status.count })}</p> : null}
       <div className="row">
         <label className="field grow">
-          URL do Spoolman
+          {t("settings.spoolman.url")}
           <input
             value={value}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="http://localhost:8000"
+            placeholder={t("settings.spoolman.urlPlaceholder")}
             spellCheck={false}
           />
         </label>
         <div className="actions">
           <button
             className="btn btn-icon"
-            title="Salvar"
-            aria-label="Salvar"
+            title={t("settings.spoolman.save")}
+            aria-label={t("settings.spoolman.save")}
             onClick={persist}
           >
             <Save size={22} aria-hidden="true" />
           </button>
           <button
             className="btn btn-icon"
-            title="Testar conexão"
-            aria-label="Testar conexão"
+            title={t("settings.spoolman.testConnection")}
+            aria-label={t("settings.spoolman.testConnection")}
             disabled={busy || !value.trim()}
             onClick={test}
           >
@@ -613,8 +622,8 @@ function SpoolmanSection({ onImported }: { onImported: () => void }) {
           </button>
           <button
             className="btn btn-primary btn-icon"
-            title="Importar spools"
-            aria-label="Importar spools"
+            title={t("settings.spoolman.import")}
+            aria-label={t("settings.spoolman.import")}
             disabled={busy || !value.trim()}
             onClick={importSpools}
           >
@@ -622,10 +631,7 @@ function SpoolmanSection({ onImported }: { onImported: () => void }) {
           </button>
         </div>
       </div>
-      <p className="hint">
-        Importar atualiza os filamentos existentes (por spool) e adiciona os
-        novos; spools arquivados são ignorados.
-      </p>
+      <p className="hint">{t("settings.spoolman.hint")}</p>
     </section>
   );
 }
@@ -633,6 +639,8 @@ function SpoolmanSection({ onImported }: { onImported: () => void }) {
 // --- Categorias de custo fixo (S5) ---------------------------------------------
 
 function CostCategoriesSection() {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.resolvedLanguage ?? i18n.language;
   const list = useAsync(() => LedgerService.ListCostCategories(), []);
   const [form, setForm] = useState({ id: 0, name: "", value: "" });
   const [err, setErr, clearErr] = useActionError();
@@ -667,27 +675,27 @@ function CostCategoriesSection() {
 
   return (
     <section className="block">
-      <h2>Categorias de custo fixo</h2>
+      <h2>{t("settings.categories.title")}</h2>
       {err ? <p className="error-text">{err}</p> : null}
       {(list.data ?? []).length === 0 ? (
-        <p className="hint">Nenhuma categoria cadastrada.</p>
+        <p className="hint">{t("settings.categories.empty")}</p>
       ) : (
         <div className="list" style={{ marginBottom: 14 }}>
           <div className="row-head cols-cat">
-            <span>Nome</span>
-            <span className="money">Valor padrão</span>
+            <span>{t("settings.categories.name")}</span>
+            <span className="money">{t("settings.categories.defaultValue")}</span>
             <span />
           </div>
           {(list.data ?? []).map((c) => (
             <div className="list-row cols-cat" key={c.id}>
               <span>{c.name}</span>
-              <span className="money">{brl(c.defaultValue)}</span>
+              <span className="money">{brl(c.defaultValue, locale)}</span>
               <span className="actions" style={{ justifySelf: "end" }}>
                 <button
                   type="button"
                   className="btn btn-icon"
-                  aria-label={`Editar categoria de custo ${c.name}`}
-                  title={`Editar categoria de custo ${c.name}`}
+                  aria-label={t("common.editItem", { item: t("settings.items.category", { name: c.name }) })}
+                  title={t("common.editItem", { item: t("settings.items.category", { name: c.name }) })}
                   onClick={() =>
                     setForm({
                       id: c.id,
@@ -699,7 +707,7 @@ function CostCategoriesSection() {
                   <Pencil size={16} aria-hidden="true" />
                 </button>
                 <DeleteButton
-                  item={`categoria de custo ${c.name}`}
+                  item={t("settings.items.category", { name: c.name })}
                   onConfirm={() => remove(c.id)}
                 />
               </span>
@@ -709,15 +717,15 @@ function CostCategoriesSection() {
       )}
       <div className="row">
         <label className="field">
-          Nome
+          {t("settings.categories.name")}
           <input
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-            placeholder="Ex.: Mão de Obra"
+            placeholder={t("settings.categories.namePlaceholder")}
           />
         </label>
         <label className="field">
-          Valor padrão (R$)
+          {t("settings.categories.value")}
           <input
             inputMode="decimal"
             value={form.value}
@@ -731,14 +739,14 @@ function CostCategoriesSection() {
             disabled={!form.name.trim() || busy}
             onClick={save}
           >
-            {busy ? "Salvando…" : form.id ? "Salvar" : "Adicionar"}
+            {busy ? t("common.saving") : form.id ? t("common.save") : t("common.add")}
           </button>
           {form.id ? (
             <button
               className="btn"
               onClick={() => setForm({ id: 0, name: "", value: "" })}
             >
-              Cancelar
+              {t("common.cancel")}
             </button>
           ) : null}
         </div>

@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Calculator, Settings as SettingsIcon } from "lucide-react";
 import appIcon from "../../assets/app.png";
+import { languageOptions } from "./i18n";
 import Quotes from "./pages/Quotes";
 import QuoteForm from "./pages/QuoteForm";
 import Settings from "./pages/Settings";
@@ -9,6 +11,7 @@ type View = { page: "quotes" } | { page: "settings" } | { page: "form"; quoteId?
 
 export default function App() {
   const [view, setView] = useState<View>({ page: "quotes" });
+  const { t, i18n } = useTranslation();
 
   return (
     <div className="app">
@@ -25,7 +28,7 @@ export default function App() {
           onClick={() => setView({ page: "quotes" })}
         >
           <Calculator size={18} aria-hidden="true" />
-          <span>Orçamentos</span>
+          <span>{t("nav.quotes")}</span>
         </button>
         <button
           className="nav-item"
@@ -33,8 +36,22 @@ export default function App() {
           onClick={() => setView({ page: "settings" })}
         >
           <SettingsIcon size={18} aria-hidden="true" />
-          <span>Configurações</span>
+          <span>{t("nav.settings")}</span>
         </button>
+        <label className="language-switcher" htmlFor="language-select">
+          <span>{t("language.label")}</span>
+          <select
+            id="language-select"
+            value={i18n.resolvedLanguage ?? i18n.language}
+            onChange={(event) => void i18n.changeLanguage(event.target.value)}
+          >
+            {languageOptions.map(({ code, name }) => (
+              <option key={code} value={code}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </label>
       </nav>
       <main className="content">
         {view.page === "quotes" ? (
