@@ -1,15 +1,41 @@
 import { useState } from "react";
-import { Check, Pencil, Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Check, Pencil, Plus, Trash2 } from "lucide-react";
 import { LedgerService } from "../../bindings/ledger";
 import { brl, dt } from "../lib/format";
 import { useActionError, useAsync } from "../lib/hooks";
-import { filterQuotesByName } from "../lib/search";
+import { filterQuotesByName, sortQuotes, type QuoteSort } from "../lib/search";
+
+function SortButton(props: { label: string; active: boolean; dir: QuoteSort["dir"]; onClick: () => void }) {
+  const { label, active, dir, onClick } = props;
+  return (
+    <button
+      type="button"
+      className="th-sort"
+      onClick={onClick}
+      aria-label={
+        active
+          ? `${label}, ${dir === "asc" ? "crescente" : "decrescente"}. Clique para inverter.`
+          : `Ordenar por ${label}`
+      }
+    >
+      {label}
+      {active && (dir === "asc" ? <ArrowUp size={12} aria-hidden="true" /> : <ArrowDown size={12} aria-hidden="true" />)}
+    </button>
+  );
+}
 
 export default function Quotes({ onNew, onEdit }: { onNew: () => void; onEdit: (id: number) => void }) {
   const quotes = useAsync(() => LedgerService.ListQuotes(), []);
   const [confirmId, setConfirmId] = useState<number | null>(null);
   const [search, setSearch] = useState("");
+  const [sort, setSort] = useState<QuoteSort>({ key: "updated", dir: "desc" });
   const [actionError, setActionError, clearActionError] = useActionError();
+
+  function toggleSort(key: QuoteSort["key"]) {
+    setSort((s) =>
+      s.key === key ? { key, dir: s.dir === "asc" ? "desc" : "asc" } : { key, dir: key === "name" ? "asc" : "desc" },
+    );
+  }
 
   async function remove(id: number) {
     clearActionError();
@@ -24,6 +50,7 @@ export default function Quotes({ onNew, onEdit }: { onNew: () => void; onEdit: (
 
   const list = quotes.data ?? [];
   const filtered = filterQuotesByName(list, search);
+  const rows = sortQuotes(filtered, sort);
 
   return (
     <div>
@@ -60,13 +87,22 @@ export default function Quotes({ onNew, onEdit }: { onNew: () => void; onEdit: (
       ) : (
         <div className="list">
           <div className="row-head cols-quote">
-            <span>Nome</span>
+            <span>
+              <SortButton label="Nome" active={sort.key === "name"} dir={sort.dir} onClick={() => toggleSort("name")} />
+            </span>
             <span className="money">Margem</span>
             <span className="money">Preço final</span>
-            <span className="money">Atualizado</span>
+            <span className="money">
+              <SortButton
+                label="Atualizado"
+                active={sort.key === "updated"}
+                dir={sort.dir}
+                onClick={() => toggleSort("updated")}
+              />
+            </span>
             <span />
           </div>
-          {filtered.map((q) => (
+          {rows.map((q) => (
             <div className="list-row cols-quote" key={q.id}>
               <span>{q.name}</span>
               <span className="money">{q.marginPercent.toLocaleString("pt-BR")}%</span>

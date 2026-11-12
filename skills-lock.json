@@ -1,11 +1,17 @@
 {
-  "version": 1,
+  "version": 2,
   "skills": {
+    "shadcn": {
+      "source": "shadcn-ui/ui",
+      "sourceType": "github",
+      "skillPath": "skills/shadcn/SKILL.md",
+      "computedHash": "388962d16c7a4f13aaeee0d8f128e50a87df8553d42ef7988c39c0e1c74a40e8"
+    },
     "wails3": {
       "source": "mirai3103/aiodb-studio",
       "sourceType": "github",
       "skillPath": ".agents/skills/wails3/SKILL.md",
-      "computedHash": "c6736d3a116bce7b4ad2683cc8bcfd16449cecaa6193c1287edf9848346d2e52"
+      "computedHash": "b68ce14336d51d893afb05ca0eabdf0a1d2145b48a3c6e4e3d35291b1c7cd269"
     }
   }
 }

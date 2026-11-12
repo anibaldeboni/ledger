@@ -1,4 +1,4 @@
-APP_DIR := ledger
+APP_DIR := .
 EXTRA_TAGS ?=
 
 .DEFAULT_GOAL := help

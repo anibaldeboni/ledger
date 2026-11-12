@@ -176,7 +176,25 @@ assert.deepEqual(names("SUP"), ["Suporte de fone"]);
 assert.deepEqual(names("geometrico"), ["Vaso Geométrico"]);
 assert.deepEqual(names("  vas  "), ["Vaso Geométrico"]);
 assert.deepEqual(names("xyz"), []);
-assert.match(quotes, /import \{ filterQuotesByName \} from "\.\.\/lib\/search";/);
+assert.match(quotes, /import \{ filterQuotesByName, sortQuotes, type QuoteSort \} from "\.\.\/lib\/search";/);
 assert.match(quotes, /<input[^>]*type="search"/);
+
+// Sorting by name and updated date toggles asc/desc without mutating the list.
+const { sortQuotes } = await import("../../src/lib/search.ts");
+const sortable = [
+  { name: "banana", updatedAt: "2026-01-01T10:00:00Z" },
+  { name: "Ábaco", updatedAt: "2026-03-01T10:00:00Z" },
+  { name: "caixa", updatedAt: "2026-02-01T10:00:00Z" },
+];
+const sortedNames = (key: "name" | "updated", dir: "asc" | "desc") =>
+  sortQuotes(sortable, { key, dir }).map((q) => q.name);
+assert.deepEqual(sortedNames("name", "asc"), ["Ábaco", "banana", "caixa"]);
+assert.deepEqual(sortedNames("name", "desc"), ["caixa", "banana", "Ábaco"]);
+assert.deepEqual(sortedNames("updated", "asc"), ["banana", "caixa", "Ábaco"]);
+assert.deepEqual(sortedNames("updated", "desc"), ["Ábaco", "caixa", "banana"]);
+assert.deepEqual(sortable.map((q) => q.name), ["banana", "Ábaco", "caixa"]);
+assert.match(quotes, /sortQuotes\(filtered, sort\)/);
+assert.match(quotes, /onClick=\{\(\) => toggleSort\("name"\)\}/);
+assert.match(quotes, /onClick=\{\(\) => toggleSort\("updated"\)\}/);
 
 console.log("T10 hook and UI regression probes passed.");
