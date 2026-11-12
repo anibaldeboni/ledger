@@ -148,6 +148,6 @@ function formatFilaments(filaments: ProductionFilamentUsage[] | null): string {
 
 function csvCell(value: CsvValue): string {
   const raw = value === undefined ? "" : String(value);
-  const text = typeof value === "string" && /^\s*[=+\-@]/.test(raw) ? `'${raw}` : raw;
+  const text = typeof value === "string" && /^[\s\u0000-\u001f\u007f]*[=+\-@]/.test(raw) ? `'${raw}` : raw;
   return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 }

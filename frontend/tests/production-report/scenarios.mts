@@ -95,11 +95,14 @@ assert.ok(csv.includes("90061"), "CSV includes order duration in seconds");
 assert.ok(csv.includes("2.25"), "CSV includes estimated print hours");
 const emptyOrder = report.orders?.[1];
 assert.ok(emptyOrder);
-for (const formula of ["=1+1", "+1+1", "-1+1", "@SUM(1,1)", " \t=1+1"]) {
+for (const formula of ["=1+1", "+1+1", "-1+1", "@SUM(1,1)", " \t=1+1", "\x01=1+1", "\x1b=1+1", "\x7f=1+1", "\x01\x02 \t=1+1"]) {
   const formulaReport = { ...report, orders: [{ ...emptyOrder, title: formula }] };
   const formulaCsv = buildProductionReportCsv(formulaReport, "2026-04-30", "2026-05-01", labels);
   assert.ok(formulaCsv.includes(`'${formula}`), `CSV text cells must neutralize spreadsheet formula prefix ${formula}`);
 }
+const multilineReport = { ...report, orders: [{ ...emptyOrder, title: 'Name, "quoted"\ncontinued' }] };
+const multilineCsv = buildProductionReportCsv(multilineReport, "2026-04-30", "2026-05-01", labels);
+assert.ok(multilineCsv.includes('"Name, ""quoted""\ncontinued"'), "CSV preserves line breaks and escapes quotes in one field");
 
 const locales = ["pt-BR", "en", "es"] as const;
 const catalogs = Object.fromEntries(locales.map((locale) => [

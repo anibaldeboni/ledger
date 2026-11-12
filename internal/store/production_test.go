@@ -1,7 +1,9 @@
 package store
 
 import (
+	"crypto/sha256"
 	"fmt"
+	"os"
 	"strings"
 	"testing"
 
@@ -575,4 +577,54 @@ func assertProductionPlanUsesIndex(t *testing.T, s *Store, query, index string, 
 	if !strings.Contains(details, index) {
 		t.Fatalf("query plan does not use %s:\n%s", index, details)
 	}
+}
+
+func TestProductionReadViewsDoNotMutateDatabase(t *testing.T) {
+	s := newTestStore(t)
+	quote := saveProductionQuote(t, s, "Read-only report quote")
+	order, err := s.CreateProductionOrder("Read-only archived order")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.AddProductionTicket(order.ID, quote.ID); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.CompleteProductionOrder(order.ID); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.ArchiveProductionOrder(order.ID); err != nil {
+		t.Fatal(err)
+	}
+
+	before := hashProductionDatabase(t, s)
+	report, err := s.GenerateProductionReport("2000-01-01T00:00:00Z", "2999-01-01T00:00:00Z")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(report.Orders) != 1 || report.Orders[0].OrderID != order.ID {
+		t.Fatalf("archived completed order missing from report: %+v", report.Orders)
+	}
+	if _, err := s.ListProductionOrders(); err != nil {
+		t.Fatal(err)
+	}
+	if archived, err := s.ListArchivedProductionOrders(); err != nil || len(archived) != 1 || archived[0].ID != order.ID {
+		t.Fatalf("archived order listing failed: %+v, %v", archived, err)
+	}
+	if after := hashProductionDatabase(t, s); before != after {
+		t.Fatalf("report and archive reads mutated the database: %x -> %x", before, after)
+	}
+}
+
+func hashProductionDatabase(t *testing.T, s *Store) [32]byte {
+	t.Helper()
+	var sequence int
+	var name, path string
+	if err := s.db.QueryRow(`PRAGMA database_list`).Scan(&sequence, &name, &path); err != nil {
+		t.Fatal(err)
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return sha256.Sum256(data)
 }
