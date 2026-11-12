@@ -1,0 +1,1 @@
+DROP INDEX idx_production_orders_deleted;

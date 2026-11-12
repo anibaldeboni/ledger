@@ -134,6 +134,7 @@ export interface ProductionOrderReport {
 export interface ProductionReport {
     "startAt": string;
     "endAt": string;
+    "cancelledOrderCount": number;
     "orders": ProductionOrderReport[] | null;
 }
 

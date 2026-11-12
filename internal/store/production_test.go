@@ -408,6 +408,81 @@ func TestProductionReportFiltersCompletionDateAndAggregatesMetrics(t *testing.T)
 	}
 }
 
+func TestProductionReportCountsSoftDeletedOrdersByDeletionDate(t *testing.T) {
+	s := newTestStore(t)
+	order, err := s.CreateProductionOrder("Canceled order")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := s.DeleteProductionOrder(order.ID); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.db.Exec(`
+		UPDATE production_orders
+		SET created_at = ?, completed_at = ?, deleted_at = ?
+		WHERE id = ?`,
+		"2025-12-01T00:00:00Z", "2026-01-02T00:00:00Z", "2026-01-02T00:00:00Z", order.ID); err != nil {
+		t.Fatal(err)
+	}
+
+	inside, err := s.GenerateProductionReport("2026-01-01T00:00:00Z", "2026-01-03T00:00:00Z")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if inside.CancelledOrderCount != 1 || len(inside.Orders) != 0 {
+		t.Fatalf("soft-deleted order must appear only in the cancellation count: %+v", inside)
+	}
+	outside, err := s.GenerateProductionReport("2026-01-01T00:00:00Z", "2026-01-02T00:00:00Z")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if outside.CancelledOrderCount != 0 {
+		t.Fatalf("cancellation outside the report range was counted: %+v", outside)
+	}
+}
+
+func TestProductionReportAggregatesEstimatesAcrossTickets(t *testing.T) {
+	s := newTestStore(t)
+	firstQuote := saveProductionQuote(t, s, "First report quote")
+	secondQuote := saveProductionQuote(t, s, "Second report quote")
+	order, err := s.CreateProductionOrder("Multi-ticket report order")
+	if err != nil {
+		t.Fatal(err)
+	}
+	first, err := s.AddProductionTicket(order.ID, firstQuote.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	second, err := s.AddProductionTicket(order.ID, secondQuote.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := s.CompleteProductionOrder(order.ID); err != nil {
+		t.Fatal(err)
+	}
+	created := "2026-02-01T00:00:00Z"
+	completed := "2026-02-01T02:00:00Z"
+	if _, err := s.db.Exec(`UPDATE production_orders SET created_at = ?, completed_at = ? WHERE id = ?`, created, completed, order.ID); err != nil {
+		t.Fatal(err)
+	}
+	for _, ticket := range []domain.ProductionTicket{first, second} {
+		if _, err := s.db.Exec(`UPDATE production_ticket_stage_history SET entered_at = ?, exited_at = ? WHERE ticket_id = ?`, created, completed, ticket.ID); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	report, err := s.GenerateProductionReport("2026-02-01T00:00:00Z", "2026-02-02T00:00:00Z")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(report.Orders) != 1 || len(report.Orders[0].Tickets) != 2 {
+		t.Fatalf("report omitted a ticket from the order: %+v", report)
+	}
+	if report.Orders[0].EstimatedPrintHours != 3 || len(report.Orders[0].Filaments) != 2 {
+		t.Fatalf("order totals did not aggregate both tickets: %+v", report.Orders[0])
+	}
+}
+
 func TestProductionBoardAndReportQueriesUseIndexes(t *testing.T) {
 	s := newTestStore(t)
 	tx, err := s.db.Begin()
@@ -429,6 +504,7 @@ func TestProductionBoardAndReportQueriesUseIndexes(t *testing.T) {
 	}
 	assertProductionPlanUsesIndex(t, s, `SELECT id FROM production_orders WHERE deleted_at IS NULL AND archived_at IS NULL ORDER BY created_at DESC, id DESC LIMIT 20`, "idx_production_orders_active_created")
 	assertProductionPlanUsesIndex(t, s, `SELECT id FROM production_orders WHERE deleted_at IS NULL AND completed_at >= ? AND completed_at < ? ORDER BY completed_at DESC, id DESC`, "idx_production_orders_completed", "2026-01-02T00:00:00Z", "2026-01-03T00:00:00Z")
+	assertProductionPlanUsesIndex(t, s, `SELECT COUNT(*) FROM production_orders WHERE deleted_at >= ? AND deleted_at < ?`, "idx_production_orders_deleted", "2026-01-02T00:00:00Z", "2026-01-03T00:00:00Z")
 	assertProductionPlanUsesIndex(t, s, `SELECT id FROM production_tickets WHERE quote_id = ?`, "idx_production_tickets_quote", int64(1))
 	assertProductionPlanUsesIndex(t, s, `SELECT id FROM production_tickets WHERE order_id = ? AND column_id = ? ORDER BY id`, "idx_production_tickets_order_column", int64(1), int64(1))
 	assertProductionPlanUsesIndex(t, s, `SELECT id FROM production_ticket_stage_history WHERE ticket_id = ? ORDER BY entered_at, id`, "idx_production_ticket_stage_history_ticket", int64(1))

@@ -73,7 +73,8 @@ type ProductionOrderReport struct {
 
 // ProductionReport contains completed orders whose completion time is in range.
 type ProductionReport struct {
-	StartAt string                  `json:"startAt"`
-	EndAt   string                  `json:"endAt"`
-	Orders  []ProductionOrderReport `json:"orders"`
+	StartAt             string                  `json:"startAt"`
+	EndAt               string                  `json:"endAt"`
+	CancelledOrderCount int64                   `json:"cancelledOrderCount"`
+	Orders              []ProductionOrderReport `json:"orders"`
 }

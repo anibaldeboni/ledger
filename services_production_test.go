@@ -79,6 +79,13 @@ func TestProductionServiceKeepsLiveQuoteAndArchivesReportableOrder(t *testing.T)
 	if len(archived) != 1 || archived[0].ID != order.ID {
 		t.Fatalf("archived order not available: %+v", archived)
 	}
+	cancelled, err := service.CreateProductionOrder("Canceled order")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := service.DeleteProductionOrder(cancelled.ID); err != nil {
+		t.Fatal(err)
+	}
 
 	start := time.Now().UTC().Add(-time.Hour).Format(time.RFC3339)
 	end := time.Now().UTC().Add(time.Hour).Format(time.RFC3339)
@@ -86,7 +93,7 @@ func TestProductionServiceKeepsLiveQuoteAndArchivesReportableOrder(t *testing.T)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(report.Orders) != 1 || report.Orders[0].EstimatedPrintHours != 2 || len(report.Orders[0].Filaments) != 1 || report.Orders[0].Filaments[0].WeightG != 40 {
+	if len(report.Orders) != 1 || report.CancelledOrderCount != 1 || report.Orders[0].EstimatedPrintHours != 2 || len(report.Orders[0].Filaments) != 1 || report.Orders[0].Filaments[0].WeightG != 40 {
 		t.Fatalf("archived order report did not use current quote estimates: %+v", report)
 	}
 }

@@ -35,6 +35,9 @@ func (s *Store) GenerateProductionReport(startAt, endAt string) (domain.Producti
 	}
 	defer tx.Rollback()
 	report := domain.ProductionReport{StartAt: startAt, EndAt: endAt, Orders: []domain.ProductionOrderReport{}}
+	if err := tx.QueryRow(`SELECT COUNT(*) FROM production_orders WHERE deleted_at >= ? AND deleted_at < ?`, startAt, endAt).Scan(&report.CancelledOrderCount); err != nil {
+		return domain.ProductionReport{}, err
+	}
 	orderPositions := make(map[int64]int)
 	ticketPositions := make(map[int64]productionTicketLocation)
 	orderFilamentPositions := make(map[int64]map[int64]int)
