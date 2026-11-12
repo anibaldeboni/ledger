@@ -124,14 +124,26 @@ func (s *Store) SaveQuote(q *domain.Quote) error {
 }
 
 func (s *Store) DeleteQuote(id int64) error {
-	res, err := s.db.Exec(`DELETE FROM quotes WHERE id=?`, id)
+	tx, err := s.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	var linked bool
+	if err := tx.QueryRow(`SELECT EXISTS(SELECT 1 FROM production_tickets WHERE quote_id = ?)`, id).Scan(&linked); err != nil {
+		return err
+	}
+	if linked {
+		return ErrProductionQuoteLinked
+	}
+	res, err := tx.Exec(`DELETE FROM quotes WHERE id=?`, id)
 	if err != nil {
 		return err
 	}
 	if affected, _ := res.RowsAffected(); affected == 0 {
 		return sql.ErrNoRows
 	}
-	return nil
+	return tx.Commit()
 }
 
 // CalculateQuote monta o CalcInput de um orçamento a partir dos cadastros e

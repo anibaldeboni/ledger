@@ -15,11 +15,27 @@ import { Call as $Call, CancellablePromise as $CancellablePromise } from "@wails
 // @ts-ignore: Unused imports
 import * as domain$0 from "./internal/domain/models.js";
 
+export function AddProductionTicket(orderID: number, quoteID: number): $CancellablePromise<domain$0.ProductionTicket> {
+    return $Call.ByID(1050355496, orderID, quoteID);
+}
+
+export function ArchiveProductionOrder(id: number): $CancellablePromise<void> {
+    return $Call.ByID(897863831, id);
+}
+
 /**
  * CalculateQuote calcula o orçamento sem salvá-lo (botão Calcular do formulário).
  */
 export function CalculateQuote(form: domain$0.QuoteEditor): $CancellablePromise<domain$0.Costs> {
     return $Call.ByID(4227971064, form);
+}
+
+export function CompleteProductionOrder(id: number): $CancellablePromise<void> {
+    return $Call.ByID(4263290744, id);
+}
+
+export function CreateProductionOrder(title: string): $CancellablePromise<domain$0.ProductionOrder> {
+    return $Call.ByID(1366387657, title);
 }
 
 export function DeleteCostCategory(id: number): $CancellablePromise<void> {
@@ -34,12 +50,24 @@ export function DeletePrinter(id: number): $CancellablePromise<void> {
     return $Call.ByID(108845925, id);
 }
 
+export function DeleteProductionColumn(id: number): $CancellablePromise<void> {
+    return $Call.ByID(4273463158, id);
+}
+
+export function DeleteProductionOrder(id: number): $CancellablePromise<void> {
+    return $Call.ByID(2215982908, id);
+}
+
 export function DeleteQuote(id: number): $CancellablePromise<void> {
     return $Call.ByID(406295829, id);
 }
 
 export function DeleteTariff(id: number): $CancellablePromise<void> {
     return $Call.ByID(2535301505, id);
+}
+
+export function GenerateProductionReport(startAt: string, endAt: string): $CancellablePromise<domain$0.ProductionReport> {
+    return $Call.ByID(3840284466, startAt, endAt);
 }
 
 export function GetQuote(id: number): $CancellablePromise<domain$0.QuoteEditor> {
@@ -58,6 +86,10 @@ export function ImportSpoolman(url: string): $CancellablePromise<number> {
     return $Call.ByID(2966826340, url);
 }
 
+export function ListArchivedProductionOrders(): $CancellablePromise<domain$0.ProductionOrder[] | null> {
+    return $Call.ByID(286632644);
+}
+
 export function ListCostCategories(): $CancellablePromise<domain$0.CostCategory[] | null> {
     return $Call.ByID(427601101);
 }
@@ -70,12 +102,28 @@ export function ListPrinters(): $CancellablePromise<domain$0.Printer[] | null> {
     return $Call.ByID(504919053);
 }
 
+export function ListProductionColumns(): $CancellablePromise<domain$0.ProductionColumn[] | null> {
+    return $Call.ByID(3859598134);
+}
+
+export function ListProductionOrders(): $CancellablePromise<domain$0.ProductionOrder[] | null> {
+    return $Call.ByID(2064439306);
+}
+
 export function ListQuotes(): $CancellablePromise<domain$0.QuoteSummary[] | null> {
     return $Call.ByID(570138357);
 }
 
 export function ListTariffs(): $CancellablePromise<domain$0.Tariff[] | null> {
     return $Call.ByID(1260516471);
+}
+
+export function MoveProductionTicket(ticketID: number, columnID: number): $CancellablePromise<void> {
+    return $Call.ByID(4156627934, ticketID, columnID);
+}
+
+export function ReorderProductionColumns(ids: number[] | null): $CancellablePromise<void> {
+    return $Call.ByID(2076032911, ids);
 }
 
 export function SaveCostCategory(c: domain$0.CostCategory): $CancellablePromise<domain$0.CostCategory> {
@@ -88,6 +136,10 @@ export function SaveFilament(f: domain$0.Filament): $CancellablePromise<domain$0
 
 export function SavePrinter(p: domain$0.Printer): $CancellablePromise<domain$0.Printer> {
     return $Call.ByID(1997871711, p);
+}
+
+export function SaveProductionColumn(column: domain$0.ProductionColumn): $CancellablePromise<domain$0.ProductionColumn> {
+    return $Call.ByID(359791368, column);
 }
 
 export function SaveQuote(form: domain$0.QuoteEditor): $CancellablePromise<domain$0.QuoteEditor> {
@@ -108,4 +160,8 @@ export function SetSpoolmanURL(url: string): $CancellablePromise<void> {
  */
 export function TestSpoolman(url: string): $CancellablePromise<void> {
     return $Call.ByID(1774702293, url);
+}
+
+export function UpdateProductionOrderTitle(id: number, title: string): $CancellablePromise<void> {
+    return $Call.ByID(1960718496, id, title);
 }

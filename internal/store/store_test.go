@@ -64,8 +64,8 @@ func TestOpenMigratesExistingDatabaseWithoutLosingData(t *testing.T) {
 	if err := s.db.QueryRow(`SELECT version FROM schema_migrations`).Scan(&version); err != nil {
 		t.Fatal(err)
 	}
-	if version != 1 {
-		t.Fatalf("migration version = %d, want 1", version)
+	if version != 2 {
+		t.Fatalf("migration version = %d, want 2", version)
 	}
 }
 

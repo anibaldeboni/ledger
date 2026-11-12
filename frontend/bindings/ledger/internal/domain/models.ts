@@ -81,6 +81,100 @@ export interface Printer {
 }
 
 /**
+ * ProductionColumn is a user-visible Kanban stage. SystemKey stays stable when
+ * the user changes the stage name or position; custom columns have an empty key.
+ */
+export interface ProductionColumn {
+    "id": number;
+    "systemKey": string;
+    "name": string;
+    "position": number;
+}
+
+/**
+ * ProductionFilamentUsage is the current quote estimate for one filament.
+ */
+export interface ProductionFilamentUsage {
+    "filamentId": number;
+    "name": string;
+    "printTimeHours": number;
+    "weightG": number;
+}
+
+/**
+ * ProductionOrder groups quote tickets into one horizontal board lane.
+ */
+export interface ProductionOrder {
+    "id": number;
+    "title": string;
+    "createdAt": string;
+    "updatedAt": string;
+    "completedAt": string;
+    "archivedAt": string;
+    "tickets": ProductionTicket[] | null;
+}
+
+/**
+ * ProductionOrderReport contains one completed order and its full lifecycle.
+ */
+export interface ProductionOrderReport {
+    "orderId": number;
+    "title": string;
+    "createdAt": string;
+    "completedAt": string;
+    "orderDurationSeconds": number;
+    "estimatedPrintHours": number;
+    "filaments": ProductionFilamentUsage[] | null;
+    "tickets": ProductionTicketReport[] | null;
+}
+
+/**
+ * ProductionReport contains completed orders whose completion time is in range.
+ */
+export interface ProductionReport {
+    "startAt": string;
+    "endAt": string;
+    "orders": ProductionOrderReport[] | null;
+}
+
+/**
+ * ProductionStageDuration is cumulative time spent by a ticket in one stage.
+ */
+export interface ProductionStageDuration {
+    "columnId": number;
+    "columnName": string;
+    "position": number;
+    "durationSeconds": number;
+}
+
+/**
+ * ProductionTicket is one execution of a live-linked quote in an order.
+ */
+export interface ProductionTicket {
+    "id": number;
+    "orderId": number;
+    "quoteId": number;
+    "quoteName": string;
+    "columnId": number;
+    "estimatedPrintHours": number;
+    "filaments": ProductionFilamentUsage[] | null;
+    "createdAt": string;
+    "updatedAt": string;
+}
+
+/**
+ * ProductionTicketReport contains one ticket's lifecycle and live quote estimates.
+ */
+export interface ProductionTicketReport {
+    "ticketId": number;
+    "quoteId": number;
+    "quoteName": string;
+    "estimatedPrintHours": number;
+    "filaments": ProductionFilamentUsage[] | null;
+    "stageDurations": ProductionStageDuration[] | null;
+}
+
+/**
  * QuoteEditor is the Wails form DTO; print times stay in slicer notation here.
  */
 export interface QuoteEditor {
