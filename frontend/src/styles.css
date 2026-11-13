@@ -809,6 +809,10 @@ section.block > h2 {
   width: auto;
 }
 
+.production-stage-row form > .actions {
+  align-self: end;
+}
+
 .production-stage-protected {
   color: var(--primary);
   font-size: 11px;
