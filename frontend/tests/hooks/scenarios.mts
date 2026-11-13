@@ -143,7 +143,7 @@ submissionRenderer.unmount();
 // Keep the one-line quote-delete error path covered without importing Wails IPC.
 const quotes = readFileSync(new URL("../../src/pages/Quotes.tsx", import.meta.url), "utf8");
 assert.match(quotes, /catch \(e\) \{\s*setActionError\(e\);/);
-assert.match(quotes, /role="alert">\{actionError\}/);
+assert.match(quotes, /role="alert">\s*\{actionError\}\s*<\/p>/);
 
 // Every insert-capable settings form and the inline category form must use the guard.
 const settings = readFileSync(new URL("../../src/pages/Settings.tsx", import.meta.url), "utf8");
@@ -176,7 +176,10 @@ assert.deepEqual(names("SUP"), ["Suporte de fone"]);
 assert.deepEqual(names("geometrico"), ["Vaso Geométrico"]);
 assert.deepEqual(names("  vas  "), ["Vaso Geométrico"]);
 assert.deepEqual(names("xyz"), []);
-assert.match(quotes, /import \{ filterQuotesByName, sortQuotes, type QuoteSort \} from "\.\.\/lib\/search";/);
+assert.match(
+  quotes,
+  /import\s*\{[\s\S]*?\bfilterQuotesByName\b[\s\S]*?\bsortQuotes\b[\s\S]*?type QuoteSort[\s\S]*?\}\s*from "\.\.\/lib\/search";/,
+);
 assert.match(quotes, /<input[^>]*type="search"/);
 
 // Sorting by name and updated date toggles asc/desc without mutating the list.

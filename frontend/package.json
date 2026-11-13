@@ -8,6 +8,7 @@
     "build:dev": "tsc && vite build --minify false --mode development",
     "build": "tsc && vite build --mode production",
     "test:i18n": "node --experimental-strip-types tests/i18n/scenarios.mts",
+    "test:quotes": "node --experimental-strip-types tests/quotes/scenarios.mts",
     "test:production-board": "node --experimental-strip-types tests/production-board/scenarios.mts",
     "test:production-report": "node --experimental-strip-types tests/production-report/scenarios.mts",
     "test:hooks": "node scripts/test-hooks.mjs",
