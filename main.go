@@ -42,8 +42,8 @@ func main() {
 
 	app.Window.NewWithOptions(application.WebviewWindowOptions{
 		Title:            "Ledger · Orçamentos 3D",
-		Width:            1120,
-		Height:           720,
+		Width:            1400,
+		Height:           900,
 		MinWidth:         900,
 		MinHeight:        600,
 		BackgroundColour: application.NewRGB(11, 14, 22),
