@@ -26,8 +26,8 @@ export default function ProductionStageManager({ columns, busy, onAdd, onSave, o
   }
 
   return (
-      <details className="production-stage-manager">
-      <summary>{t("production.columns.title")}</summary>
+    <section className="production-stage-manager" aria-labelledby="production-stage-title">
+      <h2 id="production-stage-title">{t("production.columns.title")}</h2>
       <p className="hint">{t("production.columns.hint")}</p>
       <form className="production-stage-add" onSubmit={add}>
         <FieldGroup className="production-stage-fields">
@@ -63,7 +63,7 @@ export default function ProductionStageManager({ columns, busy, onAdd, onSave, o
           />
         ))}
       </ol>
-    </details>
+    </section>
   );
 }
 

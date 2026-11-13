@@ -1,4 +1,5 @@
 import type { ProductionOrder } from "../../bindings/ledger/internal/domain/models";
+import { filterByName } from "./search.ts";
 
 export type ProductionOrderSort = {
   key: "createdAt" | "updatedAt" | "title" | "ticketCount";
@@ -16,25 +17,23 @@ export function reorderProductionColumns<T>(columns: T[], index: number, offset:
 
 export function filterAndSortProductionOrders(
   orders: ProductionOrder[],
-  selectedOrderIds: number[],
+  search: string,
   sort: ProductionOrderSort,
   locale: string,
 ): ProductionOrder[] {
-  const selected = selectedOrderIds.length ? new Set(selectedOrderIds) : null;
+  const filteredOrders = filterByName(orders, search, (order) => order.title);
   const direction = sort.direction === "asc" ? 1 : -1;
   const collator = new Intl.Collator(locale, { numeric: true, sensitivity: "base" });
 
-  return orders
-    .filter((order) => !selected || selected.has(order.id))
-    .sort((a, b) => {
-      const comparison =
-        sort.key === "title"
-          ? collator.compare(a.title, b.title)
-          : sort.key === "ticketCount"
-            ? (a.tickets?.length ?? 0) - (b.tickets?.length ?? 0)
-            : Date.parse(a[sort.key]) - Date.parse(b[sort.key]);
-      return direction * comparison || a.id - b.id;
-    });
+  return [...filteredOrders].sort((a, b) => {
+    const comparison =
+      sort.key === "title"
+        ? collator.compare(a.title, b.title)
+        : sort.key === "ticketCount"
+          ? (a.tickets?.length ?? 0) - (b.tickets?.length ?? 0)
+          : Date.parse(a[sort.key]) - Date.parse(b[sort.key]);
+    return direction * comparison || a.id - b.id;
+  });
 }
 
 export function shouldPromptToCompleteOrderAfterMove(

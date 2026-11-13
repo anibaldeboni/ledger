@@ -1,9 +1,11 @@
-// Busca por nome de orçamento: só filtra a partir de 3 caracteres, ignorando
-// caixa e acentos (ex.: "geometrico" encontra "Geométrico").
-export function filterQuotesByName<T extends { name: string }>(quotes: T[], term: string): T[] {
+export function filterByName<T>(items: T[], term: string, getName: (item: T) => string): T[] {
   const needle = normalize(term.trim());
-  if (needle.length < 3) return quotes;
-  return quotes.filter((q) => normalize(q.name).includes(needle));
+  if (needle.length < 3) return items;
+  return items.filter((item) => normalize(getName(item)).includes(needle));
+}
+
+export function filterQuotesByName<T extends { name: string }>(quotes: T[], term: string): T[] {
+  return filterByName(quotes, term, (quote) => quote.name);
 }
 
 export type QuoteSort = { key: "name" | "updated"; dir: "asc" | "desc" };

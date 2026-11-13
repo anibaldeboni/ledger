@@ -1,6 +1,15 @@
 import { useState, type DragEvent, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { Archive, Check, Plus, Trash2 } from "lucide-react";
+import {
+  ArrowLeftRight,
+  Archive,
+  Check,
+  Plus,
+  Trash2,
+  ShieldPlus,
+  RotateCcwClock,
+} from "lucide-react";
+import { Popover as PopoverPrimitive } from "radix-ui";
 import type {
   ProductionColumn,
   ProductionOrder,
@@ -26,7 +35,11 @@ type Props = {
   addingTicket: boolean;
   onToggleAddTicket: (orderId: number) => void;
   onAddTicket: (orderId: number, quoteId: number) => Promise<boolean>;
-  onMoveTicket: (orderId: number, ticketId: number, columnId: number) => Promise<boolean>;
+  onMoveTicket: (
+    orderId: number,
+    ticketId: number,
+    columnId: number,
+  ) => Promise<boolean>;
   onDeleteOrder: (order: ProductionOrder) => void;
   onCompleteOrder: (order: ProductionOrder) => void;
   onArchiveOrder: (order: ProductionOrder) => void;
@@ -48,7 +61,9 @@ export default function ProductionLane({
 }: Props) {
   const { t } = useTranslation();
   const [quoteId, setQuoteId] = useState("");
-  const [dropTargetColumnId, setDropTargetColumnId] = useState<number | null>(null);
+  const [dropTargetColumnId, setDropTargetColumnId] = useState<number | null>(
+    null,
+  );
   const tickets = order.tickets ?? [];
 
   async function addTicket(event: FormEvent<HTMLFormElement>) {
@@ -65,11 +80,17 @@ export default function ProductionLane({
     onToggleAddTicket(order.id);
   }
 
-  function dropTicket(event: DragEvent<HTMLTableCellElement>, columnId: number) {
+  function dropTicket(
+    event: DragEvent<HTMLTableCellElement>,
+    columnId: number,
+  ) {
     event.preventDefault();
     setDropTargetColumnId(null);
     const ticketId = Number(event.dataTransfer.getData("text/plain"));
-    if (Number.isSafeInteger(ticketId) && tickets.some((ticket) => ticket.id === ticketId)) {
+    if (
+      Number.isSafeInteger(ticketId) &&
+      tickets.some((ticket) => ticket.id === ticketId)
+    ) {
       void onMoveTicket(order.id, ticketId, columnId);
     }
   }
@@ -82,34 +103,86 @@ export default function ProductionLane({
           <span className="production-order-id">#{order.id}</span>
         </div>
         <p className="production-order-meta">
-          {t("production.createdAt", { date: formatTimestamp(order.createdAt, locale) })}
+          <span
+            title={t("production.createdAt", {
+              date: formatTimestamp(order.createdAt, locale),
+            })}
+            aria-label={t("production.createdAt", {
+              date: formatTimestamp(order.createdAt, locale),
+            })}
+          >
+            <ShieldPlus size={16} data-icon="inline-start" aria-hidden="true" />
+            {formatTimestamp(order.createdAt, locale)}
+          </span>
         </p>
         <p className="production-order-meta">
-          {t("production.updatedAt", { date: formatTimestamp(order.updatedAt, locale) })}
+          <span
+            title={t("production.updatedAt", {
+              date: formatTimestamp(order.updatedAt, locale),
+            })}
+            aria-label={t("production.updatedAt", {
+              date: formatTimestamp(order.updatedAt, locale),
+            })}
+          >
+            <RotateCcwClock
+              size={16}
+              data-icon="inline-start"
+              aria-hidden="true"
+            />
+            {formatTimestamp(order.updatedAt, locale)}
+          </span>
         </p>
-        <p className="hint">{t("production.ticketCount", { count: tickets.length })}</p>
+        <p className="hint">
+          {t("production.ticketCount", { count: tickets.length })}
+        </p>
         {order.completedAt ? (
-          <p className="production-order-status" role="status">{t("production.orderCompleted")}</p>
+          <p className="production-order-status" role="status">
+            {t("production.orderCompleted")}
+          </p>
         ) : null}
         <div className="production-order-actions">
           {!order.completedAt ? (
-            <Button type="button" variant="outline" size="sm" disabled={busy} onClick={toggleTicketForm}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={busy}
+              onClick={toggleTicketForm}
+            >
               <Plus data-icon="inline-start" aria-hidden="true" />
               {t("production.addTicket")}
             </Button>
           ) : null}
           {order.completedAt ? (
-            <Button type="button" variant="outline" size="sm" disabled={busy} onClick={() => onArchiveOrder(order)}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={busy}
+              onClick={() => onArchiveOrder(order)}
+            >
               <Archive data-icon="inline-start" aria-hidden="true" />
               {t("production.archiveOrder")}
             </Button>
           ) : (
-            <Button type="button" variant="ghost" size="sm" disabled={busy} onClick={() => onCompleteOrder(order)}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={busy}
+              onClick={() => onCompleteOrder(order)}
+            >
               <Check data-icon="inline-start" aria-hidden="true" />
               {t("production.completeOrder")}
             </Button>
           )}
-          <Button type="button" variant="destructive" size="sm" disabled={busy} onClick={() => onDeleteOrder(order)}>
+          <Button
+            type="button"
+            variant="destructive"
+            size="sm"
+            disabled={busy}
+            onClick={() => onDeleteOrder(order)}
+          >
             <Trash2 data-icon="inline-start" aria-hidden="true" />
             {t("production.deleteOrder")}
           </Button>
@@ -118,7 +191,9 @@ export default function ProductionLane({
           <form className="production-add-ticket" onSubmit={addTicket}>
             <FieldGroup className="production-add-ticket-fields">
               <Field>
-                <FieldLabel htmlFor={`production-quote-${order.id}`}>{t("production.quoteToAdd")}</FieldLabel>
+                <FieldLabel htmlFor={`production-quote-${order.id}`}>
+                  {t("production.quoteToAdd")}
+                </FieldLabel>
                 <select
                   id={`production-quote-${order.id}`}
                   name={`production-quote-${order.id}`}
@@ -129,7 +204,9 @@ export default function ProductionLane({
                 >
                   <option value="">{t("production.chooseQuote")}</option>
                   {quotes.map((quote) => (
-                    <option key={quote.id} value={quote.id}>{quote.name}</option>
+                    <option key={quote.id} value={quote.id}>
+                      {quote.name}
+                    </option>
                   ))}
                 </select>
               </Field>
@@ -139,16 +216,26 @@ export default function ProductionLane({
               <Button type="submit" size="sm" disabled={busy || !quoteId}>
                 {t("production.addTicket")}
               </Button>
-              <Button type="button" variant="ghost" size="sm" disabled={busy} onClick={toggleTicketForm}>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                disabled={busy}
+                onClick={toggleTicketForm}
+              >
                 {t("common.cancel")}
               </Button>
             </div>
-            {quotes.length === 0 ? <p className="hint">{t("production.noQuotes")}</p> : null}
+            {quotes.length === 0 ? (
+              <p className="hint">{t("production.noQuotes")}</p>
+            ) : null}
           </form>
         ) : null}
       </th>
       {columns.map((column) => {
-        const stageTickets = tickets.filter((ticket) => ticket.columnId === column.id);
+        const stageTickets = tickets.filter(
+          (ticket) => ticket.columnId === column.id,
+        );
         return (
           <td
             key={column.id}
@@ -161,7 +248,9 @@ export default function ProductionLane({
             onDragLeave={() => setDropTargetColumnId(null)}
             onDrop={(event) => dropTicket(event, column.id)}
           >
-            {stageTickets.length === 0 ? <p className="production-drop-hint">{t("production.dropHere")}</p> : null}
+            {stageTickets.length === 0 ? (
+              <p className="production-drop-hint">{t("production.dropHere")}</p>
+            ) : null}
             <div className="production-ticket-stack">
               {stageTickets.map((ticket) => (
                 <TicketCard
@@ -198,6 +287,10 @@ function TicketCard({
   onMoveTicket: Props["onMoveTicket"];
 }) {
   const { t } = useTranslation();
+  const [movePopoverOpen, setMovePopoverOpen] = useState(false);
+  const movableColumns = columns.filter(
+    (column) => column.id !== ticket.columnId,
+  );
 
   return (
     <Card
@@ -213,42 +306,97 @@ function TicketCard({
       onDragEnd={(event) => event.currentTarget.classList.remove("is-dragging")}
     >
       <CardHeader>
-        <CardTitle role="heading" aria-level={3} className="production-ticket-title">{ticket.quoteName}</CardTitle>
+        <CardTitle
+          role="heading"
+          aria-level={3}
+          className="production-ticket-title"
+        >
+          {ticket.quoteName}
+        </CardTitle>
         <CardDescription>
-          {t("production.quoteId", { id: ticket.quoteId })} · {t("production.estimatedPrintHours", {
-            hours: ticket.estimatedPrintHours.toLocaleString(locale, { maximumFractionDigits: 2 }),
+          {t("production.quoteId", { id: ticket.quoteId })} ·{" "}
+          {t("production.estimatedPrintHours", {
+            hours: ticket.estimatedPrintHours.toLocaleString(locale, {
+              maximumFractionDigits: 2,
+            }),
           })}
         </CardDescription>
       </CardHeader>
       <CardContent className="production-ticket-content">
         {ticket.filaments?.length ? (
-          <ul className="production-filament-estimates" aria-label={t("production.estimatedFilaments")}>
+          <ul
+            className="production-filament-estimates"
+            aria-label={t("production.estimatedFilaments")}
+          >
             {ticket.filaments.map((filament, index) => (
               <li key={`${filament.filamentId}:${index}`}>
                 <span>{filament.name}</span>
-                <span>{filament.weightG.toLocaleString(locale, { maximumFractionDigits: 1 })} g</span>
+                <span>
+                  {filament.weightG.toLocaleString(locale, {
+                    maximumFractionDigits: 1,
+                  })}{" "}
+                  g
+                </span>
               </li>
             ))}
           </ul>
         ) : (
           <p className="hint">{t("production.noFilamentEstimate")}</p>
         )}
-        <FieldGroup className="production-ticket-stage-select">
-          <Field>
-            <FieldLabel htmlFor={`production-ticket-stage-${ticket.id}`}>
-              {t("production.moveTicketLabel", { quote: ticket.quoteName })}
-            </FieldLabel>
-            <select
-              id={`production-ticket-stage-${ticket.id}`}
-              name={`production-ticket-stage-${ticket.id}`}
-              value={ticket.columnId}
-              disabled={busy}
-              onChange={(event) => void onMoveTicket(orderId, ticket.id, Number(event.target.value))}
+        <div className="production-ticket-move">
+          <PopoverPrimitive.Root
+            open={movePopoverOpen}
+            onOpenChange={setMovePopoverOpen}
+          >
+            <Button
+              asChild
+              variant="ghost"
+              size="icon-sm"
+              className="production-ticket-move-trigger"
             >
-              {columns.map((column) => <option key={column.id} value={column.id}>{column.name}</option>)}
-            </select>
-          </Field>
-        </FieldGroup>
+              <PopoverPrimitive.Trigger
+                type="button"
+                aria-label={t("production.moveTicketLabel", {
+                  quote: ticket.quoteName,
+                })}
+                title={t("production.moveTicketLabel", {
+                  quote: ticket.quoteName,
+                })}
+                disabled={busy || movableColumns.length === 0}
+              >
+                <ArrowLeftRight aria-hidden="true" />
+              </PopoverPrimitive.Trigger>
+            </Button>
+            <PopoverPrimitive.Portal>
+              <PopoverPrimitive.Content
+                className="production-ticket-move-popover"
+                side="bottom"
+                align="end"
+                sideOffset={6}
+              >
+                <PopoverPrimitive.Title className="sr-only">
+                  {t("production.moveTicketLabel", { quote: ticket.quoteName })}
+                </PopoverPrimitive.Title>
+                {movableColumns.map((column) => (
+                  <Button
+                    key={column.id}
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="production-ticket-move-option"
+                    disabled={busy}
+                    onClick={async () => {
+                      if (await onMoveTicket(orderId, ticket.id, column.id))
+                        setMovePopoverOpen(false);
+                    }}
+                  >
+                    {column.name}
+                  </Button>
+                ))}
+              </PopoverPrimitive.Content>
+            </PopoverPrimitive.Portal>
+          </PopoverPrimitive.Root>
+        </div>
       </CardContent>
     </Card>
   );
