@@ -28,7 +28,7 @@ The user selected “Permitir redesign” when asked whether a visual redesign w
 
 - [x] T1 — S1-S4 — inline — verified — commit: `b41c684` — Establish the semantic theme, shared styling patterns, and application shell.
 - [x] T2 — S1-S3 — inline — verified — commits: `e441fd7`, `dc6875c`, `4e261be` — Migrate quotes, quote form, and general settings screens.
-- [ ] T3 — S1-S3 — inline — Needs your decision: rendered viewport/keyboard inspection is unavailable — commits: `d8c4277`, `1ad320b`, pending — Migrate production board, archive, reports, and production settings; remove obsolete app-specific CSS.
+- [ ] T3 — S1-S3 — inline — Needs your decision: rendered viewport/keyboard inspection is unavailable — commits: `d8c4277`, `1ad320b`, `e008034` — Migrate production board, archive, reports, and production settings; remove obsolete app-specific CSS.
 
 ## Log
 
@@ -82,3 +82,6 @@ Committed `1ad320b` (`refactor(ui): migrate production archive and reports to Ta
 
 ### L15 — 2026-11-16 — T3 implementation and proof status
 Production pages now use Tailwind utilities and shared UI components; `frontend/src/styles.css` is reduced to imports, design tokens, base styles, and reduced-motion handling. The build and all frontend scenario scripts (`test:i18n`, `test:quotes`, `test:production-board`, `test:production-report`, `test:hooks`, `test:print-time`, and `test:theme`) passed. The `.content` and raw `<input>` test expectations were updated to match the shared `main` utilities and `Input` component; these were stale structural assertions, not product regressions. Risk: none — changes are presentation-only and preserve domain behavior. **Needs your decision:** rendered responsive/keyboard inspection could not be performed because no browser binary, automation package, or browser DevTools tool is available. Decide whether to accept the build, structural, and scenario-test evidence without a rendered visual pass, or provide a browser/DevTools session later. No visual PASS is claimed; no push or PR was performed. The final CSS/test work-unit commit is pending.
+
+### L16 — 2026-11-16 — T3c stylesheet cleanup and native assessment
+Committed T3c as `e008034` (`refactor(ui): remove legacy application stylesheet`), 809 authored changed lines. The stylesheet now contains only Tailwind imports, semantic theme tokens, global base/focus styles, and reduced-motion handling. RDD is on (global); assessment against `98898c6` returned `risk: medium`, `review_due: false`, `review_due_reason: under_budget` (cumulative candidate: 4,189 lines). No review lifecycle was started; the candidate remains pending against `98898c6`. T3 is still a **Needs your decision** result until the visual-verification limitation is dispositioned. No push or PR was performed.
