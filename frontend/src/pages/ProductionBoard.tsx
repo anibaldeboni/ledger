@@ -15,6 +15,8 @@ import {
 import { Button } from "../components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "../components/ui/field";
 import { Input } from "../components/ui/input";
+import { NativeSelect } from "../components/ui/native-select";
+import { PageHeader } from "../components/page-header";
 import { useActionError, useAsync, useSubmission } from "../lib/hooks";
 import {
   filterAndSortProductionOrders,
@@ -206,83 +208,89 @@ export default function ProductionBoard() {
   const loading = lists.loading && !lists.data;
 
   return (
-    <div className="production-page production-board-page">
-      <div className="page-head">
-        <div>
-          <h1>{t("production.title")}</h1>
-          <p className="hint">{t("production.description")}</p>
-        </div>
-      </div>
+    <div className="space-y-5">
+      <PageHeader
+        title={t("production.title")}
+        description={t("production.description")}
+        actions={
+          <details
+            className="relative shrink-0"
+            onToggle={(event) => {
+              if (event.currentTarget.open) {
+                event.currentTarget
+                  .querySelector<HTMLInputElement>("input")
+                  ?.focus();
+              }
+            }}
+            onKeyDown={(event) => {
+              if (event.key !== "Escape") return;
+              event.preventDefault();
+              event.currentTarget.open = false;
+              event.currentTarget.querySelector("summary")?.focus();
+            }}
+          >
+            <Button asChild variant="cta" size="lg" className="min-h-11">
+              <summary
+                className="list-none cursor-pointer [&::-webkit-details-marker]:hidden"
+                aria-controls="production-create-form"
+              >
+                <Plus data-icon="inline-start" aria-hidden="true" />
+                {t("production.createOrder")}
+              </summary>
+            </Button>
+            <form
+              id="production-create-form"
+              className="absolute left-0 top-full z-10 mt-2 grid w-[min(20rem,calc(100vw-2rem))] gap-3 rounded-xl border border-border bg-card p-4 shadow-lg"
+              onSubmit={createOrder}
+            >
+              <FieldGroup className="w-full">
+                <Field>
+                  <FieldLabel htmlFor="production-order-title">
+                    {t("production.orderName")}
+                  </FieldLabel>
+                  <Input
+                    id="production-order-title"
+                    name="production-order-title"
+                    autoComplete="off"
+                    className="h-11"
+                    value={newOrderTitle}
+                    onChange={(event) => setNewOrderTitle(event.target.value)}
+                    placeholder={t("production.orderNamePlaceholder")}
+                    disabled={busy || loading}
+                    required
+                  />
+                </Field>
+              </FieldGroup>
+              <div className="flex justify-end">
+                <Button
+                  type="submit"
+                  variant="cta"
+                  size="icon-lg"
+                  className="size-11"
+                  aria-label={t("production.createOrder")}
+                  disabled={busy || loading || !newOrderTitle.trim()}
+                >
+                  <Check aria-hidden="true" />
+                </Button>
+              </div>
+            </form>
+          </details>
+        }
+      />
 
       {lists.error ? (
-        <p className="error-text" role="alert">
+        <p className="rounded-md border border-destructive/20 bg-destructive/5 px-3 py-2 text-sm text-destructive" role="alert">
           {lists.error}
         </p>
       ) : null}
       {actionError ? (
-        <p className="error-text" role="alert">
+        <p className="rounded-md border border-destructive/20 bg-destructive/5 px-3 py-2 text-sm text-destructive" role="alert">
           {actionError}
         </p>
       ) : null}
 
-      <details
-        className="production-create"
-        onToggle={(event) => {
-          if (event.currentTarget.open) {
-            event.currentTarget
-              .querySelector<HTMLInputElement>("input")
-              ?.focus();
-          }
-        }}
-        onKeyDown={(event) => {
-          if (event.key !== "Escape") return;
-          event.preventDefault();
-          event.currentTarget.open = false;
-          event.currentTarget.querySelector("summary")?.focus();
-        }}
-      >
-        <Button asChild>
-          <summary aria-controls="production-create-form">
-            <Plus data-icon="inline-start" aria-hidden="true" />
-            {t("production.createOrder")}
-          </summary>
-        </Button>
-        <form
-          id="production-create-form"
-          className="production-create-form"
-          onSubmit={createOrder}
-        >
-          <FieldGroup className="production-create-fields">
-            <Field>
-              <FieldLabel htmlFor="production-order-title">
-                {t("production.orderName")}
-              </FieldLabel>
-              <Input
-                id="production-order-title"
-                name="production-order-title"
-                autoComplete="off"
-                value={newOrderTitle}
-                onChange={(event) => setNewOrderTitle(event.target.value)}
-                placeholder={t("production.orderNamePlaceholder")}
-                disabled={busy || loading}
-                required
-              />
-            </Field>
-          </FieldGroup>
-          <div className="production-board-controls">
-            <Button
-              className="btn-primary btn-icon"
-              type="submit"
-              disabled={busy || loading || !newOrderTitle.trim()}
-            >
-              <Check data-icon="inline-start" aria-hidden="true" />
-            </Button>
-          </div>
-        </form>
-      </details>
-
-      <div className="production-board-controls">
-        <FieldGroup className="production-search">
+      <div className="grid gap-4 sm:grid-cols-2 sm:justify-end">
+        <FieldGroup className="w-full sm:max-w-xs">
           <Field>
             <FieldLabel htmlFor="production-order-search">
               {t("production.searchLabel")}
@@ -291,7 +299,7 @@ export default function ProductionBoard() {
               id="production-order-search"
               name="production-order-search"
               type="search"
-              className="search-input"
+              className="h-11"
               autoComplete="off"
               placeholder={t("production.searchPlaceholder")}
               value={search}
@@ -300,13 +308,12 @@ export default function ProductionBoard() {
             />
           </Field>
         </FieldGroup>
-
-        <FieldGroup className="production-sort">
+        <FieldGroup className="w-full sm:max-w-xs">
           <Field>
             <FieldLabel htmlFor="production-order-sort">
               {t("production.sortOrders")}
             </FieldLabel>
-            <select
+            <NativeSelect
               id="production-order-sort"
               name="production-order-sort"
               value={sortValue}
@@ -324,37 +331,45 @@ export default function ProductionBoard() {
                   {t(option.label)}
                 </option>
               ))}
-            </select>
+            </NativeSelect>
           </Field>
         </FieldGroup>
       </div>
 
       {loading ? (
-        <div className="empty" role="status" aria-busy="true">
+        <div className="rounded-xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground" role="status" aria-busy="true">
           {t("production.loading")}
         </div>
       ) : lists.data && columns.length === 0 ? (
-        <div className="empty">{t("production.noStages")}</div>
+        <div className="rounded-xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
+          {t("production.noStages")}
+        </div>
       ) : lists.data && orders.length === 0 ? (
-        <div className="empty">{t("production.emptyOrders")}</div>
+        <div className="rounded-xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
+          {t("production.emptyOrders")}
+        </div>
       ) : lists.data && visibleOrders.length === 0 ? (
-        <div className="empty">{t("production.noSearchResults")}</div>
+        <div className="rounded-xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
+          {t("production.noSearchResults")}
+        </div>
       ) : lists.data ? (
         <div
-          className="production-board-scroll"
+          className="max-w-full overflow-auto overscroll-x-contain rounded-xl border border-border bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           role="region"
           aria-label={t("production.boardLabel")}
           tabIndex={0}
         >
-          <table className="production-board-table">
+          <table className="w-max min-w-full table-fixed border-separate border-spacing-0">
             <thead>
               <tr>
-                <th scope="col">{t("production.order")}</th>
+                <th scope="col" className="sticky left-0 top-0 z-30 w-64 min-w-64 border-r border-b border-border bg-muted px-4 py-3 text-left text-sm font-semibold text-foreground">
+                  {t("production.order")}
+                </th>
                 {columns.map((column) => (
-                  <th scope="col" key={column.id}>
+                  <th scope="col" className="sticky top-0 z-20 min-w-56 border-r border-b border-border bg-muted px-4 py-3 text-left text-sm font-semibold text-foreground" key={column.id}>
                     <span>{column.name}</span>
                     {column.systemKey === "completed" ? (
-                      <span className="production-stage-role">
+                      <span className="mt-1 block text-xs font-medium text-primary">
                         {t("production.columns.completionRole")}
                       </span>
                     ) : null}

@@ -9,8 +9,12 @@ export default function ProductionWorkspace() {
   const { t } = useTranslation();
 
   return (
-    <Tabs defaultValue="board" className="production-workspace">
-      <TabsList variant="line" aria-label={t("production.viewTabs")}>
+    <Tabs defaultValue="board" className="w-full">
+      <TabsList
+        variant="line"
+        className="mb-5 h-auto w-fit max-w-full flex-wrap justify-start gap-1 overflow-visible bg-transparent p-1"
+        aria-label={t("production.viewTabs")}
+      >
         <TabsTrigger value="board">{t("production.boardTab")}</TabsTrigger>
         <TabsTrigger value="archive">{t("production.archiveTab")}</TabsTrigger>
         <TabsTrigger value="reports">{t("production.reportsTab")}</TabsTrigger>

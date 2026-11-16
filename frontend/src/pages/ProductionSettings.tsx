@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { ProductionColumn } from "../../bindings/ledger/internal/domain/models";
 import { LedgerService } from "../../bindings/ledger";
+import { PageHeader } from "../components/page-header";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "../components/ui/alert-dialog";
 import { useActionError, useAsync, useSubmission } from "../lib/hooks";
 import { reorderProductionColumns } from "../lib/production-board";
@@ -51,15 +52,15 @@ export default function ProductionSettings() {
   }
 
   return (
-    <div className="production-page production-settings-page">
-      <div className="page-head">
-        <h1>{t("settings.title")}</h1>
-      </div>
+    <div className="space-y-5">
+      <PageHeader title={t("settings.title")} />
 
-      {columns.error ? <p className="error-text" role="alert">{columns.error}</p> : null}
-      {actionError ? <p className="error-text" role="alert">{actionError}</p> : null}
+      {columns.error ? <p className="text-sm text-destructive" role="alert">{columns.error}</p> : null}
+      {actionError ? <p className="text-sm text-destructive" role="alert">{actionError}</p> : null}
       {columns.loading && !columns.data ? (
-        <div className="empty" role="status" aria-busy="true">{t("production.loading")}</div>
+        <div className="rounded-xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground" role="status" aria-busy="true">
+          {t("production.loading")}
+        </div>
       ) : columns.data ? (
         <>
           <ProductionStageManager
@@ -70,7 +71,11 @@ export default function ProductionSettings() {
             onMove={reorderStage}
             onDelete={setPendingDelete}
           />
-          {stages.length === 0 ? <div className="empty">{t("production.noStages")}</div> : null}
+          {stages.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
+              {t("production.noStages")}
+            </div>
+          ) : null}
         </>
       ) : null}
 

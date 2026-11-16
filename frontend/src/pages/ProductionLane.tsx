@@ -20,6 +20,7 @@ import { brl } from "../lib/format";
 import { getProductionOrderTotal } from "../lib/production-board";
 import { Button } from "../components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "../components/ui/field";
+import { NativeSelect } from "../components/ui/native-select";
 import {
   Card,
   CardContent,
@@ -100,12 +101,12 @@ export default function ProductionLane({
 
   return (
     <tr>
-      <th scope="row" className="production-order-cell">
-        <div className="production-order-title-row">
-          <h2 className="production-order-title">{order.title}</h2>
-          <span className="production-order-id">#{order.id}</span>
+      <th scope="row" className="sticky left-0 z-10 w-64 min-w-64 border-r border-b border-border bg-card p-3 text-left align-top">
+        <div className="flex items-start justify-between gap-3">
+          <h2 className="min-w-0 break-words text-sm font-semibold leading-5">{order.title}</h2>
+          <span className="shrink-0 rounded-full bg-muted px-2 py-1 text-xs font-medium tabular-nums text-muted-foreground">#{order.id}</span>
         </div>
-        <p className="production-order-meta">
+        <p className="mt-2 flex items-center gap-1.5 break-words text-xs text-muted-foreground">
           <span
             title={t("production.createdAt", {
               date: formatTimestamp(order.createdAt, locale),
@@ -118,7 +119,7 @@ export default function ProductionLane({
             {formatTimestamp(order.createdAt, locale)}
           </span>
         </p>
-        <p className="production-order-meta">
+        <p className="mt-2 flex items-center gap-1.5 break-words text-xs text-muted-foreground">
           <span
             title={t("production.updatedAt", {
               date: formatTimestamp(order.updatedAt, locale),
@@ -135,24 +136,25 @@ export default function ProductionLane({
             {formatTimestamp(order.updatedAt, locale)}
           </span>
         </p>
-        <p className="hint">
+        <p className="mt-2 text-xs text-muted-foreground">
           {t("production.ticketCount", { count: tickets.length })}
         </p>
-        <dl className="production-order-total">
-          <dt>{t("production.orderTotal")}</dt>
-          <dd className="money">{brl(orderTotal, locale)}</dd>
+        <dl className="mt-3 flex items-baseline justify-between gap-3 border-t border-border pt-3 text-xs">
+          <dt className="text-muted-foreground">{t("production.orderTotal")}</dt>
+          <dd className="m-0 whitespace-nowrap text-sm font-semibold tabular-nums">{brl(orderTotal, locale)}</dd>
         </dl>
         {order.completedAt ? (
-          <p className="production-order-status" role="status">
+          <p className="mt-2 text-xs font-medium text-primary" role="status">
             {t("production.orderCompleted")}
           </p>
         ) : null}
-        <div className="production-order-actions">
+        <div className="mt-3 flex flex-wrap gap-1.5">
           {!order.completedAt ? (
             <Button
               type="button"
               variant="outline"
               size="sm"
+              className="min-h-11"
               disabled={busy}
               onClick={toggleTicketForm}
             >
@@ -165,6 +167,7 @@ export default function ProductionLane({
               type="button"
               variant="outline"
               size="sm"
+              className="min-h-11"
               disabled={busy}
               onClick={() => onArchiveOrder(order)}
             >
@@ -176,6 +179,7 @@ export default function ProductionLane({
               type="button"
               variant="ghost"
               size="sm"
+              className="min-h-11"
               disabled={busy}
               onClick={() => onCompleteOrder(order)}
             >
@@ -187,6 +191,7 @@ export default function ProductionLane({
             type="button"
             variant="destructive"
             size="sm"
+            className="min-h-11"
             disabled={busy}
             onClick={() => onDeleteOrder(order)}
           >
@@ -195,13 +200,13 @@ export default function ProductionLane({
           </Button>
         </div>
         {addingTicket && !order.completedAt ? (
-          <form className="production-add-ticket" onSubmit={addTicket}>
-            <FieldGroup className="production-add-ticket-fields">
+          <form className="mt-3 grid gap-3 border-t border-border pt-3" onSubmit={addTicket}>
+            <FieldGroup className="w-full">
               <Field>
                 <FieldLabel htmlFor={`production-quote-${order.id}`}>
                   {t("production.quoteToAdd")}
                 </FieldLabel>
-                <select
+                <NativeSelect
                   id={`production-quote-${order.id}`}
                   name={`production-quote-${order.id}`}
                   value={quoteId}
@@ -215,18 +220,19 @@ export default function ProductionLane({
                       {quote.name}
                     </option>
                   ))}
-                </select>
+                </NativeSelect>
               </Field>
             </FieldGroup>
-            <p className="hint">{t("production.ticketPerExecution")}</p>
-            <div className="actions">
-              <Button type="submit" size="sm" disabled={busy || !quoteId}>
+            <p className="text-xs text-muted-foreground">{t("production.ticketPerExecution")}</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button type="submit" size="sm" className="min-h-11" disabled={busy || !quoteId}>
                 {t("production.addTicket")}
               </Button>
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
+                className="min-h-11"
                 disabled={busy}
                 onClick={toggleTicketForm}
               >
@@ -234,7 +240,7 @@ export default function ProductionLane({
               </Button>
             </div>
             {quotes.length === 0 ? (
-              <p className="hint">{t("production.noQuotes")}</p>
+              <p className="text-xs text-muted-foreground">{t("production.noQuotes")}</p>
             ) : null}
           </form>
         ) : null}
@@ -246,7 +252,7 @@ export default function ProductionLane({
         return (
           <td
             key={column.id}
-            className={`production-stage-cell${dropTargetColumnId === column.id ? " is-drop-target" : ""}`}
+            className={`min-h-36 min-w-56 border-r border-b border-border bg-card p-3 align-top transition-colors ${dropTargetColumnId === column.id ? "bg-primary/10 ring-2 ring-inset ring-primary/30" : ""}`}
             onDragEnter={() => setDropTargetColumnId(column.id)}
             onDragOver={(event) => {
               event.preventDefault();
@@ -256,9 +262,11 @@ export default function ProductionLane({
             onDrop={(event) => dropTicket(event, column.id)}
           >
             {stageTickets.length === 0 ? (
-              <p className="production-drop-hint">{t("production.dropHere")}</p>
+              <p className="rounded-md border border-dashed border-border px-2 py-3 text-center text-xs text-muted-foreground">
+                {t("production.dropHere")}
+              </p>
             ) : null}
-            <div className="production-ticket-stack">
+            <div className="grid gap-2">
               {stageTickets.map((ticket) => (
                 <TicketCard
                   key={ticket.id}
@@ -301,22 +309,22 @@ function TicketCard({
 
   return (
     <Card
-      className="production-ticket-card"
+      className="w-full cursor-grab active:cursor-grabbing data-[dragging=true]:opacity-60 data-[dragging=true]:select-none"
       role="group"
       aria-label={t("production.ticketLabel", { quote: ticket.quoteName })}
       draggable={!busy}
       onDragStart={(event) => {
-        event.currentTarget.classList.add("is-dragging");
+        event.currentTarget.dataset.dragging = "true";
         event.dataTransfer.effectAllowed = "move";
         event.dataTransfer.setData("text/plain", String(ticket.id));
       }}
-      onDragEnd={(event) => event.currentTarget.classList.remove("is-dragging")}
+      onDragEnd={(event) => delete event.currentTarget.dataset.dragging}
     >
       <CardHeader>
         <CardTitle
           role="heading"
           aria-level={3}
-          className="production-ticket-title"
+          className="break-words"
         >
           {ticket.quoteName}
         </CardTitle>
@@ -329,16 +337,17 @@ function TicketCard({
           })}
         </CardDescription>
       </CardHeader>
-      <CardContent className="production-ticket-content">
+      <CardContent className="grid gap-3">
         {ticket.filaments?.length ? (
           <ul
-            className="production-filament-estimates"
+            className="grid gap-1 text-xs"
             aria-label={t("production.estimatedFilaments")}
           >
             {ticket.filaments.map((filament, index) => (
               <li key={`${filament.filamentId}:${index}`}>
                 <span>{filament.name}</span>
-                <span>
+                <span className="min-w-0 break-words">{filament.name}</span>
+                <span className="shrink-0 tabular-nums">
                   {filament.weightG.toLocaleString(locale, {
                     maximumFractionDigits: 1,
                   })}{" "}
@@ -348,9 +357,9 @@ function TicketCard({
             ))}
           </ul>
         ) : (
-          <p className="hint">{t("production.noFilamentEstimate")}</p>
+          <p className="text-xs text-muted-foreground">{t("production.noFilamentEstimate")}</p>
         )}
-        <div className="production-ticket-move">
+        <div className="flex justify-end">
           <PopoverPrimitive.Root
             open={movePopoverOpen}
             onOpenChange={setMovePopoverOpen}
@@ -358,8 +367,8 @@ function TicketCard({
             <Button
               asChild
               variant="ghost"
-              size="icon-sm"
-              className="production-ticket-move-trigger"
+              size="icon-lg"
+              className="size-11"
             >
               <PopoverPrimitive.Trigger
                 type="button"
@@ -376,7 +385,7 @@ function TicketCard({
             </Button>
             <PopoverPrimitive.Portal>
               <PopoverPrimitive.Content
-                className="production-ticket-move-popover"
+                className="z-50 grid max-h-60 min-w-48 max-w-[min(20rem,calc(100vw-2rem))] gap-1 overflow-y-auto rounded-lg border border-border bg-popover p-1 text-popover-foreground shadow-lg"
                 side="bottom"
                 align="end"
                 sideOffset={6}
@@ -390,7 +399,7 @@ function TicketCard({
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="production-ticket-move-option"
+                    className="min-h-11 w-full justify-start whitespace-normal"
                     disabled={busy}
                     onClick={async () => {
                       if (await onMoveTicket(orderId, ticket.id, column.id))
