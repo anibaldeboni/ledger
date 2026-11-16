@@ -1,6 +1,6 @@
 # Feature: tailwind-styling-standardization
 Standardize the Ledger desktop application on Tailwind-first styling and reusable semantic UI patterns, with a restrained operational-dashboard redesign.
-Branch: `feature/tailwind-styling-standardization` · Delivery: `ask-on-risk` · Chain: `feature-branch-chain` · Forecast: ~1,200 authored changed lines · Checks: `cd frontend && npm run build`, existing frontend scenario scripts, and responsive/keyboard inspection through Vite when available.
+Branch: `feature/tailwind-styling-standardization` · Delivery: `ask-on-risk` · Chain: `feature-branch-chain` · Forecast: ~4,200 authored changed lines · Checks: `cd frontend && npm run build`, existing frontend scenario scripts, and responsive/keyboard inspection through Vite when available.
 
 ## Specs
 
@@ -26,8 +26,8 @@ The user selected “Permitir redesign” when asked whether a visual redesign w
 
 ## Tasks
 
-- [x] T1 — S1-S4 — inline — verified — commit: pending — Establish the semantic theme, shared styling patterns, and application shell.
-- [ ] T2 — S1-S3 — inline — planned — commit: pending — Migrate quotes, quote form, and general settings screens.
+- [x] T1 — S1-S4 — inline — verified — commit: `b41c684` — Establish the semantic theme, shared styling patterns, and application shell.
+- [x] T2 — S1-S3 — inline — verified — commit: `e441fd7`, `dc6875c`, pending — Migrate quotes, quote form, and general settings screens.
 - [ ] T3 — S1-S3 — inline — planned — commit: pending — Migrate production board, archive, reports, and production settings; remove obsolete app-specific CSS.
 
 ## Log
@@ -58,3 +58,18 @@ The `ask-on-risk` delivery strategy and ~1,200-line forecast exceed the ~400-lin
 
 ### L7 — 2026-11-16 — Delivery decision
 The user selected “Cadeia da feature (Recomendado)” (`feature-branch-chain`) for eventual PR slices. This is only a slicing decision: no push or PR creation was authorized or performed. If PRs are requested later, use a draft/no-merge tracker and child PRs in dependency order; keep this work local until then.
+
+### L8 — 2026-11-16 — T1 commit and native assessment
+Committed T1 as `b41c684` (`refactor(ui): establish Tailwind-first theme and app shell`), with 539 authored changed lines including this 60-line task document. `gentle-ai review mode status` reported RDD on (global); assessment against `98898c6` returned `risk: medium`, `review_due: false`, `review_due_reason: under_budget`. No review lifecycle was started; the candidate remains pending against `98898c6`. No push or PR was performed.
+
+### L9 — 2026-11-16 — T2a quote-list work unit
+Committed `e441fd7` (`refactor(ui): migrate quote list to shared Tailwind components`), 302 authored changed lines. `npm run build`, `npm run test:quotes`, `npm run test:theme`, and `git diff --check` passed on the full working tree. The focused `test:quotes` assertion now pins the accessible, 44px Send action; shared `PageHeader`, `NativeSelect`, and CTA Button styling are reused. RDD assessment against `98898c6` returned `risk: medium`, `review_due: false`, `review_due_reason: under_budget` (cumulative candidate: 839 lines); the candidate remains pending against `98898c6`. T2 remains in progress for QuoteForm and Settings. Risk: none — the unit changes presentation and preserves the tested quote actions and data flow.
+
+### L10 — 2026-11-16 — Forecast update
+The initial ~1,200-line forecast was low: T1 and T2a already account for 841 authored lines. Reforecast the whole application styling work to ~4,200 lines based on the remaining quote-form, settings, and production surfaces. The user-selected `feature-branch-chain` remains in effect; no remote work is authorized or performed.
+
+### L11 — 2026-11-16 — T2b quote-form work unit
+Committed `dc6875c` (`refactor(ui): restyle quote form with reusable Tailwind fields`), 708 authored changed lines including its focused test update. `npm run test:quotes`, `npm run test:theme`, `npm run build`, and `git diff --check` passed on the full working tree. A filament swatch retains a data-driven inline color because its value comes from the saved filament; layout and controls use shared components and Tailwind. RDD assessment against `98898c6` returned `risk: medium`, `review_due: false`, `review_due_reason: under_budget` (cumulative candidate: 1,547 lines); the candidate remains pending against `98898c6`. T2 remains in progress for Settings. Risk: none — the unit changes presentation and leaves quote calculations and persistence logic unchanged.
+
+### L12 — 2026-11-16 — T2 Settings and verification
+Migrated the remaining settings sections to the shared cards, fields, buttons, and tables. Removed their legacy list/grid selectors and placed generic input/select foundations in Tailwind's base layer so component utilities can override them; the production-board `.search-input` remains until T3. The only inline styling left in these screens is data-driven filament color. `npm run test:theme`, `npm run test:quotes`, `npm run build`, and `git diff --check` passed. Browser-based viewport/keyboard inspection remains unavailable and is not reported as passed. Risk: none — no settings behavior, persistence, or data flow changed. The final Settings work-unit commit is pending.
