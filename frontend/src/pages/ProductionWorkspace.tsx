@@ -21,9 +21,9 @@ export default function ProductionWorkspace() {
         <TabsTrigger value="settings">{t("settings.title")}</TabsTrigger>
       </TabsList>
       <TabsContent value="board"><ProductionBoard /></TabsContent>
-      <TabsContent value="archive"><ProductionArchive /></TabsContent>
-      <TabsContent value="reports"><ProductionReports /></TabsContent>
-      <TabsContent value="settings"><ProductionSettings /></TabsContent>
+      <TabsContent value="archive" className="mx-auto w-full max-w-7xl"><ProductionArchive /></TabsContent>
+      <TabsContent value="reports" className="mx-auto w-full max-w-7xl"><ProductionReports /></TabsContent>
+      <TabsContent value="settings" className="mx-auto w-full max-w-7xl"><ProductionSettings /></TabsContent>
     </Tabs>
   );
 }

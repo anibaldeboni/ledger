@@ -220,13 +220,23 @@ assert.match(laneText, /getProductionOrderTotal\(order,\s*quotes,\s*columns\)/, 
 assert.match(laneText, /t\("production\.orderTotal"\)/, "the order total has a localized visible label");
 assert.match(laneText, /brl\(orderTotal,\s*locale\)/, "the order total uses the app's currency formatter");
 assert.match(
+  laneText,
+  /<p className="mt-2 flex items-center gap-1\.5 text-xs text-muted-foreground">\s*<ShieldPlus[\s\S]*?className="shrink-0"[\s\S]*?aria-hidden="true"[\s\S]*?\/>\s*<span\s+className="min-w-0 break-words"[\s\S]*?formatTimestamp\(order\.createdAt, locale\)\}/,
+  "the creation date sits beside its icon",
+);
+assert.match(
+  laneText,
+  /<p className="mt-2 flex items-center gap-1\.5 text-xs text-muted-foreground">\s*<RotateCcwClock[\s\S]*?className="shrink-0"[\s\S]*?aria-hidden="true"[\s\S]*?\/>\s*<span\s+className="min-w-0 break-words"[\s\S]*?formatTimestamp\(order\.updatedAt, locale\)\}/,
+  "the update date sits beside its icon",
+);
+assert.match(
   workspaceText,
   /<TabsTrigger value="reports">[\s\S]*?<\/TabsTrigger>\s*<TabsTrigger value="settings">\{t\("settings\.title"\)\}<\/TabsTrigger>/,
   "localized settings tab appears immediately after reports",
 );
 assert.match(
   workspaceText,
-  /<TabsContent value="settings">[\s\S]*?<ProductionSettings\s*\/>[\s\S]*?<\/TabsContent>/,
+  /<TabsContent value="settings"[^>]*>[\s\S]*?<ProductionSettings\s*\/>[\s\S]*?<\/TabsContent>/,
   "settings tab renders its dedicated page",
 );
 assert.doesNotMatch(boardText, /<ProductionStageManager\b/, "stage manager is removed from the board");
@@ -242,7 +252,31 @@ assert.doesNotMatch(tabsListClass, /(?:^|\s)(?:overflow-x-auto|w-full|mx-auto)(?
 const mainClass = appText.match(/<main id="main-content" className="([^"]*)"/)?.[1] ?? "";
 assert.match(mainClass, /min-w-0/, "the main content can shrink to the available viewport width");
 assert.match(mainClass, /overflow-y-auto/, "page content remains vertically scrollable");
-assert.match(appText, /className="mx-auto w-full max-w-7xl"/, "pages are centered in a consistent readable container");
+assert.match(
+  appText,
+  /className=\{view\.page === "production" \? "w-full" : "mx-auto w-full max-w-7xl"\}/,
+  "the production workspace uses available width while other pages stay centered",
+);
+assert.match(
+  workspaceText,
+  /<TabsContent value="board">\s*<ProductionBoard\s*\/>\s*<\/TabsContent>/,
+  "the Kanban is not limited by a readable-width container",
+);
+assert.match(
+  workspaceText,
+  /<TabsContent value="archive" className="mx-auto w-full max-w-7xl">\s*<ProductionArchive\s*\/>\s*<\/TabsContent>/,
+  "the production archive remains centered in a readable container",
+);
+assert.match(
+  workspaceText,
+  /<TabsContent value="reports" className="mx-auto w-full max-w-7xl">\s*<ProductionReports\s*\/>\s*<\/TabsContent>/,
+  "production reports remain centered in a readable container",
+);
+assert.match(
+  workspaceText,
+  /<TabsContent value="settings" className="mx-auto w-full max-w-7xl">\s*<ProductionSettings\s*\/>\s*<\/TabsContent>/,
+  "production settings remain centered in a readable container",
+);
 assert.match(boardText, /className="space-y-5"/, "the Kanban page uses the shared responsive page layout");
 assert.match(boardText, /<PageHeader[\s\S]*?title=\{t\("production\.title"\)\}/, "the Kanban page uses the shared page header");
 assert.match(
@@ -254,6 +288,11 @@ assert.doesNotMatch(boardText, /open=\{true\}/, "the floating name input starts 
 assert.match(boardText, /id="production-create-form"[\s\S]*?className="absolute left-0 top-full z-10/, "the order-name input floats above the board content");
 assert.match(boardText, /sticky left-0 top-0 z-30/, "the floating form stacks above the sticky board header");
 assert.match(boardText, /type="search"[\s\S]*?placeholder=\{t\("production\.searchPlaceholder"\)\}/, "the order search uses localized search copy");
+assert.match(
+  boardText,
+  /<div className="flex flex-col gap-4 sm:flex-row">\s*<FieldGroup[^>]*>[\s\S]*?id="production-order-search"[\s\S]*?<FieldGroup[^>]*>[\s\S]*?id="production-order-sort"/,
+  "order search and sorting controls are grouped from the left",
+);
 assert.match(boardText, /className="w-full sm:max-w-xs"[\s\S]*?type="search"/, "the search control has a responsive width");
 assert.match(boardText, /className="w-full sm:max-w-xs"[\s\S]*?<NativeSelect/, "the sort control reuses the shared select");
 assert.doesNotMatch(boardText, /production-order-filter|production-filter-option/, "the multi-select filter is removed");

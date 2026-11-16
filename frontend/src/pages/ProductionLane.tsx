@@ -101,13 +101,27 @@ export default function ProductionLane({
 
   return (
     <tr>
-      <th scope="row" className="sticky left-0 z-10 w-64 min-w-64 border-r border-b border-border bg-card p-3 text-left align-top">
+      <th
+        scope="row"
+        className="sticky left-0 z-10 w-64 min-w-64 border-r border-b border-border bg-card p-3 text-left align-top"
+      >
         <div className="flex items-start justify-between gap-3">
-          <h2 className="min-w-0 break-words text-sm font-semibold leading-5">{order.title}</h2>
-          <span className="shrink-0 rounded-full bg-muted px-2 py-1 text-xs font-medium tabular-nums text-muted-foreground">#{order.id}</span>
+          <h2 className="min-w-0 break-words text-sm font-semibold leading-5">
+            {order.title}
+          </h2>
+          <span className="shrink-0 rounded-full bg-muted px-2 py-1 text-xs font-medium tabular-nums text-muted-foreground">
+            #{order.id}
+          </span>
         </div>
-        <p className="mt-2 flex items-center gap-1.5 break-words text-xs text-muted-foreground">
+        <p className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
+          <ShieldPlus
+            size={16}
+            className="shrink-0"
+            data-icon="inline-start"
+            aria-hidden="true"
+          />
           <span
+            className="min-w-0 break-words"
             title={t("production.createdAt", {
               date: formatTimestamp(order.createdAt, locale),
             })}
@@ -115,12 +129,18 @@ export default function ProductionLane({
               date: formatTimestamp(order.createdAt, locale),
             })}
           >
-            <ShieldPlus size={16} data-icon="inline-start" aria-hidden="true" />
             {formatTimestamp(order.createdAt, locale)}
           </span>
         </p>
-        <p className="mt-2 flex items-center gap-1.5 break-words text-xs text-muted-foreground">
+        <p className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
+          <RotateCcwClock
+            size={16}
+            className="shrink-0"
+            data-icon="inline-start"
+            aria-hidden="true"
+          />
           <span
+            className="min-w-0 break-words"
             title={t("production.updatedAt", {
               date: formatTimestamp(order.updatedAt, locale),
             })}
@@ -128,11 +148,6 @@ export default function ProductionLane({
               date: formatTimestamp(order.updatedAt, locale),
             })}
           >
-            <RotateCcwClock
-              size={16}
-              data-icon="inline-start"
-              aria-hidden="true"
-            />
             {formatTimestamp(order.updatedAt, locale)}
           </span>
         </p>
@@ -140,8 +155,12 @@ export default function ProductionLane({
           {t("production.ticketCount", { count: tickets.length })}
         </p>
         <dl className="mt-3 flex items-baseline justify-between gap-3 border-t border-border pt-3 text-xs">
-          <dt className="text-muted-foreground">{t("production.orderTotal")}</dt>
-          <dd className="m-0 whitespace-nowrap text-sm font-semibold tabular-nums">{brl(orderTotal, locale)}</dd>
+          <dt className="text-muted-foreground">
+            {t("production.orderTotal")}
+          </dt>
+          <dd className="m-0 whitespace-nowrap text-sm font-semibold tabular-nums">
+            {brl(orderTotal, locale)}
+          </dd>
         </dl>
         {order.completedAt ? (
           <p className="mt-2 text-xs font-medium text-primary" role="status">
@@ -200,7 +219,10 @@ export default function ProductionLane({
           </Button>
         </div>
         {addingTicket && !order.completedAt ? (
-          <form className="mt-3 grid gap-3 border-t border-border pt-3" onSubmit={addTicket}>
+          <form
+            className="mt-3 grid gap-3 border-t border-border pt-3"
+            onSubmit={addTicket}
+          >
             <FieldGroup className="w-full">
               <Field>
                 <FieldLabel htmlFor={`production-quote-${order.id}`}>
@@ -223,9 +245,16 @@ export default function ProductionLane({
                 </NativeSelect>
               </Field>
             </FieldGroup>
-            <p className="text-xs text-muted-foreground">{t("production.ticketPerExecution")}</p>
+            <p className="text-xs text-muted-foreground">
+              {t("production.ticketPerExecution")}
+            </p>
             <div className="flex flex-wrap items-center gap-2">
-              <Button type="submit" size="sm" className="min-h-11" disabled={busy || !quoteId}>
+              <Button
+                type="submit"
+                size="sm"
+                className="min-h-11"
+                disabled={busy || !quoteId}
+              >
                 {t("production.addTicket")}
               </Button>
               <Button
@@ -240,7 +269,9 @@ export default function ProductionLane({
               </Button>
             </div>
             {quotes.length === 0 ? (
-              <p className="text-xs text-muted-foreground">{t("production.noQuotes")}</p>
+              <p className="text-xs text-muted-foreground">
+                {t("production.noQuotes")}
+              </p>
             ) : null}
           </form>
         ) : null}
@@ -321,11 +352,7 @@ function TicketCard({
       onDragEnd={(event) => delete event.currentTarget.dataset.dragging}
     >
       <CardHeader>
-        <CardTitle
-          role="heading"
-          aria-level={3}
-          className="break-words"
-        >
+        <CardTitle role="heading" aria-level={3} className="break-words">
           {ticket.quoteName}
         </CardTitle>
         <CardDescription>
@@ -345,8 +372,8 @@ function TicketCard({
           >
             {ticket.filaments.map((filament, index) => (
               <li key={`${filament.filamentId}:${index}`}>
-                <span>{filament.name}</span>
-                <span className="min-w-0 break-words">{filament.name}</span>
+                {/* <span>{filament.name}</span> */}
+                <span className="min-w-0 break-words">{filament.name} </span>
                 <span className="shrink-0 tabular-nums">
                   {filament.weightG.toLocaleString(locale, {
                     maximumFractionDigits: 1,
@@ -357,19 +384,16 @@ function TicketCard({
             ))}
           </ul>
         ) : (
-          <p className="text-xs text-muted-foreground">{t("production.noFilamentEstimate")}</p>
+          <p className="text-xs text-muted-foreground">
+            {t("production.noFilamentEstimate")}
+          </p>
         )}
         <div className="flex justify-end">
           <PopoverPrimitive.Root
             open={movePopoverOpen}
             onOpenChange={setMovePopoverOpen}
           >
-            <Button
-              asChild
-              variant="ghost"
-              size="icon-lg"
-              className="size-11"
-            >
+            <Button asChild variant="ghost" size="icon-lg" className="size-11">
               <PopoverPrimitive.Trigger
                 type="button"
                 aria-label={t("production.moveTicketLabel", {

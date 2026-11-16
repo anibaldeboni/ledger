@@ -289,7 +289,7 @@ export default function ProductionBoard() {
         </p>
       ) : null}
 
-      <div className="grid gap-4 sm:grid-cols-2 sm:justify-end">
+      <div className="flex flex-col gap-4 sm:flex-row">
         <FieldGroup className="w-full sm:max-w-xs">
           <Field>
             <FieldLabel htmlFor="production-order-search">

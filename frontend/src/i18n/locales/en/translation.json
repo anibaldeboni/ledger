@@ -5,6 +5,10 @@
   "language": {
     "label": "Language"
   },
+  "theme": {
+    "switchToDark": "Switch to dark theme",
+    "switchToLight": "Switch to light theme"
+  },
   "nav": {
     "quotes": "Quotes",
     "production": "Production",

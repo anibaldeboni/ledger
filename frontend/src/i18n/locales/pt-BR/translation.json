@@ -5,6 +5,10 @@
   "language": {
     "label": "Idioma"
   },
+  "theme": {
+    "switchToDark": "Ativar tema escuro",
+    "switchToLight": "Ativar tema claro"
+  },
   "nav": {
     "quotes": "Orçamentos",
     "production": "Produção",

@@ -5,6 +5,7 @@ const styles = readFileSync(new URL("../../src/styles.css", import.meta.url), "u
 const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
 const app = readFileSync(new URL("../../src/App.tsx", import.meta.url), "utf8");
 const button = readFileSync(new URL("../../src/components/ui/button.tsx", import.meta.url), "utf8");
+const translationLocales = ["pt-BR", "en", "es"];
 const pages = [
   ["quotes", readFileSync(new URL("../../src/pages/Quotes.tsx", import.meta.url), "utf8")],
   ["quote form", readFileSync(new URL("../../src/pages/QuoteForm.tsx", import.meta.url), "utf8")],
@@ -23,6 +24,12 @@ const productionPages = [
 ];
 const root = styles.match(/:root\s*\{([\s\S]*?)\n\}/)?.[1] ?? "";
 const theme = styles.match(/@theme inline\s*\{([\s\S]*?)\n\}/)?.[1] ?? "";
+const dark = styles.match(/\.dark\s*\{([\s\S]*?)\n\}/)?.[1] ?? "";
+
+assert.match(styles, /@custom-variant dark \(&:is\(\.dark \*\)\);/);
+assert.match(dark, /color-scheme: dark;/);
+assert.match(dark, /--background: #0b0e16;/);
+assert.match(dark, /--foreground: #e8eaf2;/);
 
 for (const [token, value] of [
   ["--background", "#f8fafc"],
@@ -42,6 +49,39 @@ for (const [token, value] of [
 
 const config = JSON.parse(readFileSync(new URL("../../components.json", import.meta.url), "utf8"));
 assert.doesNotMatch(html, /<html[^>]*class="dark"/, "the redesigned light palette is the default");
+const themeStorageKey = app.match(/const THEME_STORAGE_KEY = "([^"]+)"/)?.[1];
+assert.ok(themeStorageKey, "the app must define a persistent theme key");
+assert.match(app, /localStorage\.getItem\(THEME_STORAGE_KEY\)/, "the app must restore the saved theme");
+assert.match(app, /localStorage\.setItem\(THEME_STORAGE_KEY, nextTheme\)/, "the app must save theme changes");
+assert.match(app, /classList\.toggle\("dark", nextTheme === "dark"\)/, "the selected theme must update the document root");
+assert.match(
+  app,
+  /theme === "dark" \? <Sun aria-hidden="true" \/> : <Moon aria-hidden="true" \/>/,
+  "the theme icon must indicate the available switch",
+);
+assert.match(
+  app,
+  /const themeAction = theme === "dark" \? "theme\.switchToLight" : "theme\.switchToDark"/,
+  "the theme button label must describe the available switch",
+);
+assert.match(app, /aria-label=\{t\(themeAction\)\}/, "the theme button must expose its current action accessibly");
+assert.match(app, /<span>\{t\(themeAction\)\}<\/span>/, "the theme button must display its current action");
+assert.match(
+  html,
+  new RegExp(`localStorage\\.getItem\\(["']${themeStorageKey}["']\\)[\\s\\S]*?classList\\.add\\(["']dark["']\\)`),
+  "the saved dark theme must be applied before the app renders",
+);
+assert.ok(
+  html.indexOf("localStorage") < html.indexOf('src="/src/main.tsx"'),
+  "the theme bootstrap must run before the React entry point",
+);
+for (const locale of translationLocales) {
+  const translation = JSON.parse(
+    readFileSync(new URL(`../../src/i18n/locales/${locale}/translation.json`, import.meta.url), "utf8"),
+  );
+  assert.equal(typeof translation.theme?.switchToDark, "string", `${locale} must label the dark theme action`);
+  assert.equal(typeof translation.theme?.switchToLight, "string", `${locale} must label the light theme action`);
+}
 assert.equal(config.style, "radix-nova");
 assert.equal(config.iconLibrary, "lucide");
 assert.match(styles, /@import "tailwindcss";/);

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Calculator, Factory, Settings as SettingsIcon } from "lucide-react";
+import { Calculator, Factory, Moon, Settings as SettingsIcon, Sun } from "lucide-react";
 import appIcon from "../../assets/app.png";
 import { languageOptions } from "./i18n";
 import { Button } from "./components/ui/button";
@@ -11,10 +11,34 @@ import QuoteForm from "./pages/QuoteForm";
 import Settings from "./pages/Settings";
 
 type View = { page: "quotes" } | { page: "production" } | { page: "settings" } | { page: "form"; quoteId?: number };
+type Theme = "light" | "dark";
+
+const THEME_STORAGE_KEY = "ledger-theme";
+
+function getInitialTheme(): Theme {
+  try {
+    return window.localStorage.getItem(THEME_STORAGE_KEY) === "dark" ? "dark" : "light";
+  } catch {
+    return "light";
+  }
+}
 
 export default function App() {
   const [view, setView] = useState<View>({ page: "quotes" });
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
   const { t, i18n } = useTranslation();
+  const themeAction = theme === "dark" ? "theme.switchToLight" : "theme.switchToDark";
+
+  function toggleTheme() {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    document.documentElement.classList.toggle("dark", nextTheme === "dark");
+    setTheme(nextTheme);
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+    } catch {
+      // Keep the current session's selection when storage is unavailable.
+    }
+  }
 
   return (
     <div className="grid min-h-svh grid-rows-[auto_1fr] bg-background text-foreground md:h-svh md:grid-cols-[15rem_minmax(0,1fr)] md:grid-rows-1">
@@ -70,26 +94,39 @@ export default function App() {
             <span>{t("nav.settings")}</span>
           </Button>
         </div>
-        <label
-          className="grid w-full max-w-xs gap-1 px-4 pb-4 text-sm text-muted-foreground md:mt-auto md:px-5 md:pb-5"
-          htmlFor="language-select"
-        >
-          <span>{t("language.label")}</span>
-          <NativeSelect
-            id="language-select"
-            value={i18n.resolvedLanguage ?? i18n.language}
-            onChange={(event) => void i18n.changeLanguage(event.target.value)}
+        <div className="grid w-full gap-2 px-4 pb-4 md:mt-auto md:px-5 md:pb-5">
+          <Button
+            type="button"
+            variant="ghost"
+            size="lg"
+            className="min-h-11 w-full justify-start gap-3 px-3 text-muted-foreground"
+            aria-label={t(themeAction)}
+            onClick={toggleTheme}
           >
-            {languageOptions.map(({ code, name }) => (
-              <option key={code} value={code}>
-                {name}
-              </option>
-            ))}
-          </NativeSelect>
-        </label>
+            {theme === "dark" ? <Sun aria-hidden="true" /> : <Moon aria-hidden="true" />}
+            <span>{t(themeAction)}</span>
+          </Button>
+          <label
+            className="grid w-full max-w-xs gap-1 text-sm text-muted-foreground"
+            htmlFor="language-select"
+          >
+            <span>{t("language.label")}</span>
+            <NativeSelect
+              id="language-select"
+              value={i18n.resolvedLanguage ?? i18n.language}
+              onChange={(event) => void i18n.changeLanguage(event.target.value)}
+            >
+              {languageOptions.map(({ code, name }) => (
+                <option key={code} value={code}>
+                  {name}
+                </option>
+              ))}
+            </NativeSelect>
+          </label>
+        </div>
       </nav>
       <main id="main-content" className="min-h-0 min-w-0 overflow-y-auto px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-        <div className="mx-auto w-full max-w-7xl">
+        <div className={view.page === "production" ? "w-full" : "mx-auto w-full max-w-7xl"}>
           {view.page === "quotes" ? (
             <Quotes
               onNew={() => setView({ page: "form" })}
