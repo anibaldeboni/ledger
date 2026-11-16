@@ -372,7 +372,6 @@ function TicketCard({
           >
             {ticket.filaments.map((filament, index) => (
               <li key={`${filament.filamentId}:${index}`}>
-                {/* <span>{filament.name}</span> */}
                 <span className="min-w-0 break-words">{filament.name} </span>
                 <span className="shrink-0 tabular-nums">
                   {filament.weightG.toLocaleString(locale, {
