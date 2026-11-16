@@ -180,7 +180,7 @@ assert.match(
   quotes,
   /import\s*\{[\s\S]*?\bfilterQuotesByName\b[\s\S]*?\bsortQuotes\b[\s\S]*?type QuoteSort[\s\S]*?\}\s*from "\.\.\/lib\/search";/,
 );
-assert.match(quotes, /<input[^>]*type="search"/);
+assert.match(quotes, /<Input[^>]*type="search"/, "quote search uses the shared input component");
 
 // Sorting by name and updated date toggles asc/desc without mutating the list.
 const { sortQuotes } = await import("../../src/lib/search.ts");

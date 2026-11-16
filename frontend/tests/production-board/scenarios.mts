@@ -216,7 +216,6 @@ const boardText = await readFile(new URL("../../src/pages/ProductionBoard.tsx", 
 const laneText = await readFile(new URL("../../src/pages/ProductionLane.tsx", import.meta.url), "utf8");
 const settingsText = await readFile(new URL("../../src/pages/ProductionSettings.tsx", import.meta.url), "utf8");
 const stageManagerText = await readFile(new URL("../../src/pages/ProductionStageManager.tsx", import.meta.url), "utf8");
-const stylesText = await readFile(new URL("../../src/styles.css", import.meta.url), "utf8");
 assert.match(laneText, /getProductionOrderTotal\(order,\s*quotes,\s*columns\)/, "each production lane derives its total from current quotes and stages");
 assert.match(laneText, /t\("production\.orderTotal"\)/, "the order total has a localized visible label");
 assert.match(laneText, /brl\(orderTotal,\s*locale\)/, "the order total uses the app's currency formatter");

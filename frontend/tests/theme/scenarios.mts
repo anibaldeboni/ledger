@@ -10,6 +10,17 @@ const pages = [
   ["quote form", readFileSync(new URL("../../src/pages/QuoteForm.tsx", import.meta.url), "utf8")],
   ["settings", readFileSync(new URL("../../src/pages/Settings.tsx", import.meta.url), "utf8")],
 ];
+const productionPages = [
+  ["production board", readFileSync(new URL("../../src/pages/ProductionBoard.tsx", import.meta.url), "utf8")],
+  ["production lane", readFileSync(new URL("../../src/pages/ProductionLane.tsx", import.meta.url), "utf8")],
+  ["production stage manager", readFileSync(new URL("../../src/pages/ProductionStageManager.tsx", import.meta.url), "utf8")],
+  ["production settings", readFileSync(new URL("../../src/pages/ProductionSettings.tsx", import.meta.url), "utf8")],
+  ["production workspace", readFileSync(new URL("../../src/pages/ProductionWorkspace.tsx", import.meta.url), "utf8")],
+  ["production archive", readFileSync(new URL("../../src/pages/ProductionArchive.tsx", import.meta.url), "utf8")],
+  ["production reports", readFileSync(new URL("../../src/pages/ProductionReports.tsx", import.meta.url), "utf8")],
+  ["production report order", readFileSync(new URL("../../src/pages/ProductionReportOrderCard.tsx", import.meta.url), "utf8")],
+  ["production filament estimates", readFileSync(new URL("../../src/pages/ProductionFilamentEstimates.tsx", import.meta.url), "utf8")],
+];
 const root = styles.match(/:root\s*\{([\s\S]*?)\n\}/)?.[1] ?? "";
 const theme = styles.match(/@theme inline\s*\{([\s\S]*?)\n\}/)?.[1] ?? "";
 
@@ -78,6 +89,32 @@ for (const selector of [
 ]) {
   assert.doesNotMatch(styles, new RegExp(`\\.${selector}\\s*\\{`), `${selector} styles must be migrated to Tailwind`);
 }
+
+for (const [page, source] of productionPages) {
+  const classNames = [...source.matchAll(/className=(?:"([^"]*)"|\{([^}]*)\})/g)]
+    .map((match) => match[1] ?? match[2] ?? "")
+    .join(" ")
+    .replace(/[{}"'`$():?]/g, " ");
+  const legacy = classNames.split(/\s+/).find((className) => legacyClasses.has(className));
+  assert.equal(legacy, undefined, `${page} must use Tailwind and shared UI components`);
+  assert.doesNotMatch(classNames, /\bproduction-[a-z-]+\b/, `${page} must not depend on production-specific CSS selectors`);
+  assert.doesNotMatch(source, /classList\.(?:add|remove)\("is-dragging"\)/, `${page} must express drag states with Tailwind-compatible attributes`);
+}
+
+assert.doesNotMatch(styles, /^\.production-[\w-]+/m, "production styling must be expressed in Tailwind classes");
+for (const selector of [
+  "page-head", "search-input", "btn", "btn-primary", "btn-danger", "btn-ghost",
+  "btn-sm", "btn-icon", "field", "block", "row", "list", "list-row", "row-head",
+  "money", "muted", "empty", "error-text", "ok-text", "hint", "actions",
+  "toolbar", "grow",
+]) {
+  assert.doesNotMatch(
+    styles,
+    new RegExp(`\\.${selector}(?:\\s|\\{|:|\\.)`),
+    `${selector} must not remain as a legacy stylesheet selector`,
+  );
+}
+assert.doesNotMatch(styles, /--(?:bg|surface|surface-2|border-strong|accent-ink|danger|ok|font):/, "legacy style aliases must be removed");
 assert.match(button, /cta:\s*"bg-cta text-cta-foreground/);
 
 console.log("Tailwind-first application styling invariants passed");
