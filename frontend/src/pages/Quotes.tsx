@@ -60,7 +60,7 @@ function SortButton(props: {
       type="button"
       variant="ghost"
       size="lg"
-      className={`min-h-11 min-w-0 gap-1 px-0 text-left text-xs font-medium text-muted-foreground hover:bg-transparent hover:text-foreground ${align === "right" ? "justify-end" : "justify-start"}`}
+      className={`min-h-11 min-w-0 gap-1 px-0 text-left text-sm font-medium text-foreground hover:bg-transparent hover:text-primary ${align === "right" ? "justify-end" : "justify-start"}`}
       onClick={onClick}
       aria-label={
         active
@@ -135,22 +135,22 @@ export default function Quotes({
         actions={
           <>
             <Input
-            type="search"
-            className="h-11 w-full sm:w-64"
-            placeholder={t("quotes.searchPlaceholder")}
-            aria-label={t("quotes.searchLabel")}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+              type="search"
+              className="h-11 w-full sm:w-64"
+              placeholder={t("quotes.searchPlaceholder")}
+              aria-label={t("quotes.searchLabel")}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
             <Button
               type="button"
               variant="cta"
               size="icon-lg"
               className="size-11 shrink-0"
-            aria-label={t("quotes.create")}
-            title={t("quotes.create")}
-            onClick={onNew}
-          >
+              aria-label={t("quotes.create")}
+              title={t("quotes.create")}
+              onClick={onNew}
+            >
               <Plus aria-hidden="true" />
             </Button>
           </>
@@ -158,12 +158,18 @@ export default function Quotes({
       />
 
       {quotes.error ? (
-        <p className="rounded-md border border-destructive/20 bg-destructive/5 px-3 py-2 text-sm text-destructive" role="alert">
+        <p
+          className="rounded-md border border-destructive/20 bg-destructive/5 px-3 py-2 text-sm text-destructive"
+          role="alert"
+        >
           {quotes.error}
         </p>
       ) : null}
       {actionError ? (
-        <p className="rounded-md border border-destructive/20 bg-destructive/5 px-3 py-2 text-sm text-destructive" role="alert">
+        <p
+          className="rounded-md border border-destructive/20 bg-destructive/5 px-3 py-2 text-sm text-destructive"
+          role="alert"
+        >
           {actionError}
         </p>
       ) : null}
@@ -183,23 +189,27 @@ export default function Quotes({
             <TableHeader>
               <TableRow className="bg-muted/50 hover:bg-muted/50">
                 <TableHead className="w-[40%]">
-              <SortButton
-                label={t("quotes.table.name")}
-                active={sort.key === "name"}
-                dir={sort.dir}
-                onClick={() => toggleSort("name")}
-              />
+                  <SortButton
+                    label={t("quotes.table.name")}
+                    active={sort.key === "name"}
+                    dir={sort.dir}
+                    onClick={() => toggleSort("name")}
+                  />
                 </TableHead>
-                <TableHead className="w-28 text-right">{t("quotes.table.margin")}</TableHead>
-                <TableHead className="w-36 text-right">{t("quotes.table.finalPrice")}</TableHead>
+                <TableHead className="w-28 text-right">
+                  {t("quotes.table.margin")}
+                </TableHead>
+                <TableHead className="w-36 text-right">
+                  {t("quotes.table.finalPrice")}
+                </TableHead>
                 <TableHead className="w-40">
-              <SortButton
-                label={t("quotes.table.updated")}
-                active={sort.key === "updated"}
-                dir={sort.dir}
-                align="right"
-                onClick={() => toggleSort("updated")}
-              />
+                  <SortButton
+                    label={t("quotes.table.updated")}
+                    active={sort.key === "updated"}
+                    dir={sort.dir}
+                    align="right"
+                    onClick={() => toggleSort("updated")}
+                  />
                 </TableHead>
                 <TableHead className="w-32 text-right" />
               </TableRow>
@@ -207,7 +217,9 @@ export default function Quotes({
             <TableBody>
               {rows.map((q) => (
                 <TableRow key={q.id}>
-                  <TableCell className="max-w-0 truncate font-medium">{q.name}</TableCell>
+                  <TableCell className="max-w-0 truncate font-medium">
+                    {q.name}
+                  </TableCell>
                   <TableCell className="text-right tabular-nums">
                     {q.marginPercent.toLocaleString(locale)}%
                   </TableCell>
