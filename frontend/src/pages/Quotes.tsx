@@ -16,6 +16,7 @@ import type {
   ProductionOrder,
   QuoteSummary,
 } from "../../bindings/ledger/internal/domain/models";
+import { PageHeader } from "../components/page-header";
 import { Button } from "../components/ui/button";
 import { Checkbox } from "../components/ui/checkbox";
 import {
@@ -27,6 +28,15 @@ import {
 } from "../components/ui/field";
 import { Input } from "../components/ui/input";
 import { Separator } from "../components/ui/separator";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../components/ui/table";
 import { brl, dt } from "../lib/format";
 import { useActionError, useAsync, useSubmission } from "../lib/hooks";
 import {
@@ -40,14 +50,17 @@ function SortButton(props: {
   label: string;
   active: boolean;
   dir: QuoteSort["dir"];
+  align?: "left" | "right";
   onClick: () => void;
 }) {
-  const { label, active, dir, onClick } = props;
+  const { label, active, dir, align = "left", onClick } = props;
   const { t } = useTranslation();
   return (
-    <button
+    <Button
       type="button"
-      className="th-sort"
+      variant="ghost"
+      size="lg"
+      className={`min-h-11 min-w-0 gap-1 px-0 text-left text-xs font-medium text-muted-foreground hover:bg-transparent hover:text-foreground ${align === "right" ? "justify-end" : "justify-start"}`}
       onClick={onClick}
       aria-label={
         active
@@ -65,11 +78,11 @@ function SortButton(props: {
       {label}
       {active &&
         (dir === "asc" ? (
-          <ArrowUp size={12} aria-hidden="true" />
+          <ArrowUp aria-hidden="true" />
         ) : (
-          <ArrowDown size={12} aria-hidden="true" />
+          <ArrowDown aria-hidden="true" />
         ))}
-    </button>
+    </Button>
   );
 }
 
@@ -116,127 +129,157 @@ export default function Quotes({
   const rows = sortQuotes(filtered, sort);
 
   return (
-    <div>
-      <div className="page-head quotes-head">
-        <h1>{t("quotes.title")}</h1>
-        <div className="page-head-actions">
-          <input
+    <div className="space-y-5">
+      <PageHeader
+        title={t("quotes.title")}
+        actions={
+          <>
+            <Input
             type="search"
-            className="search-input"
+            className="h-11 w-full sm:w-64"
             placeholder={t("quotes.searchPlaceholder")}
             aria-label={t("quotes.searchLabel")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <button
-            type="button"
-            className="btn btn-primary btn-icon"
+            <Button
+              type="button"
+              variant="cta"
+              size="icon-lg"
+              className="size-11 shrink-0"
             aria-label={t("quotes.create")}
             title={t("quotes.create")}
             onClick={onNew}
           >
-            <Plus size={18} aria-hidden="true" />
-          </button>
-        </div>
-      </div>
+              <Plus aria-hidden="true" />
+            </Button>
+          </>
+        }
+      />
 
-      {quotes.error ? <p className="error-text">{quotes.error}</p> : null}
+      {quotes.error ? (
+        <p className="rounded-md border border-destructive/20 bg-destructive/5 px-3 py-2 text-sm text-destructive" role="alert">
+          {quotes.error}
+        </p>
+      ) : null}
       {actionError ? (
-        <p className="error-text" role="alert">
+        <p className="rounded-md border border-destructive/20 bg-destructive/5 px-3 py-2 text-sm text-destructive" role="alert">
           {actionError}
         </p>
       ) : null}
 
       {list.length === 0 ? (
-        <div className="empty">{t("quotes.empty")}</div>
+        <div className="rounded-xl border border-dashed border-border bg-card px-6 py-10 text-center text-muted-foreground">
+          {t("quotes.empty")}
+        </div>
       ) : filtered.length === 0 ? (
-        <div className="empty">
+        <div className="rounded-xl border border-dashed border-border bg-card px-6 py-10 text-center text-muted-foreground">
           {t("quotes.noResults", { term: search.trim() })}
         </div>
       ) : (
-        <div className="list">
-          <div className="row-head cols-quote">
-            <span>
+        <div className="overflow-hidden rounded-xl border border-border bg-card">
+          <Table className="min-w-[46rem]">
+            <TableCaption className="sr-only">{t("quotes.title")}</TableCaption>
+            <TableHeader>
+              <TableRow className="bg-muted/50 hover:bg-muted/50">
+                <TableHead className="w-[40%]">
               <SortButton
                 label={t("quotes.table.name")}
                 active={sort.key === "name"}
                 dir={sort.dir}
                 onClick={() => toggleSort("name")}
               />
-            </span>
-            <span className="money">{t("quotes.table.margin")}</span>
-            <span className="money">{t("quotes.table.finalPrice")}</span>
-            <span className="money">
+                </TableHead>
+                <TableHead className="w-28 text-right">{t("quotes.table.margin")}</TableHead>
+                <TableHead className="w-36 text-right">{t("quotes.table.finalPrice")}</TableHead>
+                <TableHead className="w-40">
               <SortButton
                 label={t("quotes.table.updated")}
                 active={sort.key === "updated"}
                 dir={sort.dir}
+                align="right"
                 onClick={() => toggleSort("updated")}
               />
-            </span>
-            <span />
-          </div>
-          {rows.map((q) => (
-            <div className="list-row cols-quote" key={q.id}>
-              <span>{q.name}</span>
-              <span className="money">
-                {q.marginPercent.toLocaleString(locale)}%
-              </span>
-              <span className="money price">{brl(q.finalPrice, locale)}</span>
-              <span className="money muted">{dt(q.updatedAt, locale)}</span>
-              <span className="actions" style={{ justifySelf: "end" }}>
-                <button
-                  type="button"
-                  className="btn btn-icon"
-                  aria-label={t("common.editItem", {
-                    item: t("quotes.item", { name: q.name }),
-                  })}
-                  title={t("common.editItem", {
-                    item: t("quotes.item", { name: q.name }),
-                  })}
-                  onClick={() => onEdit(q.id)}
-                >
-                  <Pencil size={16} aria-hidden="true" />
-                </button>
-                <QuoteOrderPopover
-                  quote={q}
-                  orders={productionOrders.data ?? []}
-                  ordersLoading={productionOrders.loading}
-                  ordersError={productionOrders.error}
-                  onRefreshOrders={productionOrders.reload}
-                />
-                {confirmId === q.id ? (
-                  <button
-                    type="button"
-                    className="btn btn-danger btn-icon"
-                    aria-label={t("common.confirmDeleteItem", {
-                      item: t("quotes.item", { name: q.name }),
-                    })}
-                    title={t("common.confirmDeleteItem", {
-                      item: t("quotes.item", { name: q.name }),
-                    })}
-                    onClick={() => remove(q.id)}
-                  >
-                    <Check size={16} aria-hidden="true" />
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    className="btn btn-danger btn-icon"
-                    aria-label={t("common.deleteItem", {
-                      item: t("quotes.item", { name: q.name }),
-                    })}
-                    title={t("common.deleteItem", {
-                      item: t("quotes.item", { name: q.name }),
-                    })}
-                    onClick={() => setConfirmId(q.id)}
-                  >
-                    <Trash2 size={16} aria-hidden="true" />
-                  </button>
-                )}
-              </span>
-            </div>
-          ))}
+                </TableHead>
+                <TableHead className="w-32 text-right" />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rows.map((q) => (
+                <TableRow key={q.id}>
+                  <TableCell className="max-w-0 truncate font-medium">{q.name}</TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {q.marginPercent.toLocaleString(locale)}%
+                  </TableCell>
+                  <TableCell className="text-right font-semibold tabular-nums text-cta">
+                    {brl(q.finalPrice, locale)}
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums text-muted-foreground">
+                    {dt(q.updatedAt, locale)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-lg"
+                        className="size-11"
+                        aria-label={t("common.editItem", {
+                          item: t("quotes.item", { name: q.name }),
+                        })}
+                        title={t("common.editItem", {
+                          item: t("quotes.item", { name: q.name }),
+                        })}
+                        onClick={() => onEdit(q.id)}
+                      >
+                        <Pencil aria-hidden="true" />
+                      </Button>
+                      <QuoteOrderPopover
+                        quote={q}
+                        orders={productionOrders.data ?? []}
+                        ordersLoading={productionOrders.loading}
+                        ordersError={productionOrders.error}
+                        onRefreshOrders={productionOrders.reload}
+                      />
+                      {confirmId === q.id ? (
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon-lg"
+                          className="size-11"
+                          aria-label={t("common.confirmDeleteItem", {
+                            item: t("quotes.item", { name: q.name }),
+                          })}
+                          title={t("common.confirmDeleteItem", {
+                            item: t("quotes.item", { name: q.name }),
+                          })}
+                          onClick={() => remove(q.id)}
+                        >
+                          <Check aria-hidden="true" />
+                        </Button>
+                      ) : (
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon-lg"
+                          className="size-11"
+                          aria-label={t("common.deleteItem", {
+                            item: t("quotes.item", { name: q.name }),
+                          })}
+                          title={t("common.deleteItem", {
+                            item: t("quotes.item", { name: q.name }),
+                          })}
+                          onClick={() => setConfirmId(q.id)}
+                        >
+                          <Trash2 aria-hidden="true" />
+                        </Button>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       )}
     </div>
@@ -382,7 +425,7 @@ function QuoteOrderPopover({
 
   return (
     <PopoverPrimitive.Root open={open} onOpenChange={changeOpen}>
-      <Button asChild variant="default" size="icon">
+      <Button asChild variant="outline" size="icon-lg" className="size-11">
         <PopoverPrimitive.Trigger
           type="button"
           aria-label={t("quotes.addToOrder", { quote: quote.name })}

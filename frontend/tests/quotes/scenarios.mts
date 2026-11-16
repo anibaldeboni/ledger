@@ -37,8 +37,8 @@ const deleteAction = quotePage.indexOf("{confirmId === q.id ? (", addAction);
 assert.ok(editAction < addAction && addAction < deleteAction, "the Send action sits immediately after edit and before delete");
 assert.match(
   quotePage,
-  /<Button asChild variant="default" size="icon">\s*<PopoverPrimitive\.Trigger[\s\S]*?aria-label=\{t\("quotes\.addToOrder"/,
-  "the Send trigger is a primary, accessible button sized like the quote-list actions",
+  /<Button asChild variant="outline" size="icon-lg" className="size-11">\s*<PopoverPrimitive\.Trigger[\s\S]*?aria-label=\{t\("quotes\.addToOrder"/,
+  "the Send trigger is accessible and meets the shared action touch target",
 );
 assert.match(quotePage, /<PopoverPrimitive\.Portal>[\s\S]*?<PopoverPrimitive\.Content[\s\S]*?align="end"/, "the popover is portaled and aligned to its trigger");
 assert.match(

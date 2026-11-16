@@ -4,6 +4,7 @@ import { Calculator, Factory, Settings as SettingsIcon } from "lucide-react";
 import appIcon from "../../assets/app.png";
 import { languageOptions } from "./i18n";
 import { Button } from "./components/ui/button";
+import { NativeSelect } from "./components/ui/native-select";
 import ProductionWorkspace from "./pages/ProductionWorkspace";
 import Quotes from "./pages/Quotes";
 import QuoteForm from "./pages/QuoteForm";
@@ -74,8 +75,7 @@ export default function App() {
           htmlFor="language-select"
         >
           <span>{t("language.label")}</span>
-          <select
-            className="min-h-11 w-full rounded-md border border-input bg-background px-3 text-base text-foreground shadow-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
+          <NativeSelect
             id="language-select"
             value={i18n.resolvedLanguage ?? i18n.language}
             onChange={(event) => void i18n.changeLanguage(event.target.value)}
@@ -85,7 +85,7 @@ export default function App() {
                 {name}
               </option>
             ))}
-          </select>
+          </NativeSelect>
         </label>
       </nav>
       <main id="main-content" className="min-h-0 min-w-0 overflow-y-auto px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
