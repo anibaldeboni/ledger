@@ -24,6 +24,16 @@ assert.deepEqual(
 
 const quotePage = await readFile(new URL("../../src/pages/Quotes.tsx", import.meta.url), "utf8");
 const quoteFormPage = await readFile(new URL("../../src/pages/QuoteForm.tsx", import.meta.url), "utf8");
+assert.doesNotMatch(
+  quoteFormPage,
+  /className=(?:"[^"]*\b(?:page-head|block|row|field|plate-row|plate-picker|chip|result|result-line|result-final|btn|toolbar|hint|error-text|invalid)\b|\{[^}]*\b(?:page-head|block|row|field|plate-row|plate-picker|chip|result|result-line|result-final|btn|toolbar|hint|error-text|invalid)\b)/,
+  "the quote form uses Tailwind utilities and shared components instead of legacy style classes",
+);
+assert.doesNotMatch(
+  quoteFormPage,
+  /style=\{\{\s*(?:margin|padding|justifySelf|flexBasis|gridTemplateColumns|alignItems|height|width)/,
+  "the quote form uses Tailwind for layout rather than static inline styles",
+);
 assert.match(quoteFormPage, /quoteForm\.fields\.adjustedPrice/, "the quote result exposes an adjusted sale-price field");
 assert.match(quoteFormPage, /marginPercentFromPrice\(result\.totalCost,\s*price\)/, "adjusting the sale price recalculates the displayed margin");
 assert.match(quoteFormPage, /finalPrice:\s*priceWasAdjusted\s*\?\s*\(adjustedPriceNum\s*\?\?\s*0\)\s*:\s*0/, "auto-calculated prices are recomputed while manual sale prices are preserved");

@@ -9,6 +9,12 @@ import {
   type QuoteEditor,
   type Tariff,
 } from "../../bindings/ledger/internal/domain/models";
+import { PageHeader } from "../components/page-header";
+import { Button } from "../components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Field, FieldGroup, FieldLabel } from "../components/ui/field";
+import { Input } from "../components/ui/input";
+import { NativeSelect } from "../components/ui/native-select";
 import { brl } from "../lib/format";
 import { parseNum } from "../lib/format";
 import { useActionError, useAsync, useSubmission } from "../lib/hooks";
@@ -272,353 +278,417 @@ export default function QuoteForm({
   const canSave = valid && name.trim() !== "";
 
   return (
-    <div>
-      <div className="page-head">
-        <h1>{quoteId ? t("quoteForm.title.edit") : t("quoteForm.title.new")}</h1>
-        <button className="btn btn-icon" aria-label={t("common.back")} onClick={onBack}>
-          <ArrowLeft size={20} aria-hidden="true" />
-        </button>
-      </div>
+    <div className="space-y-5">
+      <PageHeader
+        title={quoteId ? t("quoteForm.title.edit") : t("quoteForm.title.new")}
+        actions={
+          <Button
+            type="button"
+            variant="outline"
+            size="icon-lg"
+            className="size-11"
+            aria-label={t("common.back")}
+            onClick={onBack}
+          >
+            <ArrowLeft aria-hidden="true" />
+          </Button>
+        }
+      />
 
-      {lists.error ? <p className="error-text">{lists.error}</p> : null}
-      {editing.error ? <p className="error-text">{editing.error}</p> : null}
-      {actionError ? <p className="error-text">{actionError}</p> : null}
+      {lists.error ? <p className="text-sm text-destructive" role="alert">{lists.error}</p> : null}
+      {editing.error ? <p className="text-sm text-destructive" role="alert">{editing.error}</p> : null}
+      {actionError ? <p className="text-sm text-destructive" role="alert">{actionError}</p> : null}
 
-      <section className="block">
-        <h2>{t("quoteForm.sections.printerAndEnergy")}</h2>
-        <div className="row">
-          <label className="field">
-            {t("quoteForm.fields.printer")}
-            <select
-              value={printerId}
-              onChange={(e) => setPrinterId(Number(e.target.value))}
-            >
-              <option value={0}>{t("common.select")}</option>
-              {printers.map((p: Printer) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} · {p.powerWatts} W
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="field">
-            {t("quoteForm.fields.tariff")}
-            <select
-              value={tariffId}
-              onChange={(e) => setTariffId(Number(e.target.value))}
-            >
-              <option value={0}>{t("common.select")}</option>
-              {tariffs.map((t: Tariff) => (
-                <option key={t.id} value={t.id}>
-                  {t.name} · {brl(t.kwhPrice, locale)}/kWh
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-      </section>
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("quoteForm.sections.printerAndEnergy")}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <FieldGroup className="grid gap-4 md:grid-cols-2">
+            <Field>
+              <FieldLabel htmlFor="quote-printer">{t("quoteForm.fields.printer")}</FieldLabel>
+              <NativeSelect
+                id="quote-printer"
+                value={printerId}
+                onChange={(e) => setPrinterId(Number(e.target.value))}
+              >
+                <option value={0}>{t("common.select")}</option>
+                {printers.map((p: Printer) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} · {p.powerWatts} W
+                  </option>
+                ))}
+              </NativeSelect>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="quote-tariff">{t("quoteForm.fields.tariff")}</FieldLabel>
+              <NativeSelect
+                id="quote-tariff"
+                value={tariffId}
+                onChange={(e) => setTariffId(Number(e.target.value))}
+              >
+                <option value={0}>{t("common.select")}</option>
+                {tariffs.map((t: Tariff) => (
+                  <option key={t.id} value={t.id}>
+                    {t.name} · {brl(t.kwhPrice, locale)}/kWh
+                  </option>
+                ))}
+              </NativeSelect>
+            </Field>
+          </FieldGroup>
+        </CardContent>
+      </Card>
 
-      <section className="block">
-        <h2>{t("quoteForm.sections.filaments")}</h2>
-        {plates.map((p, i) => {
-          const fil = filById.get(p.filamentId);
-          const printTimeValid = isValidPrintDuration(p.time);
-          const bad =
-            p.filamentId === 0 ||
-            (p.time !== "" && !printTimeValid) ||
-            (p.weight !== "" && (parseNum(p.weight) ?? 0) <= 0);
-          const invalidTime = bad && !printTimeValid;
-          return (
-            <div className="plate-row" key={i}>
-              <div className="plate-picker">
-                <span
-                  className="chip"
-                  style={fil?.color ? { background: fil.color } : undefined}
-                  aria-hidden="true"
-                />
-                <select
-                  value={p.filamentId}
-                  className={p.filamentId === 0 ? "invalid" : undefined}
-                  onChange={(e) =>
-                    setPlates((ps) =>
-                      ps.map((row, j) =>
-                        j === i
-                          ? { ...row, filamentId: Number(e.target.value) }
-                          : row,
-                      ),
-                    )
-                  }
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("quoteForm.sections.filaments")}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {plates.map((p, i) => {
+            const fil = filById.get(p.filamentId);
+            const printTimeValid = isValidPrintDuration(p.time);
+            const bad =
+              p.filamentId === 0 ||
+              (p.time !== "" && !printTimeValid) ||
+              (p.weight !== "" && (parseNum(p.weight) ?? 0) <= 0);
+            const invalidTime = bad && !printTimeValid;
+            const invalidWeight = bad && (parseNum(p.weight) ?? 0) <= 0;
+            return (
+              <div
+                className="grid gap-3 rounded-lg border border-border bg-muted/30 p-3 sm:grid-cols-[minmax(0,1fr)_8rem_8rem_auto] sm:items-end"
+                key={i}
+              >
+                <Field data-invalid={p.filamentId === 0 || undefined}>
+                  <FieldLabel className="sr-only" htmlFor={`quote-filament-${i}`}>
+                    {t("quoteForm.options.chooseFilament")}
+                  </FieldLabel>
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span
+                      className="size-4 shrink-0 rounded-full border border-border"
+                      style={fil?.color ? { backgroundColor: fil.color } : undefined}
+                      aria-hidden="true"
+                    />
+                    <NativeSelect
+                      id={`quote-filament-${i}`}
+                      value={p.filamentId}
+                      aria-invalid={p.filamentId === 0}
+                      onChange={(e) =>
+                        setPlates((ps) =>
+                          ps.map((row, j) =>
+                            j === i
+                              ? { ...row, filamentId: Number(e.target.value) }
+                              : row,
+                          ),
+                        )
+                      }
+                    >
+                      <option value={0}>{t("quoteForm.options.chooseFilament")}</option>
+                      {filaments.map((f: Filament) => (
+                        <option key={f.id} value={f.id}>
+                          {f.name}
+                          {f.material ? ` · ${f.material}` : ""} ·{" "}
+                          {brl(f.pricePerKg, locale)}/kg
+                        </option>
+                      ))}
+                    </NativeSelect>
+                  </div>
+                </Field>
+                <Field data-invalid={invalidTime || undefined}>
+                  <FieldLabel htmlFor={`quote-duration-${i}`}>{t("quoteForm.fields.duration")}</FieldLabel>
+                  <Input
+                    id={`quote-duration-${i}`}
+                    className="h-11"
+                    aria-invalid={invalidTime}
+                    value={p.time}
+                    placeholder="1h57m"
+                    title={t("quoteForm.printTimeHint")}
+                    spellCheck={false}
+                    onChange={(e) =>
+                      setPlates((ps) =>
+                        ps.map((row, j) =>
+                          j === i ? { ...row, time: e.target.value } : row,
+                        ),
+                      )
+                    }
+                  />
+                </Field>
+                <Field data-invalid={invalidWeight || undefined}>
+                  <FieldLabel htmlFor={`quote-weight-${i}`}>{t("quoteForm.fields.weight")}</FieldLabel>
+                  <Input
+                    id={`quote-weight-${i}`}
+                    className="h-11"
+                    inputMode="decimal"
+                    aria-invalid={invalidWeight}
+                    value={p.weight}
+                    placeholder="35"
+                    onChange={(e) =>
+                      setPlates((ps) =>
+                        ps.map((row, j) =>
+                          j === i ? { ...row, weight: e.target.value } : row,
+                        ),
+                      )
+                    }
+                  />
+                </Field>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="icon-lg"
+                  className="size-11 justify-self-end"
+                  aria-label={t("quoteForm.removeFilament")}
+                  title={t("quoteForm.removeFilament")}
+                  onClick={() => setPlates((ps) => ps.filter((_, j) => j !== i))}
                 >
-                  <option value={0}>{t("quoteForm.options.chooseFilament")}</option>
-                  {filaments.map((f: Filament) => (
-                    <option key={f.id} value={f.id}>
-                      {f.name}
-                      {f.material ? ` · ${f.material}` : ""} ·{" "}
-                      {brl(f.pricePerKg, locale)}/kg
+                  <Trash2 aria-hidden="true" />
+                </Button>
+              </div>
+            );
+          })}
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="icon-lg"
+              className="size-11"
+              aria-label={t("quoteForm.addFilament")}
+              title={t("quoteForm.addFilament")}
+              onClick={() => setPlates((ps) => [...ps, { ...emptyPlate }])}
+            >
+              <Plus aria-hidden="true" />
+            </Button>
+            {plates.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{t("quoteForm.needFilament")}</p>
+            ) : null}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("quoteForm.sections.fixedCosts")}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {fixed.map((f, i) => (
+            <div
+              className="grid gap-3 rounded-lg border border-border bg-muted/30 p-3 sm:grid-cols-[minmax(0,1fr)_10rem_auto] sm:items-end"
+              key={i}
+            >
+              <Field>
+                <FieldLabel className="sr-only" htmlFor={`quote-category-${i}`}>
+                  {t("quoteForm.options.chooseCategory")}
+                </FieldLabel>
+                <NativeSelect
+                  id={`quote-category-${i}`}
+                  value={f.categoryId}
+                  onChange={(e) => pickCategory(i, Number(e.target.value))}
+                >
+                  <option value={0}>{t("quoteForm.options.chooseCategory")}</option>
+                  {categories.map((c: CostCategory) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
                     </option>
                   ))}
-                </select>
-              </div>
-              <label className="field">
-                {t("quoteForm.fields.duration")}
-                <input
-                  className={invalidTime ? "invalid" : undefined}
-                  aria-invalid={invalidTime}
-                  value={p.time}
-                  placeholder="1h57m"
-                  title={t("quoteForm.printTimeHint")}
-                  spellCheck={false}
-                  onChange={(e) =>
-                    setPlates((ps) =>
-                      ps.map((row, j) =>
-                        j === i ? { ...row, time: e.target.value } : row,
-                      ),
-                    )
-                  }
-                />
-              </label>
-              <label className="field">
-                {t("quoteForm.fields.weight")}
-                <input
+                </NativeSelect>
+              </Field>
+              <Field>
+                <FieldLabel htmlFor={`quote-fixed-cost-${i}`}>{t("quoteForm.fields.fixedCost")}</FieldLabel>
+                <Input
+                  id={`quote-fixed-cost-${i}`}
+                  className="h-11"
                   inputMode="decimal"
-                  className={
-                    bad && (parseNum(p.weight) ?? 0) <= 0
-                      ? "invalid"
-                      : undefined
-                  }
-                  value={p.weight}
-                  placeholder="35"
+                  value={f.value}
+                  placeholder="0"
                   onChange={(e) =>
-                    setPlates((ps) =>
-                      ps.map((row, j) =>
-                        j === i ? { ...row, weight: e.target.value } : row,
+                    setFixed((fs) =>
+                      fs.map((row, j) =>
+                        j === i ? { ...row, value: e.target.value } : row,
                       ),
                     )
                   }
                 />
-              </label>
-              <button
-                className="btn btn-danger btn-icon"
-                aria-label={t("quoteForm.removeFilament")}
-                title={t("quoteForm.removeFilament")}
-                onClick={() => setPlates((ps) => ps.filter((_, j) => j !== i))}
+              </Field>
+              <Button
+                type="button"
+                variant="destructive"
+                size="icon-lg"
+                className="size-11 justify-self-end"
+                aria-label={t("quoteForm.removeCost")}
+                title={t("quoteForm.removeCost")}
+                onClick={() => setFixed((fs) => fs.filter((_, j) => j !== i))}
               >
-                <Trash2 size={16} aria-hidden="true" />
-              </button>
+                <Trash2 aria-hidden="true" />
+              </Button>
             </div>
-          );
-        })}
-        <div className="toolbar" style={{ marginTop: 8 }}>
-          <button
-            className="btn btn-primary btn-icon"
-            aria-label={t("quoteForm.addFilament")}
-            title={t("quoteForm.addFilament")}
-            onClick={() => setPlates((ps) => [...ps, { ...emptyPlate }])}
-          >
-            <Plus size={18} aria-hidden="true" />
-          </button>
-          {plates.length === 0 ? (
-            <p className="hint">{t("quoteForm.needFilament")}</p>
-          ) : null}
-        </div>
-      </section>
-
-      <section className="block">
-        <h2>{t("quoteForm.sections.fixedCosts")}</h2>
-        {fixed.map((f, i) => (
-          <div
-            className="plate-row"
-            key={i}
-            style={{ gridTemplateColumns: "1fr 130px auto", alignItems: "end" }}
-          >
-            <select
-              value={f.categoryId}
-              onChange={(e) => pickCategory(i, Number(e.target.value))}
-            >
-              <option value={0}>{t("quoteForm.options.chooseCategory")}</option>
-              {categories.map((c: CostCategory) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-            <label className="field">
-              {t("quoteForm.fields.fixedCost")}
-              <input
-                inputMode="decimal"
-                value={f.value}
-                placeholder="0"
-                onChange={(e) =>
-                  setFixed((fs) =>
-                    fs.map((row, j) =>
-                      j === i ? { ...row, value: e.target.value } : row,
-                    ),
-                  )
-                }
-              />
-            </label>
-            <button
-              className="btn btn-danger btn-icon"
-              aria-label={t("quoteForm.removeCost")}
-              title={t("quoteForm.removeCost")}
-              onClick={() => setFixed((fs) => fs.filter((_, j) => j !== i))}
-            >
-              <Trash2 size={16} aria-hidden="true" />
-            </button>
-          </div>
-        ))}
-        <div className="row" style={{ marginTop: 8 }}>
-          <button
-            className="btn btn-primary btn-icon"
+          ))}
+          <Button
+            type="button"
+            variant="outline"
+            size="icon-lg"
+            className="size-11"
             title={t("quoteForm.addCost")}
             aria-label={t("quoteForm.addCost")}
-            onClick={() =>
-              setFixed((fs) => [...fs, { categoryId: 0, value: "" }])
-            }
+            onClick={() => setFixed((fs) => [...fs, { categoryId: 0, value: "" }])}
           >
-            <Plus size={18} aria-hidden="true" />
-          </button>
-        </div>
-        <div
-          className="row"
-          style={{
-            marginTop: 12,
-            paddingTop: 12,
-            borderTop: "1px solid var(--border)",
-          }}
-        >
-          <label className="field">
-            {t("quoteForm.fields.newCategory")}
-            <input
-              value={newCat.name}
-              placeholder={t("quoteForm.placeholders.newCategory")}
-              onChange={(e) =>
-                setNewCat((c) => ({ ...c, name: e.target.value }))
-              }
-            />
-          </label>
-          <label className="field" style={{ flexBasis: 120 }}>
-            {t("quoteForm.fields.defaultValue")}
-            <input
-              inputMode="decimal"
-              value={newCat.value}
-              placeholder="0"
-              onChange={(e) =>
-                setNewCat((c) => ({ ...c, value: e.target.value }))
-              }
-            />
-          </label>
-          <button
-            className="btn btn-sm"
-            onClick={createCategory}
-            disabled={!newCat.name.trim() || busy}
-          >
-            {t("quoteForm.createAndAddCategory")}
-          </button>
-        </div>
-      </section>
+            <Plus aria-hidden="true" />
+          </Button>
+          <FieldGroup className="grid gap-4 border-t border-border pt-4 sm:grid-cols-[minmax(0,1fr)_10rem_auto] sm:items-end">
+            <Field>
+              <FieldLabel htmlFor="quote-new-category">{t("quoteForm.fields.newCategory")}</FieldLabel>
+              <Input
+                id="quote-new-category"
+                className="h-11"
+                value={newCat.name}
+                placeholder={t("quoteForm.placeholders.newCategory")}
+                onChange={(e) => setNewCat((c) => ({ ...c, name: e.target.value }))}
+              />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="quote-new-category-value">{t("quoteForm.fields.defaultValue")}</FieldLabel>
+              <Input
+                id="quote-new-category-value"
+                className="h-11"
+                inputMode="decimal"
+                value={newCat.value}
+                placeholder="0"
+                onChange={(e) => setNewCat((c) => ({ ...c, value: e.target.value }))}
+              />
+            </Field>
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              className="min-h-11"
+              onClick={createCategory}
+              disabled={!newCat.name.trim() || busy}
+            >
+              {t("quoteForm.createAndAddCategory")}
+            </Button>
+          </FieldGroup>
+        </CardContent>
+      </Card>
 
-      <section className="block">
-        <h2>{t("quoteForm.sections.profitMargin")}</h2>
-        <div className="row">
-          <label className="field" style={{ flexBasis: 200 }}>
-            {t("quoteForm.fields.margin")}
-            <input
-              inputMode="decimal"
-              value={margin}
-              placeholder={t("quoteForm.placeholders.margin")}
-              onChange={(e) => changeMargin(e.target.value)}
-            />
-          </label>
-          <p className="hint">{t("quoteForm.finalPriceFormula")}</p>
-        </div>
-      </section>
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("quoteForm.sections.profitMargin")}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <FieldGroup className="grid gap-4 sm:grid-cols-[14rem_minmax(0,1fr)] sm:items-end">
+            <Field>
+              <FieldLabel htmlFor="quote-margin">{t("quoteForm.fields.margin")}</FieldLabel>
+              <Input
+                id="quote-margin"
+                className="h-11"
+                inputMode="decimal"
+                value={margin}
+                placeholder={t("quoteForm.placeholders.margin")}
+                onChange={(e) => changeMargin(e.target.value)}
+              />
+            </Field>
+            <p className="pb-2 text-sm text-muted-foreground">{t("quoteForm.finalPriceFormula")}</p>
+          </FieldGroup>
+        </CardContent>
+      </Card>
 
-      <div className="toolbar" style={{ marginBottom: 16 }}>
-        <button
-          className="btn btn-primary"
+      <div className="flex flex-wrap items-center gap-3">
+        <Button
+          type="button"
+          variant="cta"
+          size="lg"
+          className="min-h-11"
           disabled={!valid || busy}
           onClick={calculate}
         >
           {t("quoteForm.calculate")}
-        </button>
+        </Button>
         {!valid ? (
-          <p className="hint">
+          <p className="text-sm text-muted-foreground" role="status">
             {t("quoteForm.requiredFields")}
           </p>
         ) : null}
       </div>
 
       {result ? (
-        <section className="result">
-          <div className="result-line">
-            <span>{t("quoteForm.result.filament")}</span>
-            <strong>{brl(result.filament, locale)}</strong>
-          </div>
-          <div className="result-line">
-            <span>{t("quoteForm.result.energy")}</span>
-            <strong>{brl(result.energy, locale)}</strong>
-          </div>
-          <div className="result-line">
-            <span>{t("quoteForm.result.amortization")}</span>
-            <strong>{brl(result.amortization, locale)}</strong>
-          </div>
-          <div className="result-line">
-            <span>{t("quoteForm.result.fixedCosts")}</span>
-            <strong>{brl(result.fixedCosts, locale)}</strong>
-          </div>
-          <div className="result-line">
-            <span>{t("quoteForm.result.totalCost")}</span>
-            <strong>{brl(result.totalCost, locale)}</strong>
-          </div>
-          <div className="result-line">
-            <span>{t("quoteForm.result.profit")}</span>
-            <strong>
-              {brl(
-                adjustedPriceValid && adjustedPriceNum !== null
-                  ? adjustedPriceNum - result.totalCost
-                  : result.profit,
-                locale,
-              )}
-            </strong>
-          </div>
-          <div className="result-final">
-            <span>{t("quoteForm.result.finalPrice")}</span>
-            <span className="value">{brl(result.finalPrice, locale)}</span>
-          </div>
-          <div className="row" style={{ marginTop: 12 }}>
-            <label className="field" style={{ flexBasis: 260 }}>
-              {t("quoteForm.fields.adjustedPrice")}
-              <input
-                id="quote-adjusted-price"
-                inputMode="decimal"
-                value={adjustedPrice}
-                aria-invalid={!adjustedPriceValid}
-                onChange={(e) => changeAdjustedPrice(e.target.value)}
-              />
-            </label>
-          </div>
-          <div className="row" style={{ marginTop: 16 }}>
-            <label className="field" style={{ flexBasis: 260 }}>
-              {t("quoteForm.fields.quoteName")}
-              <input
-                value={name}
-                placeholder={t("quoteForm.placeholders.quoteName")}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </label>
-            <button
-              className="btn btn-primary"
-              disabled={!canSave || busy}
-              onClick={save}
-            >
-              {quoteId ? t("quoteForm.saveChanges") : t("quoteForm.saveQuote")}
-            </button>
-          </div>
-          {!canSave && result ? (
-            <p className="hint">{t("quoteForm.needName")}</p>
-          ) : null}
-        </section>
+        <Card className="border-primary/20">
+          <CardContent className="space-y-3">
+            <dl className="space-y-2">
+              <div className="flex items-center justify-between gap-4 text-sm">
+                <dt className="text-muted-foreground">{t("quoteForm.result.filament")}</dt>
+                <dd className="m-0 tabular-nums">{brl(result.filament, locale)}</dd>
+              </div>
+              <div className="flex items-center justify-between gap-4 text-sm">
+                <dt className="text-muted-foreground">{t("quoteForm.result.energy")}</dt>
+                <dd className="m-0 tabular-nums">{brl(result.energy, locale)}</dd>
+              </div>
+              <div className="flex items-center justify-between gap-4 text-sm">
+                <dt className="text-muted-foreground">{t("quoteForm.result.amortization")}</dt>
+                <dd className="m-0 tabular-nums">{brl(result.amortization, locale)}</dd>
+              </div>
+              <div className="flex items-center justify-between gap-4 text-sm">
+                <dt className="text-muted-foreground">{t("quoteForm.result.fixedCosts")}</dt>
+                <dd className="m-0 tabular-nums">{brl(result.fixedCosts, locale)}</dd>
+              </div>
+              <div className="flex items-center justify-between gap-4 text-sm">
+                <dt className="text-muted-foreground">{t("quoteForm.result.totalCost")}</dt>
+                <dd className="m-0 tabular-nums">{brl(result.totalCost, locale)}</dd>
+              </div>
+              <div className="flex items-center justify-between gap-4 text-sm">
+                <dt className="text-muted-foreground">{t("quoteForm.result.profit")}</dt>
+                <dd className="m-0 tabular-nums">
+                  {brl(
+                    adjustedPriceValid && adjustedPriceNum !== null
+                      ? adjustedPriceNum - result.totalCost
+                      : result.profit,
+                    locale,
+                  )}
+                </dd>
+              </div>
+            </dl>
+            <div className="flex items-baseline justify-between gap-4 border-t border-border pt-3">
+              <span className="text-sm font-medium">{t("quoteForm.result.finalPrice")}</span>
+              <span className="text-2xl font-semibold tabular-nums text-cta">
+                {brl(result.finalPrice, locale)}
+              </span>
+            </div>
+            <FieldGroup className="grid gap-4 border-t border-border pt-4 sm:grid-cols-2 xl:grid-cols-[15rem_minmax(0,1fr)_auto] xl:items-end">
+              <Field data-invalid={!adjustedPriceValid || undefined}>
+                <FieldLabel htmlFor="quote-adjusted-price">{t("quoteForm.fields.adjustedPrice")}</FieldLabel>
+                <Input
+                  id="quote-adjusted-price"
+                  className="h-11"
+                  inputMode="decimal"
+                  value={adjustedPrice}
+                  aria-invalid={!adjustedPriceValid}
+                  onChange={(e) => changeAdjustedPrice(e.target.value)}
+                />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="quote-name">{t("quoteForm.fields.quoteName")}</FieldLabel>
+                <Input
+                  id="quote-name"
+                  className="h-11"
+                  value={name}
+                  placeholder={t("quoteForm.placeholders.quoteName")}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </Field>
+              <Button
+                type="button"
+                variant="default"
+                size="lg"
+                className="min-h-11"
+                disabled={!canSave || busy}
+                onClick={save}
+              >
+                {quoteId ? t("quoteForm.saveChanges") : t("quoteForm.saveQuote")}
+              </Button>
+            </FieldGroup>
+            {!canSave ? (
+              <p className="text-sm text-muted-foreground" role="status">
+                {t("quoteForm.needName")}
+              </p>
+            ) : null}
+          </CardContent>
+        </Card>
       ) : null}
     </div>
   );
