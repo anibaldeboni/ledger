@@ -28,7 +28,7 @@ The user selected “Permitir redesign” when asked whether a visual redesign w
 
 - [x] T1 — S1-S4 — inline — verified — commit: `b41c684` — Establish the semantic theme, shared styling patterns, and application shell.
 - [x] T2 — S1-S3 — inline — verified — commits: `e441fd7`, `dc6875c`, `4e261be` — Migrate quotes, quote form, and general settings screens.
-- [ ] T3 — S1-S3 — inline — Needs your decision: rendered viewport/keyboard inspection is unavailable — commits: `d8c4277`, `1ad320b`, `e008034` — Migrate production board, archive, reports, and production settings; remove obsolete app-specific CSS.
+- [x] T3 — S1-S3 — inline — verified with accepted visual-proof limitation — commits: `d8c4277`, `1ad320b`, `e008034` — Migrate production board, archive, reports, and production settings; remove obsolete app-specific CSS.
 
 ## Log
 
@@ -85,3 +85,6 @@ Production pages now use Tailwind utilities and shared UI components; `frontend/
 
 ### L16 — 2026-11-16 — T3c stylesheet cleanup and native assessment
 Committed T3c as `e008034` (`refactor(ui): remove legacy application stylesheet`), 809 authored changed lines. The stylesheet now contains only Tailwind imports, semantic theme tokens, global base/focus styles, and reduced-motion handling. RDD is on (global); assessment against `98898c6` returned `risk: medium`, `review_due: false`, `review_due_reason: under_budget` (cumulative candidate: 4,189 lines). No review lifecycle was started; the candidate remains pending against `98898c6`. T3 is still a **Needs your decision** result until the visual-verification limitation is dispositioned. No push or PR was performed.
+
+### L17 — 2026-11-16 — User accepted verification limitation
+The user chose “Aceitar evidência atual (Recomendado)”. The user accepts the build, structural checks, and scenario tests as sufficient to close the feature without a rendered viewport/keyboard pass. No visual PASS is claimed; no browser was installed or remote service invoked.
