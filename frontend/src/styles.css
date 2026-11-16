@@ -907,6 +907,27 @@ section.block > h2 {
   margin: 4px 0 0;
 }
 
+.production-order-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 8px 0 0;
+}
+
+.production-order-total dt {
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+
+.production-order-total dd {
+  margin: 0;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .production-order-actions {
   display: flex;
   flex-wrap: wrap;

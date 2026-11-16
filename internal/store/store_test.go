@@ -222,6 +222,69 @@ func TestQuoteRoundTrip(t *testing.T) {
 	}
 }
 
+func TestSaveQuoteUsesAdjustedSalePriceAndRecalculatesMargin(t *testing.T) {
+	tests := []struct {
+		name        string
+		priceFactor float64
+		wantMargin  float64
+	}{
+		{name: "sale above cost", priceFactor: 2, wantMargin: 50},
+		{name: "sale below cost", priceFactor: 0.5, wantMargin: -100},
+	}
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			s := newTestStore(t)
+			printer := domainPrinter()
+			if err := s.SavePrinter(&printer); err != nil {
+				t.Fatal(err)
+			}
+			tariff := domainTariff()
+			if err := s.SaveTariff(&tariff); err != nil {
+				t.Fatal(err)
+			}
+			filament := domainFilament()
+			if err := s.SaveFilament(&filament); err != nil {
+				t.Fatal(err)
+			}
+			category := domainCategory()
+			if err := s.SaveCostCategory(&category); err != nil {
+				t.Fatal(err)
+			}
+
+			quote := domainQuote(printer.ID, tariff.ID, filament.ID, category.ID)
+			quote.MarginPercent = 20
+			costs, err := s.CalculateQuote(&quote)
+			if err != nil {
+				t.Fatal(err)
+			}
+			wantPrice := costs.TotalCost * tc.priceFactor
+			quote.FinalPrice = wantPrice
+
+			if err := s.SaveQuote(&quote); err != nil {
+				t.Fatal(err)
+			}
+			got, err := s.GetQuote(quote.ID)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if got.FinalPrice != wantPrice {
+				t.Errorf("saved price = %v, want adjusted sale price %v", got.FinalPrice, wantPrice)
+			}
+			if diff := got.MarginPercent - tc.wantMargin; diff < -1e-9 || diff > 1e-9 {
+				t.Errorf("saved margin = %v, want %v", got.MarginPercent, tc.wantMargin)
+			}
+			quotes, err := s.ListQuotes()
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(quotes) != 1 || quotes[0].FinalPrice != wantPrice || quotes[0].MarginPercent != got.MarginPercent {
+				t.Errorf("quote summary = %+v, want price %v and margin %v", quotes, wantPrice, got.MarginPercent)
+			}
+		})
+	}
+}
+
 func TestSpoolmanConfig(t *testing.T) {
 	s := newTestStore(t)
 	if err := s.SetSpoolmanURL("http://localhost:8000"); err != nil {

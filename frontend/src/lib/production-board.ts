@@ -1,4 +1,8 @@
-import type { ProductionOrder } from "../../bindings/ledger/internal/domain/models";
+import type {
+  ProductionColumn,
+  ProductionOrder,
+  QuoteSummary,
+} from "../../bindings/ledger/internal/domain/models";
 import { filterByName } from "./search.ts";
 
 export type ProductionOrderSort = {
@@ -34,6 +38,26 @@ export function filterAndSortProductionOrders(
           : Date.parse(a[sort.key]) - Date.parse(b[sort.key]);
     return direction * comparison || a.id - b.id;
   });
+}
+
+export function getProductionOrderTotal(
+  order: ProductionOrder,
+  quotes: QuoteSummary[],
+  columns: ProductionColumn[],
+): number {
+  const pricesByQuoteId = new Map(
+    quotes.map((quote) => [quote.id, quote.finalPrice]),
+  );
+  const cancelledColumnId = columns.find(
+    (column) => column.systemKey === "cancelled",
+  )?.id;
+  return (order.tickets ?? []).reduce(
+    (total, ticket) =>
+      ticket.columnId === cancelledColumnId
+        ? total
+        : total + (pricesByQuoteId.get(ticket.quoteId) ?? 0),
+    0,
+  );
 }
 
 export function shouldPromptToCompleteOrderAfterMove(

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import type { ProductionOrder } from "../../bindings/ledger/internal/domain/models.ts";
 import {
+  getProductionOrderTotal,
   filterAndSortProductionOrders,
   reorderProductionColumns,
   shouldPromptToCompleteOrderAfterMove,
@@ -41,6 +42,41 @@ const orders = [
   order(2, "Alpha", "2026-01-03T00:00:00Z", "2026-01-05T00:00:00Z", [1, 2]),
   order(3, "Bravo", "2026-01-02T00:00:00Z", "2026-01-08T00:00:00Z"),
 ];
+
+const currentQuotes = [
+  { id: 1, name: "First", finalPrice: 120.5, marginPercent: 0, updatedAt: "" },
+  { id: 2, name: "Second", finalPrice: 45.25, marginPercent: 0, updatedAt: "" },
+  { id: 3, name: "Third", finalPrice: 15.75, marginPercent: 0, updatedAt: "" },
+  { id: 4, name: "Unlinked", finalPrice: 500, marginPercent: 0, updatedAt: "" },
+];
+const orderTotalColumns = [
+  { id: 10, systemKey: "todo", name: "To-do", position: 0 },
+  { id: 20, systemKey: "cancelled", name: "Cancelado (renamed)", position: 1 },
+  { id: 30, systemKey: "completed", name: "Done", position: 2 },
+];
+const orderWithQuotes = order(4, "Order total", "", "", [10, 20, 30]);
+assert.equal(
+  getProductionOrderTotal(orderWithQuotes, currentQuotes, orderTotalColumns),
+  136.25,
+  "an order total excludes cancelled-stage tickets and counts only linked quotes",
+);
+const updatedQuotes = currentQuotes.map((quote) =>
+  quote.id === 1 ? { ...quote, finalPrice: 130.5 } : quote,
+);
+assert.equal(
+  getProductionOrderTotal(orderWithQuotes, updatedQuotes, orderTotalColumns),
+  146.25,
+  "an order total reflects updated active quote prices",
+);
+assert.equal(
+  getProductionOrderTotal(
+    order(5, "Empty order", "", ""),
+    currentQuotes,
+    orderTotalColumns,
+  ),
+  0,
+  "an order without linked quotes has a zero total",
+);
 
 assert.deepEqual(
   filterAndSortProductionOrders(orders, "", { key: "createdAt", direction: "desc" }, "en").map((item) => item.id),
@@ -180,6 +216,9 @@ const laneText = await readFile(new URL("../../src/pages/ProductionLane.tsx", im
 const settingsText = await readFile(new URL("../../src/pages/ProductionSettings.tsx", import.meta.url), "utf8");
 const stageManagerText = await readFile(new URL("../../src/pages/ProductionStageManager.tsx", import.meta.url), "utf8");
 const stylesText = await readFile(new URL("../../src/styles.css", import.meta.url), "utf8");
+assert.match(laneText, /getProductionOrderTotal\(order,\s*quotes,\s*columns\)/, "each production lane derives its total from current quotes and stages");
+assert.match(laneText, /t\("production\.orderTotal"\)/, "the order total has a localized visible label");
+assert.match(laneText, /brl\(orderTotal,\s*locale\)/, "the order total uses the app's currency formatter");
 assert.match(
   workspaceText,
   /<TabsTrigger value="reports">[\s\S]*?<\/TabsTrigger>\s*<TabsTrigger value="settings">\{t\("settings\.title"\)\}<\/TabsTrigger>/,

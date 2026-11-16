@@ -68,14 +68,17 @@ func (s *Store) GetQuote(id int64) (domain.Quote, error) {
 	return q, rows.Err()
 }
 
-// SaveQuote insere (ID=0) ou atualiza um orçamento, substituindo seus usos de
-// filamento e custos fixos, e recalcula o preço final.
+// SaveQuote inserts or updates a quote, deriving its price from margin unless one is supplied.
 func (s *Store) SaveQuote(q *domain.Quote) error {
 	costs, err := s.CalculateQuote(q)
 	if err != nil {
 		return err
 	}
-	q.FinalPrice = costs.FinalPrice
+	if q.FinalPrice > 0 {
+		q.MarginPercent = (q.FinalPrice - costs.TotalCost) / q.FinalPrice * 100
+	} else {
+		q.FinalPrice = costs.FinalPrice
+	}
 	now := time.Now().UTC().Format(time.RFC3339)
 
 	tx, err := s.db.Begin()

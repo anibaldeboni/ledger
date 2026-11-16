@@ -21,6 +21,7 @@
     "createdAt": "Created {{date}}",
     "updatedAt": "Updated {{date}}",
     "ticketCount": "Tickets: {{count}}",
+    "orderTotal": "Order total",
     "searchLabel": "Search orders by name",
     "searchPlaceholder": "Search orders...",
     "sortOrders": "Sort orders",
@@ -234,6 +235,7 @@
       "newCategory": "New category",
       "defaultValue": "Default value ($)",
       "margin": "Margin (%)",
+      "adjustedPrice": "Adjusted price",
       "quoteName": "Quote name"
     },
     "options": {

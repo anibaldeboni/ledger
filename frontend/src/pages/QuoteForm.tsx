@@ -13,6 +13,7 @@ import { brl } from "../lib/format";
 import { parseNum } from "../lib/format";
 import { useActionError, useAsync, useSubmission } from "../lib/hooks";
 import { isValidPrintDuration } from "../lib/print-time";
+import { marginPercentFromPrice } from "../lib/quote-pricing";
 import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 
 /** Um "plate": filamento + tempo + peso. */
@@ -51,6 +52,8 @@ export default function QuoteForm({
   const [printerId, setPrinterId] = useState(0);
   const [tariffId, setTariffId] = useState(0);
   const [margin, setMargin] = useState("");
+  const [adjustedPrice, setAdjustedPrice] = useState("");
+  const [priceWasAdjusted, setPriceWasAdjusted] = useState(false);
   const [plates, setPlates] = useState<PlateForm[]>([{ ...emptyPlate }]);
   const [fixed, setFixed] = useState<FixedForm[]>([]);
   const [result, setResult] = useState<Costs | null>(null);
@@ -64,6 +67,8 @@ export default function QuoteForm({
     setPrinterId(q.printerId);
     setTariffId(q.tariffId);
     setMargin(String(q.marginPercent));
+    setAdjustedPrice(q.finalPrice > 0 ? String(q.finalPrice) : "");
+    setPriceWasAdjusted(q.finalPrice > 0);
     setPlates(
       (q.filaments ?? []).map((f) => ({
         filamentId: f.filamentId,
@@ -94,13 +99,80 @@ export default function QuoteForm({
         (parseNum(p.weight) ?? 0) > 0,
     );
   const marginNum = parseNum(margin);
+  const adjustedPriceNum = parseNum(adjustedPrice);
+  const adjustedPriceValid =
+    adjustedPriceNum !== null &&
+    Number.isFinite(adjustedPriceNum) &&
+    adjustedPriceNum > 0;
   const valid =
     printerId > 0 &&
     tariffId > 0 &&
     platesValid &&
     marginNum !== null &&
-    marginNum > 0 &&
-    marginNum < 100;
+    Number.isFinite(marginNum) &&
+    ((priceWasAdjusted || result)
+      ? adjustedPriceValid
+      : marginNum > 0 && marginNum < 100);
+
+  function changeMargin(value: string) {
+    setMargin(value);
+    setPriceWasAdjusted(false);
+    const nextMargin = parseNum(value);
+    if (!result) {
+      setAdjustedPrice("");
+      return;
+    }
+    if (
+      nextMargin === null ||
+      !Number.isFinite(nextMargin) ||
+      nextMargin >= 100
+    ) {
+      setAdjustedPrice("");
+      return;
+    }
+
+    const nextPrice = result.totalCost / (1 - nextMargin / 100);
+    setAdjustedPrice(
+      nextPrice > 0 && Number.isFinite(nextPrice) ? String(nextPrice) : "",
+    );
+    if (nextPrice > 0 && Number.isFinite(nextPrice)) {
+      setResult((current) =>
+        current
+          ? {
+              ...current,
+              finalPrice: nextPrice,
+              profit: nextPrice - current.totalCost,
+            }
+          : current,
+      );
+    }
+  }
+
+  function changeAdjustedPrice(value: string) {
+    setAdjustedPrice(value);
+    if (value.trim() === "" && result) {
+      setPriceWasAdjusted(false);
+      setAdjustedPrice(result.finalPrice > 0 ? String(result.finalPrice) : "");
+      const nextMargin = marginPercentFromPrice(
+        result.totalCost,
+        result.finalPrice,
+      );
+      if (nextMargin !== null) setMargin(String(nextMargin));
+      return;
+    }
+
+    const price = parseNum(value);
+    if (!result || price === null || !Number.isFinite(price) || price <= 0) {
+      setPriceWasAdjusted(false);
+      return;
+    }
+
+    const nextMargin = marginPercentFromPrice(result.totalCost, price);
+    if (nextMargin !== null) {
+      setPriceWasAdjusted(true);
+      setMargin(String(nextMargin));
+    }
+  }
 
   function buildQuote(): QuoteEditor {
     return {
@@ -118,7 +190,7 @@ export default function QuoteForm({
         categoryId: f.categoryId,
         value: parseNum(f.value) ?? 0,
       })),
-      finalPrice: 0,
+      finalPrice: priceWasAdjusted ? (adjustedPriceNum ?? 0) : 0,
       createdAt: "",
       updatedAt: "",
     };
@@ -128,7 +200,19 @@ export default function QuoteForm({
     await runExclusive(async () => {
       clearError();
       try {
-        setResult(await LedgerService.CalculateQuote(buildQuote()));
+        const hasAdjustedPrice = priceWasAdjusted && adjustedPriceValid;
+        const costs = await LedgerService.CalculateQuote(buildQuote());
+        setResult(costs);
+        if (hasAdjustedPrice && adjustedPriceNum !== null) {
+          const nextMargin = marginPercentFromPrice(
+            costs.totalCost,
+            adjustedPriceNum,
+          );
+          if (nextMargin !== null) setMargin(String(nextMargin));
+        } else {
+          setAdjustedPrice(costs.finalPrice > 0 ? String(costs.finalPrice) : "");
+          setPriceWasAdjusted(false);
+        }
       } catch (e) {
         setActionError(e);
       }
@@ -443,7 +527,7 @@ export default function QuoteForm({
               inputMode="decimal"
               value={margin}
               placeholder={t("quoteForm.placeholders.margin")}
-              onChange={(e) => setMargin(e.target.value)}
+              onChange={(e) => changeMargin(e.target.value)}
             />
           </label>
           <p className="hint">{t("quoteForm.finalPriceFormula")}</p>
@@ -489,11 +573,30 @@ export default function QuoteForm({
           </div>
           <div className="result-line">
             <span>{t("quoteForm.result.profit")}</span>
-            <strong>{brl(result.profit, locale)}</strong>
+            <strong>
+              {brl(
+                adjustedPriceValid && adjustedPriceNum !== null
+                  ? adjustedPriceNum - result.totalCost
+                  : result.profit,
+                locale,
+              )}
+            </strong>
           </div>
           <div className="result-final">
             <span>{t("quoteForm.result.finalPrice")}</span>
             <span className="value">{brl(result.finalPrice, locale)}</span>
+          </div>
+          <div className="row" style={{ marginTop: 12 }}>
+            <label className="field" style={{ flexBasis: 260 }}>
+              {t("quoteForm.fields.adjustedPrice")}
+              <input
+                id="quote-adjusted-price"
+                inputMode="decimal"
+                value={adjustedPrice}
+                aria-invalid={!adjustedPriceValid}
+                onChange={(e) => changeAdjustedPrice(e.target.value)}
+              />
+            </label>
           </div>
           <div className="row" style={{ marginTop: 16 }}>
             <label className="field" style={{ flexBasis: 260 }}>

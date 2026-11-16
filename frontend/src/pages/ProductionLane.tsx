@@ -16,6 +16,8 @@ import type {
   ProductionTicket,
   QuoteSummary,
 } from "../../bindings/ledger/internal/domain/models";
+import { brl } from "../lib/format";
+import { getProductionOrderTotal } from "../lib/production-board";
 import { Button } from "../components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "../components/ui/field";
 import {
@@ -65,6 +67,7 @@ export default function ProductionLane({
     null,
   );
   const tickets = order.tickets ?? [];
+  const orderTotal = getProductionOrderTotal(order, quotes, columns);
 
   async function addTicket(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -135,6 +138,10 @@ export default function ProductionLane({
         <p className="hint">
           {t("production.ticketCount", { count: tickets.length })}
         </p>
+        <dl className="production-order-total">
+          <dt>{t("production.orderTotal")}</dt>
+          <dd className="money">{brl(orderTotal, locale)}</dd>
+        </dl>
         {order.completedAt ? (
           <p className="production-order-status" role="status">
             {t("production.orderCompleted")}

@@ -21,6 +21,7 @@
     "createdAt": "Creado {{date}}",
     "updatedAt": "Actualizado {{date}}",
     "ticketCount": "Tickets: {{count}}",
+    "orderTotal": "Total del pedido",
     "searchLabel": "Buscar pedidos por nombre",
     "searchPlaceholder": "Buscar pedidos...",
     "sortOrders": "Ordenar pedidos",
@@ -234,6 +235,7 @@
       "newCategory": "Nueva categoría",
       "defaultValue": "Valor predeterminado ($)",
       "margin": "Margen (%)",
+      "adjustedPrice": "Precio ajustado",
       "quoteName": "Nombre del presupuesto"
     },
     "options": {

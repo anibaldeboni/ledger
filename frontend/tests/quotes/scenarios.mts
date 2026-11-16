@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { filterByName } from "../../src/lib/search.ts";
+import { marginPercentFromPrice } from "../../src/lib/quote-pricing.ts";
+
+assert.equal(marginPercentFromPrice(75, 100), 25, "calculates margin from the sale price");
+assert.equal(marginPercentFromPrice(125, 100), -25, "reports a loss when sale price is below cost");
+assert.equal(marginPercentFromPrice(75, 0), null, "does not calculate a margin for a zero sale price");
 
 const searchOrders = [
   { id: 1, title: "Pedido Café" },
@@ -18,6 +23,12 @@ assert.deepEqual(
 );
 
 const quotePage = await readFile(new URL("../../src/pages/Quotes.tsx", import.meta.url), "utf8");
+const quoteFormPage = await readFile(new URL("../../src/pages/QuoteForm.tsx", import.meta.url), "utf8");
+assert.match(quoteFormPage, /quoteForm\.fields\.adjustedPrice/, "the quote result exposes an adjusted sale-price field");
+assert.match(quoteFormPage, /marginPercentFromPrice\(result\.totalCost,\s*price\)/, "adjusting the sale price recalculates the displayed margin");
+assert.match(quoteFormPage, /finalPrice:\s*priceWasAdjusted\s*\?\s*\(adjustedPriceNum\s*\?\?\s*0\)\s*:\s*0/, "auto-calculated prices are recomputed while manual sale prices are preserved");
+assert.match(quoteFormPage, /if \(value\.trim\(\) === "" && result\)[\s\S]*?setAdjustedPrice\(result\.finalPrice > 0 \? String\(result\.finalPrice\) : ""\)/, "clearing an adjustment restores the calculated sale price");
+assert.match(quoteFormPage, /\(\(priceWasAdjusted \|\| result\)[\s\S]*?\?\s*adjustedPriceValid\s*:\s*marginNum > 0 && marginNum < 100/, "saved loss-making quotes remain editable without relaxing new-quote margin validation");
 assert.match(quotePage, /\bSend\b/, "each quote row has a Send action");
 assert.match(quotePage, /\bBetweenHorizontalStart\b/, "new-order creation uses the requested icon");
 const editAction = quotePage.indexOf("onClick={() => onEdit(q.id)}");
@@ -77,6 +88,7 @@ const locales = await Promise.all(
   }),
 );
 for (const [locale, translations] of locales) {
+  assert.ok(translations.quoteForm.fields.adjustedPrice, `${locale} has quoteForm.fields.adjustedPrice`);
   for (const key of [
     "addToOrder",
     "orderSearchPlaceholder",
@@ -105,6 +117,11 @@ assert.equal(
   locales.find(([locale]) => locale === "pt-BR")?.[1].quotes.createOrderAndAddTooltip,
   "Criar novo pedido e adicionar item",
   "the create-order tooltip matches the requested Portuguese copy",
+);
+assert.equal(
+  locales.find(([locale]) => locale === "pt-BR")?.[1].quoteForm.fields.adjustedPrice,
+  "Preço ajustado",
+  "the adjusted sale-price field uses the requested Portuguese copy",
 );
 
 console.log("Quote-to-production order actions passed");
