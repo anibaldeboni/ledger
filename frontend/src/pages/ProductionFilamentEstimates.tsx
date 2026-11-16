@@ -12,21 +12,21 @@ export default function ProductionFilamentEstimates({
   emptyLabel: string;
 }) {
   return (
-    <div className="production-estimated-filaments">
-      <p className="production-estimated-filaments-title">{label}</p>
+    <div className="grid min-w-0 gap-2">
+      <p className="text-sm font-medium text-muted-foreground">{label}</p>
       {filaments?.length ? (
-        <ul className="production-filament-estimates" aria-label={label}>
+        <ul className="grid gap-1 text-xs" aria-label={label}>
           {filaments.map((filament, index) => (
-            <li key={`${filament.filamentId}:${index}`}>
-              <span>{filament.name}</span>
-              <span>
+            <li className="flex justify-between gap-3" key={`${filament.filamentId}:${index}`}>
+              <span className="min-w-0 break-words">{filament.name}</span>
+              <span className="shrink-0 tabular-nums">
                 {filament.weightG.toLocaleString(locale, { maximumFractionDigits: 1 })} g · {filament.printTimeHours.toLocaleString(locale, { maximumFractionDigits: 2 })} h
               </span>
             </li>
           ))}
         </ul>
       ) : (
-        <p className="hint">{emptyLabel}</p>
+        <p className="text-sm text-muted-foreground">{emptyLabel}</p>
       )}
     </div>
   );

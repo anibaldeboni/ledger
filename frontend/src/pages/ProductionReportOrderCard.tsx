@@ -10,28 +10,28 @@ export default function ProductionReportOrderCard({ order, locale }: { order: Pr
   const tickets = order.tickets ?? [];
 
   return (
-    <Card className="production-report-order">
+    <Card>
       <CardHeader>
-        <CardTitle role="heading" aria-level={2}>{order.title}</CardTitle>
+        <CardTitle className="break-words" role="heading" aria-level={2}>{order.title}</CardTitle>
         <CardDescription>{t("production.orderId", { id: order.orderId })}</CardDescription>
       </CardHeader>
       <CardContent>
-        <dl className="production-report-metrics">
-          <div>
-            <dt>{t("production.reports.createdAt")}</dt>
-            <dd>{dt(order.createdAt, locale)}</dd>
+        <dl className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid min-w-0 gap-1">
+            <dt className="text-xs font-medium text-muted-foreground">{t("production.reports.createdAt")}</dt>
+            <dd className="m-0 break-words text-sm tabular-nums">{dt(order.createdAt, locale)}</dd>
           </div>
-          <div>
-            <dt>{t("production.reports.completedAt")}</dt>
-            <dd>{dt(order.completedAt, locale)}</dd>
+          <div className="grid min-w-0 gap-1">
+            <dt className="text-xs font-medium text-muted-foreground">{t("production.reports.completedAt")}</dt>
+            <dd className="m-0 break-words text-sm tabular-nums">{dt(order.completedAt, locale)}</dd>
           </div>
-          <div>
-            <dt>{t("production.reports.orderDuration")}</dt>
-            <dd>{formatDuration(order.orderDurationSeconds, t)}</dd>
+          <div className="grid min-w-0 gap-1">
+            <dt className="text-xs font-medium text-muted-foreground">{t("production.reports.orderDuration")}</dt>
+            <dd className="m-0 break-words text-sm tabular-nums">{formatDuration(order.orderDurationSeconds, t)}</dd>
           </div>
-          <div>
-            <dt>{t("production.reports.estimatedPrintHours")}</dt>
-            <dd>{order.estimatedPrintHours.toLocaleString(locale, { maximumFractionDigits: 2 })} h</dd>
+          <div className="grid min-w-0 gap-1">
+            <dt className="text-xs font-medium text-muted-foreground">{t("production.reports.estimatedPrintHours")}</dt>
+            <dd className="m-0 break-words text-sm tabular-nums">{order.estimatedPrintHours.toLocaleString(locale, { maximumFractionDigits: 2 })} h</dd>
           </div>
         </dl>
         <ProductionFilamentEstimates
@@ -40,16 +40,16 @@ export default function ProductionReportOrderCard({ order, locale }: { order: Pr
           label={t("production.reports.orderFilaments")}
           emptyLabel={t("production.noFilamentEstimate")}
         />
-        <div className="production-report-tickets">
-          <p className="production-section-label">{t("production.reports.ticketCount", { count: tickets.length })}</p>
+        <div className="mt-5 grid gap-3">
+          <h3 className="text-sm font-semibold">{t("production.reports.ticketCount", { count: tickets.length })}</h3>
           {tickets.length ? tickets.map((ticket) => (
-            <section className="production-report-ticket" key={ticket.ticketId}>
-              <div className="production-report-ticket-heading">
+            <section className="grid gap-4 rounded-lg border border-border bg-muted/30 p-4" key={ticket.ticketId}>
+              <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
-                  <h3>{ticket.quoteName}</h3>
-                  <p className="production-order-meta">{t("production.quoteId", { id: ticket.quoteId })}</p>
+                  <h4 className="break-words text-sm font-semibold">{ticket.quoteName}</h4>
+                  <p className="mt-1 text-xs text-muted-foreground">{t("production.quoteId", { id: ticket.quoteId })}</p>
                 </div>
-                <p className="production-order-meta">
+                <p className="m-0 text-xs text-muted-foreground">
                   {t("production.reports.ticketEstimatedPrintHours", {
                     hours: ticket.estimatedPrintHours.toLocaleString(locale, { maximumFractionDigits: 2 }),
                   })}
@@ -62,12 +62,12 @@ export default function ProductionReportOrderCard({ order, locale }: { order: Pr
                 emptyLabel={t("production.noFilamentEstimate")}
               />
               {ticket.stageDurations?.length ? (
-                <Table className="production-report-stage-table">
+                <Table className="mt-3">
                   <TableCaption>{t("production.reports.stageTableCaption", { quote: ticket.quoteName })}</TableCaption>
                   <TableHeader>
                     <TableRow>
                       <TableHead scope="col">{t("production.reports.stage")}</TableHead>
-                      <TableHead scope="col" className="money">{t("production.reports.stageDuration")}</TableHead>
+                      <TableHead scope="col" className="text-right">{t("production.reports.stageDuration")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -76,17 +76,17 @@ export default function ProductionReportOrderCard({ order, locale }: { order: Pr
                       .map((stage) => (
                         <TableRow key={stage.columnId}>
                           <TableCell>{stage.columnName}</TableCell>
-                          <TableCell className="money">{formatDuration(stage.durationSeconds, t)}</TableCell>
+                          <TableCell className="text-right tabular-nums">{formatDuration(stage.durationSeconds, t)}</TableCell>
                         </TableRow>
                       ))}
                   </TableBody>
                 </Table>
               ) : (
-                <p className="hint">{t("production.reports.noStageDurations")}</p>
+                <p className="text-sm text-muted-foreground">{t("production.reports.noStageDurations")}</p>
               )}
             </section>
           )) : (
-            <p className="hint">{t("production.reports.noTickets")}</p>
+            <p className="text-sm text-muted-foreground">{t("production.reports.noTickets")}</p>
           )}
         </div>
       </CardContent>

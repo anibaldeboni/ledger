@@ -4,6 +4,7 @@ import type { TFunction } from "i18next";
 import { Download } from "lucide-react";
 import { LedgerService } from "../../bindings/ledger";
 import type { ProductionReport } from "../../bindings/ledger/internal/domain/models";
+import { PageHeader } from "../components/page-header";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "../components/ui/field";
@@ -56,16 +57,14 @@ export default function ProductionReports() {
   }
 
   return (
-    <div className="production-page production-reports-page">
-      <header className="page-head">
-        <div>
-          <h1>{t("production.reports.title")}</h1>
-          <p className="hint">{t("production.reports.description")}</p>
-        </div>
-      </header>
+    <div className="space-y-5">
+      <PageHeader
+        title={t("production.reports.title")}
+        description={t("production.reports.description")}
+      />
 
-      <form className="production-report-period" onSubmit={generate}>
-        <FieldGroup className="production-report-date-fields">
+      <form className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-end" onSubmit={generate}>
+        <FieldGroup className="grid gap-4 sm:grid-cols-2">
           <Field>
             <FieldLabel htmlFor="production-report-start">{t("production.reports.startDate")}</FieldLabel>
             <Input
@@ -80,6 +79,7 @@ export default function ProductionReports() {
                 setPeriodError(null);
                 clearActionError();
               }}
+              className="h-11"
               disabled={busy}
               required
             />
@@ -98,6 +98,7 @@ export default function ProductionReports() {
                 setPeriodError(null);
                 clearActionError();
               }}
+              className="h-11"
               disabled={busy}
               aria-invalid={Boolean(periodError)}
               required
@@ -106,18 +107,18 @@ export default function ProductionReports() {
             {periodError ? <FieldError>{periodError}</FieldError> : null}
           </Field>
         </FieldGroup>
-        <Button type="submit" disabled={busy || !startDate || !endDate}>
+        <Button type="submit" size="lg" className="min-h-11" disabled={busy || !startDate || !endDate}>
           {busy ? t("production.reports.generating") : t("production.reports.generate")}
         </Button>
       </form>
 
-      {actionError ? <p className="error-text" role="alert">{actionError}</p> : null}
+      {actionError ? <p className="text-sm text-destructive" role="alert">{actionError}</p> : null}
       {report ? (
         <>
-          <p className="hint" role="status" aria-live="polite">
+          <p className="text-sm text-muted-foreground" role="status" aria-live="polite">
             {t("production.reports.selectedPeriod", { start: startDate, end: endDate })}
           </p>
-          <div className="production-report-summary">
+          <div className="grid gap-3 sm:grid-cols-2">
             <Card size="sm">
               <CardHeader>
                 <CardDescription>{t("production.reports.completedOrderCount")}</CardDescription>
@@ -130,24 +131,26 @@ export default function ProductionReports() {
                 <CardTitle>{report.cancelledOrderCount}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="hint">{t("production.reports.cancelledOrderExplanation")}</p>
+                <p className="text-sm text-muted-foreground">{t("production.reports.cancelledOrderExplanation")}</p>
               </CardContent>
             </Card>
           </div>
-          <div className="production-report-export">
-            <Button type="button" variant="outline" onClick={exportCsv}>
+          <div className="flex justify-end">
+            <Button type="button" variant="outline" size="lg" className="min-h-11" onClick={exportCsv}>
               <Download data-icon="inline-start" aria-hidden="true" />
               {t("production.reports.exportCsv")}
             </Button>
           </div>
           {report.orders?.length ? (
-            <div className="production-report-order-list">
+            <div className="grid gap-4">
               {report.orders.map((order) => (
                 <ProductionReportOrderCard key={order.orderId} order={order} locale={locale} />
               ))}
             </div>
           ) : (
-            <div className="empty" role="status">{t("production.reports.noCompletedOrders")}</div>
+            <div className="rounded-xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground" role="status">
+              {t("production.reports.noCompletedOrders")}
+            </div>
           )}
         </>
       ) : null}
