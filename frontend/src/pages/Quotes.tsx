@@ -58,8 +58,6 @@ function SortButton(props: {
 
   const alignText = (a: String) => {
     switch (a) {
-      case "left":
-        return "justify-start";
       case "right":
         return "justify-end";
       case "center":
@@ -216,12 +214,12 @@ export default function Quotes({
                 <TableHead className="w-36 text-right">
                   {t("quotes.table.finalPrice")}
                 </TableHead>
-                <TableHead className="w-40 text-center">
+                <TableHead className="w-40 text-right">
                   <SortButton
                     label={t("quotes.table.updated")}
                     active={sort.key === "updated"}
                     dir={sort.dir}
-                    align="center"
+                    align="right"
                     onClick={() => toggleSort("updated")}
                   />
                 </TableHead>
