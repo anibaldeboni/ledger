@@ -50,17 +50,31 @@ function SortButton(props: {
   label: string;
   active: boolean;
   dir: QuoteSort["dir"];
-  align?: "left" | "right";
+  align?: "left" | "right" | "center";
   onClick: () => void;
 }) {
   const { label, active, dir, align = "left", onClick } = props;
   const { t } = useTranslation();
+
+  const alignText = (a: String) => {
+    switch (a) {
+      case "left":
+        return "justify-start";
+      case "right":
+        return "justify-end";
+      case "center":
+        return "justify-center";
+      default:
+        return "justify-start";
+    }
+  };
+
   return (
     <Button
       type="button"
       variant="ghost"
       size="lg"
-      className={`min-h-11 min-w-0 gap-1 px-0 text-left text-sm font-medium text-foreground hover:bg-transparent hover:text-primary ${align === "right" ? "justify-end" : "justify-start"}`}
+      className={`min-h-11 min-w-0 gap-1 px-0 text-left text-sm font-medium text-foreground hover:bg-transparent hover:text-primary ${alignText(align)}`}
       onClick={onClick}
       aria-label={
         active
@@ -202,12 +216,12 @@ export default function Quotes({
                 <TableHead className="w-36 text-right">
                   {t("quotes.table.finalPrice")}
                 </TableHead>
-                <TableHead className="w-40">
+                <TableHead className="w-40 text-center">
                   <SortButton
                     label={t("quotes.table.updated")}
                     active={sort.key === "updated"}
                     dir={sort.dir}
-                    align="right"
+                    align="center"
                     onClick={() => toggleSort("updated")}
                   />
                 </TableHead>
