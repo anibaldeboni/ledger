@@ -48,6 +48,19 @@ for (const [token, value] of [
 }
 
 const config = JSON.parse(readFileSync(new URL("../../components.json", import.meta.url), "utf8"));
+const mainClass = app.match(/<main id="main-content" className="([^"]+)"/)?.[1] ?? "";
+assert.ok(mainClass.split(/\s+/).includes("md:overflow-y-auto"), "the desktop main region must own scrolling");
+assert.ok(!mainClass.split(/\s+/).includes("overflow-y-auto"), "the document must own scrolling below the desktop breakpoint");
+assert.match(
+  styles,
+  /@media\s*\(min-width:\s*48rem\)\s*\{[\s\S]*?html,\s*body,\s*#root\s*\{[^}]*height:\s*100%;/,
+  "the desktop app root must fill the viewport",
+);
+assert.match(
+  styles,
+  /@media\s*\(min-width:\s*48rem\)\s*\{[\s\S]*?html,\s*body\s*\{[^}]*overflow:\s*hidden;/,
+  "the desktop document must not scroll alongside main",
+);
 assert.doesNotMatch(html, /<html[^>]*class="dark"/, "the redesigned light palette is the default");
 const themeStorageKey = app.match(/const THEME_STORAGE_KEY = "([^"]+)"/)?.[1];
 assert.ok(themeStorageKey, "the app must define a persistent theme key");

@@ -125,7 +125,7 @@ export default function App() {
           </label>
         </div>
       </nav>
-      <main id="main-content" className="min-h-0 min-w-0 overflow-y-auto px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      <main id="main-content" className="min-h-0 min-w-0 px-4 py-6 sm:px-6 sm:py-8 md:overflow-y-auto lg:px-8">
         <div className={view.page === "production" ? "w-full" : "mx-auto w-full max-w-7xl"}>
           {view.page === "quotes" ? (
             <Quotes

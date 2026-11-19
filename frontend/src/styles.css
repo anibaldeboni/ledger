@@ -148,6 +148,17 @@
     min-height: 100%;
     margin: 0;
   }
+  @media (min-width: 48rem) {
+    html,
+    body,
+    #root {
+      height: 100%;
+    }
+    html,
+    body {
+      overflow: hidden;
+    }
+  }
   body {
     @apply bg-background font-sans text-base text-foreground antialiased;
     line-height: 1.5;
